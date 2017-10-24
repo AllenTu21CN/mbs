@@ -1,0 +1,9 @@
+stages:
+  - build
+  
+job:
+  stage: build
+  script:
+    - sh gitlab-ci.sh
+  only:
+    - master

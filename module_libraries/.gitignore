@@ -1,0 +1,6 @@
+/build
+jniLibs/
+.cproject
+/src/main/cpp/avalon/
+sanp_mpx_mc_protocol_*.h
+sanp_mpx_mc_tools_*.h

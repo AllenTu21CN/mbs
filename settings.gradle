@@ -1,0 +1,1 @@
+include ':app_mp100', ':module_libraries', ':module_mediacontrol'
