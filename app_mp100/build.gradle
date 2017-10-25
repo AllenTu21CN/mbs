@@ -8,6 +8,7 @@ android {
         targetSdkVersion 23
         applicationId 'sanp.mp100'
         versionName 'V0.0.0'
+        versionCode 0
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -50,4 +51,5 @@ dependencies {
 
     // used for wamp-autobahn
     implementation 'com.android.support.constraint:constraint-layout:+'
+    compile 'com.google.code.gson:gson:2.8.0'
 }
