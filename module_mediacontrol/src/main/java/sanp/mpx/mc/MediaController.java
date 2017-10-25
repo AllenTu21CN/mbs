@@ -45,7 +45,7 @@ import sanp.avalon.libs.media.base.AVDefines.DataType;
 public class MediaController implements MediaEngine.Callback, IOEngine.IOSession.Observer, Runnable {
     private static final String TAG = "MediaController";
 
-    public static final String SAVE_PATH = System.getenv("EXTERNAL_STORAGE") + "/Dapanji";
+    public static final String SAVE_PATH = System.getenv("EXTERNAL_STORAGE") + "/MPX";
     public static final String BACKGROUND_DEFAULT_COLOR = "#121212";
     public static final String BACKGROUND_DEFAULT_IMAGE = "none";
 
@@ -2880,14 +2880,14 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 //                    "rtsp://10.1.83.201:5000/main.h264",
 //                    "rtsp://10.1.83.200:5000/main.h264",
 //                    "rtsp://10.1.83.201:5000/main.h264",
-//                    Environment.getExternalStorageDirectory() + "/Dapanji/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
-//                    Environment.getExternalStorageDirectory() + "/Dapanji/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
-//                    Environment.getExternalStorageDirectory() + "/Dapanji/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
-//                    Environment.getExternalStorageDirectory() + "/Dapanji/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
-                    Environment.getExternalStorageDirectory() + "/Dapanji/test_720p_24fps_1mbps_17secs.mp4?loop=true",
-                    Environment.getExternalStorageDirectory() + "/Dapanji/test_720p_24fps_1mbps_17secs.mp4?loop=true",
-//                    Environment.getExternalStorageDirectory() + "/Dapanji/test_720p_24fps_1mbps_17secs.mp4?loop=true",
-//                    Environment.getExternalStorageDirectory() + "/Dapanji/test_720p_24fps_1mbps_17secs.mp4?loop=true",
+//                    Environment.getExternalStorageDirectory() + "/MPX/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
+//                    Environment.getExternalStorageDirectory() + "/MPX/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
+//                    Environment.getExternalStorageDirectory() + "/MPX/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
+//                    Environment.getExternalStorageDirectory() + "/MPX/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
+                    Environment.getExternalStorageDirectory() + "/MPX/test_720p_24fps_1mbps_17secs.mp4?loop=true",
+                    Environment.getExternalStorageDirectory() + "/MPX/test_720p_24fps_1mbps_17secs.mp4?loop=true",
+//                    Environment.getExternalStorageDirectory() + "/MPX/test_720p_24fps_1mbps_17secs.mp4?loop=true",
+//                    Environment.getExternalStorageDirectory() + "/MPX/test_720p_24fps_1mbps_17secs.mp4?loop=true",
             };
             final String[] gEncodingUrls = {
                     /*0*/Environment.getExternalStorageDirectory() + "/test1080p",
@@ -2953,7 +2953,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             final String[] sourceUrls = {
                 "capture://none?type=video&id=0",
 //                "capture://none?type=video&id=1",
-//                Environment.getExternalStorageDirectory() + "/Dapanji/test_1080p.mp4?loop=true",
+//                Environment.getExternalStorageDirectory() + "/MPX/test_1080p.mp4?loop=true",
 //                Environment.getExternalStorageDirectory() + "/sample/test-2.mp4?loop=true",
 //                Environment.getExternalStorageDirectory() + "/sample/test-3.mp4?loop=true",
 //                "rtsp://10.1.83.200:5000/main.h264",

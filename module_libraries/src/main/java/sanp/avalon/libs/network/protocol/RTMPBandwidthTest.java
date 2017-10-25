@@ -18,7 +18,7 @@ public class RTMPBandwidthTest {
     }
 
     static private RTMPBandwidthTest mRTMPBandwidthTest = null;
-    static private final String resPath = System.getenv("EXTERNAL_STORAGE") +"/Dapanji";
+    static private final String resPath = System.getenv("EXTERNAL_STORAGE") +"/MPX";
     static private final String h264StreamFile = "speed0_h264";
     static private final String h264IndexFile  = h264StreamFile + "_idx";
     static private final String h264SPSFile    = h264StreamFile + "_sps";

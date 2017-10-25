@@ -12,7 +12,7 @@ public class LogManager {
      * 日志打印开关
      */
     private final static boolean IS_DEBUG_ON = true;
-    public final static String APP_TAG = "DaPanJi";
+    public final static String APP_TAG = "MPX";
 
     public final static String LOG_TAG = "";
 
