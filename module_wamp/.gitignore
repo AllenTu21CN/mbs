@@ -5,3 +5,4 @@ gen/*
 !libs/*
 .sconsign.dblite
 _upload
+/build
