@@ -41,6 +41,8 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
     private Button mBtnGetProvinces2;
     private Button mBtnGetCities;
     private Button mBtnGetCities2;
+    private Button mBtnGetLessonTimetable;
+    private Button mBtnGetLessonTimetable2;
 
     private Handler mHandler = null;
 
@@ -73,6 +75,12 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
 
         mBtnGetCities2 = (Button) findViewById(R.id.btn_getCities2);
         mBtnGetCities2.setOnClickListener(this);
+
+        mBtnGetLessonTimetable = (Button) findViewById(R.id.btn_getLessonTimetable);
+        mBtnGetLessonTimetable.setOnClickListener(this);
+
+        mBtnGetLessonTimetable2 = (Button) findViewById(R.id.btn_getLessonTimetable2);
+        mBtnGetLessonTimetable2.setOnClickListener(this);
 
         mBtnConnect = (Button) findViewById(R.id.btn_connect);
         mBtnConnect.setOnClickListener(this);
@@ -137,6 +145,12 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
                 break;
             case R.id.btn_getCities2:
                 invokeFuncGetCities2(mBtnGetCities2);
+                break;
+            case R.id.btn_getLessonTimetable:
+                invokeFuncGetLessonTimetable(mBtnGetLessonTimetable);
+                break;
+            case R.id.btn_getLessonTimetable2:
+                invokeFuncGetLessonTimetable2(mBtnGetLessonTimetable2);
                 break;
         }
     }
@@ -315,6 +329,49 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
         LogManager.e("after invokeFuncGetCities2: " + ret);
     }
 
+    private void invokeFuncGetLessonTimetable(Button btn) {
+        LogManager.e("invokeFuncGetLessonTimetable");
+        btn.setEnabled(false);
+
+        try {
+            List<BusinessPlatform.TimeTable> tables = mBusinessPlatform.getLessonTimetable(1, "2017-10-16", "2017-10-22");
+            mMsg += "getLessonTimetable relust:\n";
+            for(BusinessPlatform.TimeTable item: tables) {
+                mMsg += item.id + "," + item.type + "," + item.subject_name + "," + item.title + "," + item.date + "\n";
+            }
+            mMsg += "----\n";
+            mMsgText.setText(mMsg);
+        } catch (InterruptedException | InternalError e) {
+            e.printStackTrace();
+        }
+
+        btn.setEnabled(true);
+        LogManager.e("after invokeFuncGetLessonTimetable");
+    }
+
+    private void invokeFuncGetLessonTimetable2(Button btn) {
+        btn.setEnabled(false);
+
+        LogManager.e("invokeFuncGetLessonTimetable2");
+        int ret = mBusinessPlatform.getLessonTimetable(1, "2017-10-16", "2017-10-22",
+                (value, args, kwargs) -> {
+                    if(value == 0) {
+                        mMsg += "getLessonTimetable relust:\n";
+                        for(Object item: args) {
+                            BusinessPlatform.TimeTable table = (BusinessPlatform.TimeTable) item;
+                            mMsg += table.id + "," + table.type + "," + table.subject_name + "," + table.title + "," + table.date + "\n";
+                        }
+                        mMsg += "----\n";
+                        flushMsgView();
+                    } else {
+                        LogManager.e("invokeFuncGetLessonTimetable2 fail: " + kwargs.get("message"));
+                    }
+                    setBtnEnable(btn, true);
+                }
+        );
+        LogManager.e("after invokeFuncGetLessonTimetable2: " + ret);
+    }
+
     private void setBtnEnable(Button btn, boolean able) {
         mHandler.sendMessage(Message.obtain(mHandler, 0, able?1:0, 0, btn));
     }
@@ -331,6 +388,8 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
             setBtnEnable(mBtnGetProvinces2, able);
             setBtnEnable(mBtnGetCities, able);
             setBtnEnable(mBtnGetCities2, able);
+            setBtnEnable(mBtnGetLessonTimetable, able);
+            setBtnEnable(mBtnGetLessonTimetable2, able);
         } else {
             mBtnSum.setEnabled(able);
             mBtnSum2.setEnabled(able);
@@ -338,6 +397,8 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
             mBtnGetProvinces2.setEnabled(able);
             mBtnGetCities.setEnabled(able);
             mBtnGetCities2.setEnabled(able);
+            mBtnGetLessonTimetable.setEnabled(able);
+            mBtnGetLessonTimetable2.setEnabled(able);
         }
     }
 

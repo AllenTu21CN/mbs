@@ -51,20 +51,20 @@ public class BusinessPlatform implements Runnable {
     }
 
     public class School {
-        public String id;
+        public long id;
         public String name;
         public String type;
         public String role;
     }
 
     public class SchoolClass {
-        public String id;
+        public long id;
         public String name;
         public String type;
     }
 
     public class TimeTable {
-        public String id;
+        public long id;
         public String type;
         public String subject_id;
         public String subject_name;
@@ -369,6 +369,8 @@ public class BusinessPlatform implements Runnable {
     }
 
     /**
+     * @param start_date: e.g. "2017-10-16"
+     * @param end_date: e.g. "2017-10-22"
      * @param resultCallback:
      *      if the resultCallback::value is 0, that means the action has been done successfully,
      *  get result(List<TimeTable>) from resultCallback::args
