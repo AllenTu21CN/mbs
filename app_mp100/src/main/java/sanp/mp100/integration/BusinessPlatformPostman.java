@@ -25,79 +25,10 @@ import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.R;
 
 /**
- * Created by Tuyj on 2017/10/25.
+ * Created by Tuyj on 2017/10/27.
  */
 
-public class BusinessPlatform {
-
-    public interface Callback {
-        void done(int value, List<Object> args, Map<String, Object> kwargs);
-    }
-
-    public class Province {
-        public String id;
-        public String province;
-    }
-
-    public class City {
-        public String id;
-        public String province;
-        public String city;
-    }
-
-    public class District {
-        public String id;
-        public String province;
-        public String city;
-        public String district;
-    }
-
-    public class School {
-        public long id;
-        public String name;
-        public String type;
-        public String role;
-    }
-
-    public class SchoolClass {
-        public long id;
-        public String name;
-        public String type;
-    }
-
-    public class TimeTable {
-        public long id;
-        public String type;
-        public String subject_id;
-        public String subject_name;
-        public String title;
-        public String teacher_id;
-        public String teacher_name;
-        public String date;
-        public String section;
-        public String duration;
-        public String status;
-    }
-
-    public class Organization {
-        public Province province;
-        public City city;
-        public District district;
-        public School school;
-        public SchoolClass schoolClass;
-    }
-
-    private static BusinessPlatform gBusinessPlatform = null;
-    public static BusinessPlatform getInstance() {
-        if (gBusinessPlatform == null) {
-            synchronized (BusinessPlatform.class) {
-                if (gBusinessPlatform == null) {
-                    gBusinessPlatform = new BusinessPlatform();
-                }
-            }
-        }
-        return gBusinessPlatform;
-    }
+public class BusinessPlatformPostman implements Runnable {
 
     private enum State {
         NONE(0),
@@ -130,16 +61,9 @@ public class BusinessPlatform {
     private Object mRunningLock = new Object();
     private Handler mHandler = null;
 
-    private Boolean mInited = false;
-    private Boolean mActivated = false;
-    private Boolean mBound = false;
-    private Context mContext = null;
-    private SharedPreferences mSharedPref = null;
-    private Organization mOrganization = null;
-
-    BusinessPlatform() {
+    BusinessPlatformPostman() {
         if (mThread == null) {
-            mThread = new Thread(this, "BusinessPlatform");
+            mThread = new Thread(this, "BusinessPlatformPostman");
             mThread.start();
             waitUntilReady();
         }
@@ -169,7 +93,7 @@ public class BusinessPlatform {
 
                     ...; 将BusinessPlatform拆分成postman和BusinessPlatforml
 
-                    mOrganization = new Organization();
+                            mOrganization = new Organization();
                 }
 
                 mInited = true;
@@ -594,7 +518,7 @@ public class BusinessPlatform {
 
     @Override
     public void run() {
-        LogManager.i("BusinessPlatform thread started!");
+        LogManager.i("BusinessPlatformPostman thread started!");
         Looper.prepare();
         mHandler = new Handler() {
             public void handleMessage(Message msg) {
@@ -616,7 +540,7 @@ public class BusinessPlatform {
         notifyReady();
         Looper.loop();
         notifyOver();
-        LogManager.i("BusinessPlatform thread exit...!");
+        LogManager.i("BusinessPlatformPostman thread exit...!");
     }
 
     private void tryConnect() {
@@ -672,7 +596,7 @@ public class BusinessPlatform {
     }
 
     private void onReady(Session session, SessionDetails details, Callback actionCallback, Callback onStateChanged) {
-        LogManager.i("BusinessPlatform(" + session.getID() + ") onReady");
+        LogManager.i("BusinessPlatformPostman(" + session.getID() + ") onReady");
         synchronized (mLock) {
             mState = State.READY;
             if(onStateChanged != null) {
@@ -689,7 +613,7 @@ public class BusinessPlatform {
     }
 
     private void onDisconnected(Session session, boolean wasClean, Callback cb) {
-        LogManager.i("BusinessPlatform(" + session.getID() + ") onDisconnected with" + (wasClean?"clean":"un-clean"));
+        LogManager.i("BusinessPlatformPostman(" + session.getID() + ") onDisconnected with" + (wasClean?"clean":"un-clean"));
         synchronized (mLock) {
             mState = State.NONE;
             if(cb != null) {
@@ -701,10 +625,10 @@ public class BusinessPlatform {
     }
 
     private void onConnecting(Session session) {
-        LogManager.i("BusinessPlatform(" + session.getID() + ") onConnecting");
+        LogManager.i("BusinessPlatformPostman(" + session.getID() + ") onConnecting");
     }
 
     private void onDisconnecting(Session session, CloseDetails closeDetails) {
-        LogManager.i(String.format("BusinessPlatform(%lld) onDisconnecting with [reason=%s] [message=%s]", session.getID(), closeDetails.reason, closeDetails.message));
+        LogManager.i(String.format("BusinessPlatformPostman(%lld) onDisconnecting with [reason=%s] [message=%s]", session.getID(), closeDetails.reason, closeDetails.message));
     }
 }

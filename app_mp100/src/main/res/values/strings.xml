@@ -2,4 +2,8 @@
     <string name="app_name">MP100</string>
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send</string>
+
+    <string name="my_preferences">sanp.mp100.my_preferences</string>
+    <string name="has_activated">has_activated</string>
+    <string name="my_organization">my_org</string>
 </resources>

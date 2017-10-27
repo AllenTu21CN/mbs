@@ -1,8 +1,7 @@
-package sanp.mp100;
+package sanp.mp100.ui.test;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -16,6 +15,7 @@ import java.util.Map;
 import io.crossbar.autobahn.wamp.types.CallResult;
 
 import sanp.avalon.libs.base.utils.LogManager;
+import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatform;
 
 public class BusinessPlatformTestActivity extends AppCompatActivity implements View.OnClickListener {
