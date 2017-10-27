@@ -1,6 +1,9 @@
 package sanp.mp100;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -28,11 +31,18 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
     private TextView mMsgText;
     private String mMsg = "";
 
+    private Button mBtnConnect;
+    private Button mBtnConnect2;
+    private Button mBtnDisConnect;
+
     private Button mBtnSum;
     private Button mBtnSum2;
     private Button mBtnGetProvinces;
-    private Button mBtnConnect;
-    private Button mBtnDisConnect;
+    private Button mBtnGetProvinces2;
+    private Button mBtnGetCities;
+    private Button mBtnGetCities2;
+
+    private Handler mHandler = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +54,8 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
         mMsgText = (TextView) findViewById(R.id.text_result);
         mMsgText.setText(mMsg);
 
+        findViewById(R.id.button_clean_msg).setOnClickListener(this);
+
         mBtnSum = (Button) findViewById(R.id.btn_sum);
         mBtnSum.setOnClickListener(this);
 
@@ -53,62 +65,107 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
         mBtnGetProvinces = (Button) findViewById(R.id.btn_getProvinces);
         mBtnGetProvinces.setOnClickListener(this);
 
+        mBtnGetProvinces2 = (Button) findViewById(R.id.btn_getProvinces2);
+        mBtnGetProvinces2.setOnClickListener(this);
+
+        mBtnGetCities = (Button) findViewById(R.id.btn_getCities);
+        mBtnGetCities.setOnClickListener(this);
+
+        mBtnGetCities2 = (Button) findViewById(R.id.btn_getCities2);
+        mBtnGetCities2.setOnClickListener(this);
+
         mBtnConnect = (Button) findViewById(R.id.btn_connect);
         mBtnConnect.setOnClickListener(this);
+
+        mBtnConnect2 = (Button) findViewById(R.id.btn_connect2);
+        mBtnConnect2.setOnClickListener(this);
 
         mBtnDisConnect = (Button) findViewById(R.id.btn_disconnect);
         mBtnDisConnect.setOnClickListener(this);
 
         mBtnConnect.setEnabled(true);
+        mBtnConnect2.setEnabled(true);
         mBtnDisConnect.setEnabled(false);
-        enableInvoke(false);
+        enableInvoke(false, false);
+
+        mHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case 0:
+                        ((Button)msg.obj).setEnabled(msg.arg1!=0);
+                        break;
+                    case 1:
+                        mMsgText.setText(mMsg);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.button_clean_msg:
+                mMsg = "";
+                mMsgText.setText(mMsg);
+                break;
             case R.id.btn_connect:
-                //connectRemote();
+                connectRemote();
+                break;
+            case R.id.btn_connect2:
                 connectRemote2();
                 break;
             case R.id.btn_disconnect:
                 disconnectRemote();
                 break;
             case R.id.btn_sum:
-                invokeFuncSum2(mBtnSum, "");
+                invokeFuncSum(mBtnSum, "");
                 break;
             case R.id.btn_sum2:
                 invokeFuncSum2(mBtnSum2, "2");
                 break;
             case R.id.btn_getProvinces:
-                //invokeFuncGetProvinces(mBtnGetProvinces);
-                invokeFuncGetProvinces2(mBtnGetProvinces);
+                invokeFuncGetProvinces(mBtnGetProvinces);
+                break;
+            case R.id.btn_getProvinces2:
+                invokeFuncGetProvinces2(mBtnGetProvinces2);
+                break;
+            case R.id.btn_getCities:
+                invokeFuncGetCities(mBtnGetCities);
+                break;
+            case R.id.btn_getCities2:
+                invokeFuncGetCities2(mBtnGetCities2);
                 break;
         }
     }
 
     private void connectRemote() {
         mBtnConnect.setEnabled(false);
+        mBtnConnect2.setEnabled(false);
 
         // finally, provide everything to a Client instance and connect
         LogManager.e("call connect");
-        int ret = mBusinessPlatform.syncConnect(websocketURL1, realm1, this::onBusinessPlatformStateChanged);
+        int ret = mBusinessPlatform.syncConnect(websocketURL2, realm2, this::onBusinessPlatformStateChanged);
         LogManager.e("after connect: " + ret);
 
-        if(ret < 0)
-            mBtnConnect.setEnabled(true);
+        onBusinessPlatformStateChanged(ret == 0 ? 1 : 0, null, null);
     }
 
     private void connectRemote2() {
         mBtnConnect.setEnabled(false);
+        mBtnConnect2.setEnabled(false);
 
         // finally, provide everything to a Client instance and connect
         LogManager.e("call connect");
         int ret = mBusinessPlatform.asyncConnect(websocketURL2, realm2, this::onBusinessPlatformStateChanged);
         LogManager.e("after connect: " + ret);
 
-        if(ret < 0)
+        if(ret != 0) {
             mBtnConnect.setEnabled(true);
+            mBtnConnect2.setEnabled(true);
+        }
     }
 
     private void disconnectRemote() {
@@ -119,28 +176,30 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
         int ret = mBusinessPlatform.disconnect();
         LogManager.e("after leave: " + ret);
 
-        if(ret < 0)
+        if(ret != 0)
             mBtnDisConnect.setEnabled(true);
     }
 
     private void invokeFuncSum(Button btn, String suffix) {
+        String procedureName = "sum" + suffix;
+        LogManager.e("invoke " + procedureName);
         btn.setEnabled(false);
 
-        String procedureName = "sum" + suffix;
         List<Object> args = new ArrayList<>();
         for(int i = 1; i < 4 ; ++i)
             args.add(i);
 
-        LogManager.e("invoke " + procedureName);
-        CallResult result = mBusinessPlatform.syncInvoke(procedureName, args, null);
-        if (result != null) {
+        try {
+            CallResult result = mBusinessPlatform.syncInvoke(procedureName, args, null);
             LogManager.i("Sum: " + result.results.get(0));
             mMsg += result.results.get(0) + "\n";
             mMsgText.setText(mMsg);
+        } catch (InterruptedException | InternalError e) {
+            e.printStackTrace();
         }
-        LogManager.e("after " + procedureName);
 
         btn.setEnabled(true);
+        LogManager.e("after " + procedureName);
     }
 
     private void invokeFuncSum2(Button btn, String suffix) {
@@ -160,32 +219,34 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
                     if(value == 0) {
                         LogManager.i("Sum: " + args.get(0));
                         mMsg += args.get(0) + "\n";
-                        mMsgText.setText(mMsg);
+                        flushMsgView();
                     } else {
                         LogManager.e("invokeFuncSum2 fail: " + kwargs.get("message"));
                     }
-                    btn.setEnabled(true);
+                    setBtnEnable(btn, true);
                 }
         );
         LogManager.e("after " + procedureName + ": " + ret);
     }
 
     private void invokeFuncGetProvinces(Button btn) {
+        LogManager.e("invokeFuncGetProvinces");
         btn.setEnabled(false);
 
-        LogManager.e("invokeFuncGetProvinces");
-        List<BusinessPlatform.Province> provinces = mBusinessPlatform.getAreaProvinces();
-        if(provinces != null) {
+        try {
+            List<BusinessPlatform.Province> provinces = mBusinessPlatform.getAreaProvinces();
             mMsg += "getAreaProvinces relust:\n";
             for(BusinessPlatform.Province item: provinces) {
                 mMsg += item.id + "," + item.province + "\n";
             }
             mMsg += "----\n";
             mMsgText.setText(mMsg);
+        } catch (InterruptedException | InternalError e) {
+            e.printStackTrace();
         }
-        LogManager.e("after invokeFuncGetProvinces");
 
         btn.setEnabled(true);
+        LogManager.e("after invokeFuncGetProvinces");
     }
 
     private void invokeFuncGetProvinces2(Button btn) {
@@ -201,33 +262,98 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
                             mMsg += province.id + "," + province.province + "\n";
                         }
                         mMsg += "----\n";
-                        mMsgText.setText(mMsg);
+                        flushMsgView();
                     } else {
                         LogManager.e("invokeFuncGetProvinces2 fail: " + kwargs.get("message"));
                     }
-                    btn.setEnabled(true);
+                    setBtnEnable(btn, true);
                 }
         );
         LogManager.e("after invokeFuncGetProvinces2: " + ret);
     }
 
-    private void enableInvoke(boolean able) {
-        mBtnSum.setEnabled(able);
-        mBtnSum2.setEnabled(able);
-        mBtnGetProvinces.setEnabled(able);
+    private void invokeFuncGetCities(Button btn) {
+        LogManager.e("invokeFuncGetCities");
+        btn.setEnabled(false);
+
+        try {
+            List<BusinessPlatform.City> cities = mBusinessPlatform.getAreaCitiesByProvince("广东省");
+            mMsg += "getAreaCitiesByProvince relust:\n";
+            for(BusinessPlatform.City item: cities) {
+                mMsg += item.id + "," + item.city + "\n";
+            }
+            mMsg += "----\n";
+            mMsgText.setText(mMsg);
+        } catch (InterruptedException | InternalError e) {
+            e.printStackTrace();
+        }
+
+        btn.setEnabled(true);
+        LogManager.e("after invokeFuncGetCities");
+    }
+
+    private void invokeFuncGetCities2(Button btn) {
+        btn.setEnabled(false);
+
+        LogManager.e("invokeFuncGetCities2");
+        int ret = mBusinessPlatform.getAreaCitiesByProvince("广东省",
+                (value, args, kwargs) -> {
+                    if(value == 0) {
+                        mMsg += "getAreaCitiesByProvince relust:\n";
+                        for(Object item: args) {
+                            BusinessPlatform.City city = (BusinessPlatform.City) item;
+                            mMsg += city.id + "," + city.city + "\n";
+                        }
+                        mMsg += "----\n";
+                        flushMsgView();
+                    } else {
+                        LogManager.e("invokeFuncGetCities2 fail: " + kwargs.get("message"));
+                    }
+                    setBtnEnable(btn, true);
+                }
+        );
+        LogManager.e("after invokeFuncGetCities2: " + ret);
+    }
+
+    private void setBtnEnable(Button btn, boolean able) {
+        mHandler.sendMessage(Message.obtain(mHandler, 0, able?1:0, 0, btn));
+    }
+
+    private void flushMsgView() {
+        mHandler.sendMessage(Message.obtain(mHandler, 1));
+    }
+
+    private void enableInvoke(boolean able, boolean async) {
+        if(async) {
+            setBtnEnable(mBtnSum, able);
+            setBtnEnable(mBtnSum2, able);
+            setBtnEnable(mBtnGetProvinces, able);
+            setBtnEnable(mBtnGetProvinces2, able);
+            setBtnEnable(mBtnGetCities, able);
+            setBtnEnable(mBtnGetCities2, able);
+        } else {
+            mBtnSum.setEnabled(able);
+            mBtnSum2.setEnabled(able);
+            mBtnGetProvinces.setEnabled(able);
+            mBtnGetProvinces2.setEnabled(able);
+            mBtnGetCities.setEnabled(able);
+            mBtnGetCities2.setEnabled(able);
+        }
     }
 
     private void onBusinessPlatformStateChanged(int connected, List<Object> useless1, Map<String, Object> useless2) {
         if(connected == 0) {
             LogManager.i("Disconnect from BusinessPlatform");
-            mBtnConnect.setEnabled(true);
-            mBtnDisConnect.setEnabled(false);
-            enableInvoke(false);
+            setBtnEnable(mBtnConnect, true);
+            setBtnEnable(mBtnConnect2, true);
+            setBtnEnable(mBtnDisConnect, false);
+            enableInvoke(false, true);
         } else {
             LogManager.i("Has connected with BusinessPlatform");
-            mBtnConnect.setEnabled(false);
-            mBtnDisConnect.setEnabled(true);
-            enableInvoke(true);
+            setBtnEnable(mBtnConnect, false);
+            setBtnEnable(mBtnConnect2, false);
+            setBtnEnable(mBtnDisConnect, true);
+            enableInvoke(true, true);
         }
     }
 }

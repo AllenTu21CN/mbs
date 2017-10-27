@@ -1,5 +1,9 @@
 package sanp.mp100.integration;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 
@@ -22,7 +26,7 @@ import sanp.avalon.libs.base.utils.LogManager;
  * Created by Tuyj on 2017/10/25.
  */
 
-public class BusinessPlatform {
+public class BusinessPlatform implements Runnable {
 
     public interface Callback {
         void done(int value, List<Object> args, Map<String, Object> kwargs);
@@ -100,24 +104,48 @@ public class BusinessPlatform {
         }
     };
 
+    private static final int MSG_CONNECT = 0;
+    private static final int MSG_STOP_LOOP = -1;
+
+    private static final long THREAD_EXIT_TIMEOUT_MS = 1000;
+
     private String mWebSocketURL = "";
     private String mRealm = "";
     private Session mWAMPSession = null;
     private State mState = State.NONE;
     private Object mLock = new Object();
 
-    BusinessPlatform() {
+    private Thread mThread = null;
+    private boolean mRunning = false;
+    private Object mRunningLock = new Object();
+    private Handler mHandler = null;
 
+    BusinessPlatform() {
+        if (mThread == null) {
+            mThread = new Thread(this, "BusinessPlatform");
+            mThread.start();
+            waitUntilReady();
+        }
+    }
+
+    void release() {
+        if (mThread != null) {
+            mHandler.sendMessage(mHandler.obtainMessage(MSG_STOP_LOOP));
+            waitUntilOver();
+            try {
+                mThread.join(THREAD_EXIT_TIMEOUT_MS);
+            } catch (InterruptedException e) {
+                LogManager.e(e);
+            }
+            mThread = null;
+        }
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: sync-action success
-     *      > 0 : sync-action fail
-     * onStateChanged: value:
-     *      0: disconnected
-     *      > 0: connected
+     * @param onStateChanged, been called while state has been changed
+     *      @param onStateChanged::value, 0-disconnected, otherwise connected
+     *      @param onStateChanged::args, useless
+     *      @param onStateChanged::kwargs, useless
      * */
     public int syncConnect(String websocketURL, String realm, Callback onStateChanged) {
         synchronized(mLock) {
@@ -143,8 +171,13 @@ public class BusinessPlatform {
             );
             mWAMPSession.addOnConnectListener(this::onConnecting);
             mWAMPSession.addOnLeaveListener(this::onDisconnecting);
-            Client client = new Client(mWAMPSession, mWebSocketURL, mRealm);
-            client.connect();
+
+            if(!mHandler.sendMessage(mHandler.obtainMessage(MSG_CONNECT))) {
+                LogManager.e("send looper message to try to connect failed");
+                mState = State.NONE;
+                mWAMPSession = null;
+                return -3;
+            }
 
             while (mState == State.CONNECTING) {
                 try {
@@ -154,22 +187,26 @@ public class BusinessPlatform {
                     LogManager.e("connect interrupted");
                     mState = State.NONE;
                     mWAMPSession = null;
-                    return 2;
+                    return 4;
                 }
             }
 
+            if(mState != State.READY) {
+                mState = State.NONE;
+                mWAMPSession = null;
+                return -5;
+            }
+
             mWAMPSession.removeOnDisconnectListener(dis);
-            return (mState == State.READY ? 0 : 1);
+            return 0;
         }
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * onStateChanged: value:
-     *      0: disconnected
-     *      > 0: connected
+     * @param onStateChanged, been called while state has been changed
+     *      @param onStateChanged::value, 0-disconnected, otherwise connected
+     *      @param onStateChanged::args, useless
+     *      @param onStateChanged::kwargs, useless
      * */
     public int asyncConnect(String websocketURL, String realm, Callback onStateChanged) {
         synchronized(mLock) {
@@ -195,18 +232,16 @@ public class BusinessPlatform {
             );
             mWAMPSession.addOnConnectListener(this::onConnecting);
             mWAMPSession.addOnLeaveListener(this::onDisconnecting);
-            Client client = new Client(mWAMPSession, mWebSocketURL, mRealm);
-            client.connect();
 
+            if(!mHandler.sendMessage(mHandler.obtainMessage(MSG_CONNECT))) {
+                mState = State.NONE;
+                mWAMPSession = null;
+                return -3;
+            }
             return 0;
         }
     }
 
-    /**
-     * return values:
-     *      < 0 : logical error
-     *      0: action success
-     *  */
     public int disconnect() {
         synchronized(mLock) {
             if (mState == State.NONE) {
@@ -229,7 +264,6 @@ public class BusinessPlatform {
         return mState == State.READY;
     }
 
-
     static private final String PROCEDURE_NAME_AREA_GET_PROVINCES   = "area.getProvinces";
     static private final String PROCEDURE_NAME_AREA_GET_CITIES      = "area.getCitiesByProvince";
     static private final String PROCEDURE_NAME_AREA_GET_DISTRICTS   = "area.getDistrictsByCity";
@@ -237,251 +271,165 @@ public class BusinessPlatform {
     static private final String PROCEDURE_NAME_ORG_GET_CLASSES      = "org.getClassesBySchoolId";
     static private final String PROCEDURE_NAME_LESSON_GET_TIMETABLE = "lesson.getTimetable";
 
-    Boolean mProvincesReturened = false;
-    List<Province> mProvinces = null;
-    /**
-     * return values:
-     *      null : sync-action fail
-     *      otherwise: sync-action success
-     * */
-    public List<Province> getAreaProvinces() {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return null;
-            }
-
-            mProvincesReturened = false;
-            mProvinces = null;
-            CompletableFuture<CallResult> f = mWAMPSession.call(PROCEDURE_NAME_AREA_GET_PROVINCES);
-            f.whenComplete((callResult, throwable) -> {
-                synchronized(mProvincesReturened) {
-                    mProvincesReturened = true;
-                    if (throwable == null) {
-                        mProvinces = new ArrayList<>();
-                        Gson gson = new Gson();
-                        for(Object item: callResult.results) {
-                            mProvinces.add(gson.fromJson(item.toString(), Province.class));
-                        }
-                    } else {
-                        LogManager.e("getAreaProvinces error: " + throwable.getMessage());
-                    }
-                    mProvincesReturened.notify();
-                }
-            });
-
-            synchronized(mProvincesReturened) {
-                while (!mProvincesReturened) {
-                    try {
-                        mProvincesReturened.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        LogManager.e("getAreaProvinces interrupted");
-                        return null;
-                    }
-                }
-                return mProvinces;
-            }
-        }
+    public List<Province> getAreaProvinces()
+            throws RuntimeException, InterruptedException, InternalError {
+        List<Province> provinces = new ArrayList<>();
+        syncGetObjectList(provinces, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
+        return provinces;
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * resultCallback:
-     *      if value is 0, it means the action has been done successfully. get result(List<Province>) from args
-     *      otherwise, value is error code, and get error message from kwargs ({"message": "..."})
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result(List<Province>) from resultCallback::args
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getAreaProvinces(Callback resultCallback) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(PROCEDURE_NAME_AREA_GET_PROVINCES);
-            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, Province.class, resultCallback));
-            return 0;
-        }
+        return asyncGetObjectList(resultCallback, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
     }
 
-    public List<City> getAreaCitiesByProvince(String province) {
-        return null;
+    public List<City> getAreaCitiesByProvince(String province)
+            throws RuntimeException, InterruptedException, InternalError {
+        List<City> cities = new ArrayList<>();
+        syncGetObjectList(cities, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
+        return cities;
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * resultCallback:
-     *      if value is 0, it means the action has been done successfully. get result(List<City>) from args
-     *      otherwise, value is error code, and get error message from kwargs ({"message": "..."})
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result(List<City>) from resultCallback::args
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getAreaCitiesByProvince(String province, Callback resultCallback) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(PROCEDURE_NAME_AREA_GET_CITIES, province);
-            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, City.class, resultCallback));
-            return 0;
-        }
+        return asyncGetObjectList(resultCallback, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
     }
 
-    public List<District> getAreaDistrictsByCity(String province, String city) {
-        return null;
+    public List<District> getAreaDistrictsByCity(String province, String city)
+            throws RuntimeException, InterruptedException, InternalError {
+        List<District> districts = new ArrayList<>();
+        syncGetObjectList(districts, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
+        return districts;
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * resultCallback:
-     *      if value is 0, it means the action has been done successfully. get result(List<District>) from args
-     *      otherwise, value is error code, and get error message from kwargs ({"message": "..."})
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result(List<District>) from resultCallback::args
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getAreaDistrictsByCity(String province, String city, Callback resultCallback) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
-            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, District.class, resultCallback));
-            return 0;
-        }
+        return asyncGetObjectList(resultCallback, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
     }
 
-    public List<School> getOrgSchoolsByArea(String province, String city, String district) {
-        return null;
+    public List<School> getOrgSchoolsByArea(String province, String city, String district)
+            throws RuntimeException, InterruptedException, InternalError {
+        List<School> schools = new ArrayList<>();
+        syncGetObjectList(schools, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
+        return schools;
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * resultCallback:
-     *      if value is 0, it means the action has been done successfully. get result(List<School>) from args
-     *      otherwise, value is error code, and get error message from kwargs ({"message": "..."})
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result(List<School>) from resultCallback::args
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getOrgSchoolsByArea(String province, String city, String district, Callback resultCallback) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
-            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, School.class, resultCallback));
-            return 0;
-        }
+        return asyncGetObjectList(resultCallback, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
     }
 
-    public List<SchoolClass> getOrgClassesBySchoolId(long school_id) {
-        return null;
+    public List<SchoolClass> getOrgClassesBySchoolId(long school_id)
+            throws RuntimeException, InterruptedException, InternalError {
+        List<SchoolClass> classes = new ArrayList<>();
+        syncGetObjectList(classes, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
+        return classes;
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * resultCallback:
-     *      if value is 0, it means the action has been done successfully. get result(List<SchoolClass>) from args
-     *      otherwise, value is error code, and get error message from kwargs ({"message": "..."})
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result(List<SchoolClass>) from resultCallback::args
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getOrgClassesBySchoolId(long school_id, Callback resultCallback) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
-            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, SchoolClass.class, resultCallback));
-            return 0;
-        }
+        return asyncGetObjectList(resultCallback, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
     }
 
-    public List<TimeTable> getLessonTimetable(long class_id, String start_date, String end_date) {
-        return null;
+    public List<TimeTable> getLessonTimetable(long class_id, String start_date, String end_date)
+            throws RuntimeException, InterruptedException, InternalError {
+        List<TimeTable> tables = new ArrayList<>();
+        syncGetObjectList(tables, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
+        return tables;
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * resultCallback:
-     *      if value is 0, it means the action has been done successfully. get result(List<TimeTable>) from args
-     *      otherwise, value is error code, and get error message from kwargs ({"message": "..."})
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result(List<TimeTable>) from resultCallback::args
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getLessonTimetable(long class_id, String start_date, String end_date, Callback resultCallback) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
-            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, TimeTable.class, resultCallback));
-            return 0;
-        }
+        return asyncGetObjectList(resultCallback, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
     }
 
-    private Boolean mInvokeReturened = false;
-    private CallResult mCallResult = null;
-    /**
-     * return values:
-     *      null : sync-action fail
-     *      otherwise: sync-action success, then get args and kwargs from CallResult
-     * */
-    public CallResult syncInvoke(String procedureName, List<Object> args, Map<String, Object> kwargs) {
+    public CallResult syncInvoke(String procedureName, List<Object> args, Map<String, Object> kwargs)
+            throws RuntimeException, InterruptedException, InternalError {
+
+        Object lock = new Object();
+        List<Object> rets = new ArrayList<>();
+        CallResult result = new CallResult(null, null);
+
         synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return null;
+            if (mState != State.READY) {
+                throw new RuntimeException("connnet first");
             }
 
-            mInvokeReturened = false;
-            mCallResult = null;
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args, kwargs, (Class<CallResult>) null);
             f.whenComplete((callResult, throwable) -> {
-                synchronized(mInvokeReturened) {
-                    mInvokeReturened = true;
+                synchronized (lock) {
                     if (throwable == null) {
-                        mCallResult = callResult;
+                        result.results = callResult.results;
+                        result.kwresults = callResult.kwresults;
+                        rets.add(0);
                     } else {
                         LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) fail: %s", procedureName, args, kwargs, throwable.getMessage()));
+                        rets.add(-1);
+                        rets.add(throwable.getMessage());
                     }
-                    mInvokeReturened.notify();
+                    lock.notify();
                 }
             });
+        }
 
-            synchronized(mInvokeReturened) {
-                while (!mInvokeReturened) {
-                    try {
-                        mInvokeReturened.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                        LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) interrupted", procedureName, args, kwargs));
-                        return null;
-                    }
+        synchronized(lock) {
+            while (rets.size() == 0) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) interrupted", procedureName, args, kwargs));
+                    throw e;
                 }
-                return mCallResult;
             }
+            if((Integer)rets.get(0) != 0)
+                throw new InternalError((String) rets.get(1));
+            return result;
         }
     }
 
     /**
-     * return values:
-     *      < 0 : logical error
-     *      0: async-action success
-     * resultCallback:
-     *      if value is 0, it means the action has been done successfully. get result from args and kwargs
-     *      otherwise, value is error code, and get error message from kwargs ({"message": "..."})
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result from resultCallback::args and resultCallback::kwargs
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
      * */
     public int asyncInvoke(String procedureName, List<Object> args, Map<String, Object> kwargs, Callback resultCallback) {
         synchronized(mLock) {
@@ -498,6 +446,129 @@ public class BusinessPlatform {
                     resultCallback.done(-2, null, new HashMap<String, Object>(){{put("message", throwable.getMessage());}});
                 }
             });
+            return 0;
+        }
+    }
+
+    @Override
+    public void run() {
+        LogManager.i("BusinessPlatform thread started!");
+        Looper.prepare();
+        mHandler = new Handler() {
+            public void handleMessage(Message msg) {
+                switch (msg.what) {
+                    case MSG_CONNECT: {
+                        tryConnect();
+                        break;
+                    }
+                    case MSG_STOP_LOOP: {
+                        Looper.myLooper().quit();
+                        break;
+                    }
+                    default: {
+                        LogManager.e("Unknown message type: " + msg.what);
+                    }
+                }
+            }
+        };
+        notifyReady();
+        Looper.loop();
+        notifyOver();
+        LogManager.i("BusinessPlatform thread exit...!");
+    }
+
+    private void tryConnect() {
+        Client client = new Client(mWAMPSession, mWebSocketURL, mRealm);
+        client.connect();
+    }
+
+    private void waitUntilReady() {
+        synchronized (mRunningLock) {
+            while (!mRunning) {
+                try {
+                    mRunningLock.wait();
+                } catch (InterruptedException ie) { /* not expected */ }
+            }
+        }
+    }
+
+    private void notifyReady() {
+        synchronized (mRunningLock) {
+            mRunning = true;
+            mRunningLock.notify();
+        }
+    }
+
+    private void waitUntilOver() {
+        synchronized (mRunningLock) {
+            while (mRunning) {
+                try {
+                    mRunningLock.wait();
+                } catch (InterruptedException ie) { /* not expected */ }
+            }
+        }
+    }
+
+    private void notifyOver() {
+        synchronized (mRunningLock) {
+            mRunning = false;
+            mRunningLock.notify();
+        }
+    }
+
+    private <T> void syncGetObjectList(List<T> result, Class<T> classof, String procedureName, Object... args)
+            throws RuntimeException, InterruptedException, InternalError {
+        Object lock = new Object();
+        List<Object> rets = new ArrayList<>();
+
+        synchronized(mLock) {
+            if (mState != State.READY) {
+                throw new RuntimeException("connnet first");
+            }
+
+            CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args);
+            f.whenComplete((callResult, throwable) -> {
+                synchronized (lock) {
+                    if (throwable == null) {
+                        Gson gson = new Gson();
+                        for (Object item : callResult.results) {
+                            result.add(gson.fromJson(item.toString(), classof));
+                        }
+                        rets.add(0);
+                    } else {
+                        LogManager.e(String.format("procedure(%s) error: %s", procedureName, throwable.getMessage()));
+                        rets.add(-1);
+                        rets.add(throwable.getMessage());
+                    }
+                    lock.notify();
+                }
+            });
+        }
+
+        synchronized(lock) {
+            while (rets.size() == 0) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    LogManager.e(procedureName + " interrupted");
+                    throw e;
+                }
+            }
+            if((Integer)rets.get(0) != 0)
+                throw new InternalError((String) rets.get(1));
+        }
+    }
+
+    private <T> int asyncGetObjectList(Callback resultCallback, Class<T> classof, String procedureName, Object... args) {
+        synchronized(mLock) {
+            if(mState != State.READY) {
+                LogManager.w("connnet first");
+                return -1;
+            }
+
+            CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args);
+            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, classof, resultCallback));
             return 0;
         }
     }

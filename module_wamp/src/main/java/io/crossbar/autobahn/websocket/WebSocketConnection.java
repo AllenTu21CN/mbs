@@ -509,7 +509,9 @@ public class WebSocketConnection implements IWebSocket {
      */
     private void createHandler() {
 
-        mMasterHandler = new Handler(Looper.getMainLooper()) {
+        // @tuyj: allow to use the looper in current thread
+        // mMasterHandler = new Handler(Looper.getMainLooper()) {
+        mMasterHandler = new Handler(Looper.myLooper()) {
 
             public void handleMessage(Message msg) {
                 // We have received the closing handshake and replied to it, discard
@@ -603,10 +605,12 @@ public class WebSocketConnection implements IWebSocket {
                             mExecutor.scheduleAtFixedRate(mAutoPinger, mIdleTimeout, mIdleTimeout, TimeUnit.SECONDS);
                             String protocol = getOrDefault(serverHandshake.headers,
                                     "Sec-WebSocket-Protocol", null);
+                            // ------> @tuyj: compat "Sec-Websocket-Protocol"
                             if(protocol == null) {
                                 protocol = getOrDefault(serverHandshake.headers,
                                         "Sec-Websocket-Protocol", null);
                             }
+                            // <------
                             mWsHandler.setConnection(WebSocketConnection.this);
                             mWsHandler.onConnect(new ConnectionResponse(protocol));
                             mWsHandler.onOpen();
