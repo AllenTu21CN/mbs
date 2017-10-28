@@ -6,10 +6,8 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.widget.GridView;
 
-import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,6 +35,8 @@ public class CourseTable extends Activity implements CourseThread.Notify {
 
     // course table view
     private GridView mCourseTable;
+    // course table Monday's date
+    private Date     mCourseTableMonday;
 
     // course adapter
     private CourseAdapter mCourseAdapter = null;
@@ -162,12 +162,13 @@ public class CourseTable extends Activity implements CourseThread.Notify {
         calendar.setTime(date);
 
         // current week: monday's date
-        Date monday = getFirstDateOfWeek(date);
+        mCourseTableMonday = getFirstDateOfWeek(date);
 
-        LogManager.i("Current week, Monday date is: " + format.format(monday));
+        LogManager.i("Current week, Monday date is: " +
+            format.format(mCourseTableMonday));
 
         // checkout this week's courses
-        mCourseThread.checkoutCourse(monday, 7);
+        mCourseThread.checkoutCourse(mCourseTableMonday, 7);
     }
 
     // @brief Updates course table
@@ -187,6 +188,10 @@ public class CourseTable extends Activity implements CourseThread.Notify {
         LogManager.i(courses);
 
         //TODO, update course table view
+        //2017/10/28
+
+        // update course adapter course-list
+        mCourseAdapter.updateCourseList(list, mCourseTableMonday);
 
         // notify to adapter update course table
         mCourseAdapter.notifyDataSetChanged();
@@ -207,5 +212,21 @@ public class CourseTable extends Activity implements CourseThread.Notify {
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
 
         return calendar.getTime();
+    }
+
+    // @brief Calculates days between date1 and date2: date2 - date1
+    public static int daysBetween(Date date1,Date date2)
+    {
+        Calendar cal = Calendar.getInstance();
+
+        cal.setTime(date1);
+        long time1 = cal.getTimeInMillis();
+
+        cal.setTime(date2);
+        long time2 = cal.getTimeInMillis();
+
+        long between_days=(time2-time1)/(1000*3600*24);
+
+        return Integer.parseInt(String.valueOf(between_days));
     }
 }
