@@ -159,7 +159,7 @@ public class CourseThread implements Runnable {
         String date_string = date_format.format(date);
         String end_string  = date_format.format(date);
 
-        long class_id = 0;
+        long class_id = 1;  //TODO, needn't this
         try {
             // checkout courses from classroom(BusinessPlatform)
             mCourseList = mClassRoom.getLessonTimetable(class_id, date_string, end_string);
