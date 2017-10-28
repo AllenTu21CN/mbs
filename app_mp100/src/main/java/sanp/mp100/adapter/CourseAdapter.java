@@ -92,8 +92,16 @@ public class CourseAdapter extends BaseAdapter {
                 continue;
             }
 
+            LogManager.i("Id: " + it.id +
+                    "; Type: " + it.type +
+                    "; Subject Name: " + it.subject_name +
+                    "; Title:  " + it.title +
+                    "; Date: " + it.date + "; days: " + days +
+                    "; Section: "+ it.section + "\n");
+
             // find the course and update course
-            int index = days * 7 + (section - 1);
+            //int index = days * 7 + (section - 1);
+            int index = (section - 1) * 7 + days;
             TimeTable course = mCourseList.get(index);
 
             course.id           = it.id;

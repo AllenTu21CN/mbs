@@ -175,6 +175,8 @@ public class CourseTable extends Activity implements CourseThread.Notify {
     private void updateCourseTable(List<TimeTable> list) {
         LogManager.i("CourseTable need to update course table");
 
+        /* Debug output course list. Don't output here,
+         * it'll be output in CourseAdapter.updateCourseList()
         String courses = "Table:\n";
         for (TimeTable it : list) {
             courses += "Id: " + it.id +
@@ -186,6 +188,7 @@ public class CourseTable extends Activity implements CourseThread.Notify {
         }
 
         LogManager.i(courses);
+        */
 
         //TODO, update course table view
         //2017/10/28
@@ -217,6 +220,7 @@ public class CourseTable extends Activity implements CourseThread.Notify {
     // @brief Calculates days between date1 and date2: date2 - date1
     public static int daysBetween(Date date1,Date date2)
     {
+        /*
         Calendar cal = Calendar.getInstance();
 
         cal.setTime(date1);
@@ -228,5 +232,24 @@ public class CourseTable extends Activity implements CourseThread.Notify {
         long between_days=(time2-time1)/(1000*3600*24);
 
         return Integer.parseInt(String.valueOf(between_days));
+        */
+
+        java.util.Calendar calst = java.util.Calendar.getInstance();
+        java.util.Calendar caled = java.util.Calendar.getInstance();
+        calst.setTime(date1);
+        caled.setTime(date2);
+
+        calst.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        calst.set(java.util.Calendar.MINUTE, 0);
+        calst.set(java.util.Calendar.SECOND, 0);
+        caled.set(java.util.Calendar.HOUR_OF_DAY, 0);
+        caled.set(java.util.Calendar.MINUTE, 0);
+        caled.set(java.util.Calendar.SECOND, 0);
+
+        // calculate
+        int days = ((int) (caled.getTime().getTime() / 1000) - (int) (calst
+                .getTime().getTime() / 1000)) / 3600 / 24;
+
+        return days;
     }
 }
