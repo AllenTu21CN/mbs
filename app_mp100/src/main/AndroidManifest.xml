@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".ui.CourseTable"/>
         <activity android:name=".ui.test.BusinessPlatformTestActivity"/>
         <activity android:name=".ui.test.BusinessPlatformPostmanTestActivity"/>
     </application>

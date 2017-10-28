@@ -1,4 +1,4 @@
-package sanp.mp100.adapter; 
+package sanp.mp100.ui.adapter; 
 
 import android.os.Handler;
 import android.os.Looper;

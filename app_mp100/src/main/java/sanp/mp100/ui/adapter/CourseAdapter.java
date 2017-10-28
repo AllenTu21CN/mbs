@@ -1,4 +1,4 @@
-package sanp.mp100.adapter; 
+package sanp.mp100.ui.adapter; 
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -13,8 +13,8 @@ import java.util.Date;
 import java.util.List;
 
 import sanp.avalon.libs.base.utils.LogManager;
-import sanp.mp100.CourseTable;
 import sanp.mp100.R;
+import sanp.mp100.ui.CourseTable;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
 
 /**

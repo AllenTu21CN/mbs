@@ -1,5 +1,6 @@
 package sanp.mp100.ui.test;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +18,7 @@ import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.BusinessPlatformPostman;
+import sanp.mp100.ui.CourseTable;
 
 public class BusinessPlatformTestActivity extends AppCompatActivity implements View.OnClickListener, BusinessPlatform.Observer {
 
@@ -38,6 +40,7 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
     private Button mBtnGetProvinces2;
     private Button mBtnGetLessonTimetable;
     private Button mBtnGetLessonTimetable2;
+    private Button mBtnShowCourseTable;
 
     private Handler mHandler = null;
 
@@ -65,6 +68,9 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
 
         mBtnGetLessonTimetable2 = (Button) findViewById(R.id.btn_getLessonTimetable2);
         mBtnGetLessonTimetable2.setOnClickListener(this);
+
+        mBtnShowCourseTable = (Button) findViewById(R.id.btn_showCourseTable);
+        mBtnShowCourseTable.setOnClickListener(this);
 
         mBtnConnect = (Button) findViewById(R.id.btn_connect);
         mBtnConnect.setOnClickListener(this);
@@ -127,6 +133,9 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
                 break;
             case R.id.btn_getLessonTimetable2:
                 invokeFuncGetLessonTimetable2(mBtnGetLessonTimetable2);
+                break;
+            case R.id.btn_showCourseTable:
+                showCourseTable();
                 break;
         }
     }
@@ -243,6 +252,12 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
         LogManager.e("after invokeFuncGetLessonTimetable2: " + ret);
     }
 
+    // Shows course table view
+    private void showCourseTable() {
+        Intent intent = new Intent(this, CourseTable.class);
+        startActivity(intent);
+    }
+
     private void setBtnEnable(Button btn, boolean able) {
         mHandler.sendMessage(Message.obtain(mHandler, 0, able?1:0, 0, btn));
     }
@@ -257,11 +272,13 @@ public class BusinessPlatformTestActivity extends AppCompatActivity implements V
             setBtnEnable(mBtnGetProvinces2, able);
             setBtnEnable(mBtnGetLessonTimetable, able);
             setBtnEnable(mBtnGetLessonTimetable2, able);
+            setBtnEnable(mBtnShowCourseTable, able);
         } else {
             mBtnGetProvinces.setEnabled(able);
             mBtnGetProvinces2.setEnabled(able);
             mBtnGetLessonTimetable.setEnabled(able);
             mBtnGetLessonTimetable2.setEnabled(able);
+            mBtnShowCourseTable.setEnabled(able);
         }
     }
 
