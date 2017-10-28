@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/course_table"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/course_table_layout"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:background="@drawable/course_table_bk"
+        android:orientation="vertical">
+
+        <!-- Dateline -->
+        <LinearLayout
+            android:id="@+id/course_table_dateline"
+            android:layout_width="400px"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="65px"
+            android:layout_gravity="center_horizontal"
+            android:weightSum="22"
+            android:orientation="horizontal"
+            >
+
+            <RelativeLayout
+                android:id="@+id/course_table_dateline01"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="21">
+
+                <!-- date and date button -->
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <!-- author: will@1dao2.com
+             date:   2017/10/22
+
+             course table canvas:
+             1920 x 1080
+
+             sidebar      table         sidebar
+             + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
+        week |260px|      1400px        |260px|
+             + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
+             |     |                    |     |
+             |Time |    Course Table    |EMPTY|
+             |     |                    |     |
+               ...         ...            ...
+
+
+         Table: 7 x 8 => 1400px * 640px
+         -->
+        <LinearLayout
+            android:id="@+id/course_table_canvas_layout"
+            android:layout_width="@dimen/course_table_with_sidebar_width"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/course_table_layout_margin_top_date"
+            android:orientation="vertical">
+
+            <!-- author: will@1dao2.com
+                 date: 2017/10/22
+
+                 week, 1920x1080:
+
+                 left margin: 260px
+                 canvas(bar): 1400px * content
+
+                      sidebar      table         sidebar
+                      + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
+                 week |260px|      1400px        |260px|
+                      + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
+            -->
+            <LinearLayout
+                android:id="@+id/course_table_week_canvas"
+                android:layout_width="@dimen/course_table_width"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/course_table_sidebar_width"
+                android:orientation="horizontal">
+
+                <!-- week: 1, 2, 3, 4, 5, 6, 7 -->
+                <TextView
+                    android:text="星期一"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/week_text_color"
+                    android:textSize="@dimen/week_text_font_size"
+                    android:gravity="center"
+                    android:padding="5dp" />
+
+                <TextView
+                    android:text="星期二"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/week_text_color"
+                    android:textSize="@dimen/week_text_font_size"
+                    android:gravity="center"
+                    android:padding="5dp" />
+
+                <TextView
+                    android:text="星期三"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/week_text_color"
+                    android:textSize="@dimen/week_text_font_size"
+                    android:gravity="center"
+                    android:padding="5dp" />
+
+                <TextView
+                    android:text="星期四"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/week_text_color"
+                    android:textSize="@dimen/week_text_font_size"
+                    android:gravity="center"
+                    android:padding="5dp" />
+
+                <TextView
+                    android:text="星期五"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/week_text_color"
+                    android:textSize="@dimen/week_text_font_size"
+                    android:gravity="center"
+                    android:padding="5dp" />
+
+                <TextView
+                    android:text="星期六"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/week_text_color"
+                    android:textSize="@dimen/week_text_font_size"
+                    android:gravity="center"
+                    android:padding="5dp" />
+
+                <TextView
+                    android:text="星期日"
+                    android:layout_weight="1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/week_text_color"
+                    android:textSize="@dimen/week_text_font_size"
+                    android:gravity="center"
+                    android:padding="5dp" />
+
+            </LinearLayout>
+
+
+
+            <!-- author: will@1dao2.com
+                 date:   2017/10/22
+
+             course time and table canvas:
+             1920 x 1080
+
+                  sidebar      table         sidebar
+                  + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
+             week |260px|      1400px        |260px|
+                  + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
+                  |     |                    |     |
+                  |Time |    Course Table    |EMPTY|
+                  |     |                    |     |
+                    ...         ...            ...
+
+              course table canvas's height 640px.
+            -->
+
+            <LinearLayout
+                android:id="@+id/course_table_canvas"
+                android:layout_width="@dimen/course_table_with_sidebar_width"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/course_table_canvas_margin_top_week"
+                android:orientation="horizontal">
+
+                <!-- course table time canvas
+
+                     canvas: (260px - 16px) * 640px = 244px * 640px
+                     Time Text: align right
+
+                 -->
+                <LinearLayout
+                    android:id="@+id/course_table_time_canvas"
+                    android:layout_width="@dimen/course_table_time_width"
+                    android:layout_height="@dimen/course_table_height"
+                    android:layout_marginRight="@dimen/course_table_time_margin_right"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right|center_vertical"
+                        android:text="1"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right|center_vertical"
+                        android:text="2"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right|center_vertical"
+                        android:text="3"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="4"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="5"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="6"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="7"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:text="第8课"
+                        android:textColor="@color/table_time_text_color"
+                        android:textSize="@dimen/table_time_text_font_size" />
+
+                </LinearLayout>
+
+                <!-- course table canvas
+
+                     canvas: 1400px * 640px
+                -->
+                <LinearLayout
+                    android:id="@+id/course_table_grid_canvas"
+                    android:layout_width="@dimen/course_table_width"
+                    android:layout_height="@dimen/course_table_height">
+
+                    <!-- course table -->
+                    <GridView
+                        android:id="@+id/course_table_gird_view"
+                        android:layout_width="@dimen/course_table_width"
+                        android:layout_height="@dimen/course_table_height"
+                        android:numColumns="7"
+                        android:stretchMode="columnWidth"
+
+                        android:background="#26d9dbdc"
+                        android:horizontalSpacing="2px"
+                        android:verticalSpacing="2px"
+                        android:padding="2px"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

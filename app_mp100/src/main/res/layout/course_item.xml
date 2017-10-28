@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<!-- author: will@1dao2.com
+     date:   2017/10/22
+
+ See res/dimens.xml
+
+ 1) 1920x1080
+ Course Table: 7 x 8 => 1400px * 640px
+ Course Item: 200px * 80px
+
+ TODO:
+    android:layout_width="@dimen/course_table_item_width"
+    android:layout_height="@dimen/course_table_item_height"
+
+ -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/course_item"
+    android:layout_width="200px"
+    android:layout_height="80px"
+    android:layout_margin="0px"
+    android:padding="0px"
+    android:background="@drawable/course_selector">
+
+    <TextView
+        android:id="@+id/course_name_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="未知"
+        android:textSize="22sp"
+        android:textColor="#88dca2"
+        android:maxLines="1"
+        android:padding="10dp"
+        />
+
+</FrameLayout>

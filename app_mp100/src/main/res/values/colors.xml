@@ -3,4 +3,11 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <!-- course table color values -->
+
+    <color name="week_text_color">#6ce4f4</color>
+    <color name="table_time_text_color">#6ce4f4</color>
+
 </resources>

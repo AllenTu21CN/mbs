@@ -1,0 +1,53 @@
+<!-- xxxhdpi: 1280x720 -->
+<resources>
+    <!-- author: will@1dao2.com
+         date:   2017/10/22
+
+         course table canvas:
+         1920 x 1080
+
+         sidebar      table         sidebar
+         + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
+    week |260px|      1400px        |260px|
+         + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
+         |     |                    |     |
+         |Time |    Course Table    |EMPTY|
+         |     |                    |     |
+           ...         ...            ...
+
+
+         Table: 7 x 8 => 1400px * 640px
+     -->
+
+    <!-- 1280 * 720
+
+         Course Table: 938px * 432px
+         Course Table Item: 134px * 54px
+
+     -->
+
+    <dimen name="course_table_width">938px</dimen>
+    <dimen name="course_table_height">432px</dimen>
+    <dimen name="course_table_item_width">134px</dimen>
+    <dimen name="course_table_item_height">54px</dimen>
+
+    <dimen name="course_table_sidebar_width">171px</dimen>
+    <dimen name="course_table_with_sidebar_width">1109px</dimen>
+
+    <!-- Time canvas: (260px-16px)244px * 640px: -->
+    <dimen name="course_table_time_width">161px</dimen>
+    <dimen name="course_table_time_margin_right">10px</dimen>
+
+    <!-- TODO: why 27px -->
+    <dimen name="course_table_layout_margin_top_date">18px</dimen>
+
+    <dimen name="course_table_canvas_margin_top_week">6px</dimen>
+
+
+
+
+    <!-- Text Font size -->
+    <dimen name="week_text_font_size">14.5sp</dimen>
+    <dimen name="table_time_text_font_size">14.5sp</dimen>
+
+</resources>
