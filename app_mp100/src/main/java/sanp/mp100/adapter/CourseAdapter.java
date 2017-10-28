@@ -33,9 +33,10 @@ public class CourseAdapter extends BaseAdapter {
     private Context mContext;
 
     // The course list which is checked from service
+    // 8 courses(sections) each day
     private List<TimeTable> mCourseList;
 
-    // 12 sections a day
+    // 12 sections each day
 //  private List<TimeTable> m12CourseList;
 
     public CourseAdapter(Context context) {
@@ -47,9 +48,9 @@ public class CourseAdapter extends BaseAdapter {
     private void initCourseAdapter() {
         mCourseList = new ArrayList<>();
 
-        // the total course number: 7courses * 7days = 49
+        // the total course number: 8courses * 7days = 49
         for (int iday = 0; iday < 7; iday ++) {
-            for (int isection = 0; isection < 7; isection ++) {
+            for (int isection = 0; isection < 8; isection ++) {
                 TimeTable course = new TimeTable();
 
                 course.id           = -1; 
@@ -102,6 +103,11 @@ public class CourseAdapter extends BaseAdapter {
             // find the course and update course
             //int index = days * 7 + (section - 1);
             int index = (section - 1) * 7 + days;
+            if (index < 0 || index > 8 * 7) {
+                LogManager.w("Course index: " + index + "is out range");
+                return;
+            }
+
             TimeTable course = mCourseList.get(index);
 
             course.id           = it.id;
@@ -121,9 +127,7 @@ public class CourseAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
-        return mCourseList.size(); // 4 * 7
-    }
+    public int getCount() { return mCourseList.size(); }
 
     @Override
     public TimeTable getItem(int position) {
