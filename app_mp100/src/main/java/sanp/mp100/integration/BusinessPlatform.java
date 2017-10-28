@@ -599,7 +599,7 @@ public class BusinessPlatform {
         if(mConnectionSettings == null)
             return;
         SharedPreferences.Editor editor = mSharedPref.edit();
-        editor.putString(mContext.getString(R.string.platform_has_connection_settings), "true");
+        editor.putBoolean(mContext.getString(R.string.platform_has_connection_settings), true);
         editor.putString(mContext.getString(R.string.platform_connection), new Gson().toJson(mConnectionSettings));
         editor.commit();
     }
@@ -623,7 +623,7 @@ public class BusinessPlatform {
         if(mActivatingConfig == null)
             return;
         SharedPreferences.Editor editor = mSharedPref.edit();
-        editor.putString(mContext.getString(R.string.platform_has_activating_config), "true");
+        editor.putBoolean(mContext.getString(R.string.platform_has_activating_config), true);
         editor.putString(mContext.getString(R.string.platform_activating_config), new Gson().toJson(mActivatingConfig));
         editor.commit();
     }
@@ -651,7 +651,7 @@ public class BusinessPlatform {
         if(mOrganization == null)
             return;
         SharedPreferences.Editor editor = mSharedPref.edit();
-        editor.putString(mContext.getString(R.string.platform_has_organization), "true");
+        editor.putBoolean(mContext.getString(R.string.platform_has_organization), true);
         editor.putString(mContext.getString(R.string.platform_organization), new Gson().toJson(mOrganization));
         editor.commit();
     }
@@ -673,7 +673,7 @@ public class BusinessPlatform {
     private void onActivating(boolean success) {
         mActivating = success ? State.Done : State.None;
         SharedPreferences.Editor editor = mSharedPref.edit();
-        editor.putString(mContext.getString(R.string.platform_had_activated), success?"true":"false");
+        editor.putBoolean(mContext.getString(R.string.platform_had_activated), success);
         editor.commit();
 
         if(success && mBinding == State.Done && mHasOrganization)
