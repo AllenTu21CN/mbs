@@ -1,5 +1,4 @@
-package com.will.course.coursetable.adapter;
-
+package sanp.mp100.adapter; 
 
 import android.os.Handler;
 import android.os.Looper;
@@ -10,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.LogManager;
+
+import sanp.mp100.integration.BusinessPlatform;
 
 /**
  * @file  CourseThread.java

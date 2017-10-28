@@ -1,4 +1,4 @@
-package com.will.course.coursetable;
+package sanp.mp100; 
 
 import android.app.Activity;
 import android.content.Context;
@@ -6,24 +6,28 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.widget.GridView;
 
-import com.will.course.coursetable.adapter.CourseAdapter;
+import sanp.mp100.adapter.CourseAdapter;
 
 /**
- * Created by hui on 2017/10/12.
+ * @brief Course table activity, It will show courses on course table view.
+ * Course will be updated by the course adapter.
  *
- * course table activity, read courses and show them on the table
+ * @author will@1dao2.com
+ * @date   2017/10/12
+ *
+ * @modified 2017/10/28, add this into Monica
+ * 
  */
 
 public class CourseTable extends Activity {
 
-    private Context  m_context;
+    private Context  mContext;
 
     // course table view
-    private GridView m_course_table;
+    private GridView mCourseTable;
 
     // course adapter
-    CourseAdapter m_course_adapter;
-
+    CourseAdapter mCourseAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,7 @@ public class CourseTable extends Activity {
 
         setContentView(R.layout.course_table);
 
-        m_context = this;
+        mContext = this;
 
         initView();
     }
@@ -42,13 +46,13 @@ public class CourseTable extends Activity {
     // init course table view
     private void initView() {
         // find the course tables
-        m_course_table  = (GridView) findViewById(R.id.course_table_gird_view);
+        mCourseTable  = (GridView) findViewById(R.id.course_table_gird_view);
 
         // course adapter
-        m_course_adapter = new CourseAdapter(m_context);
+        mCourseAdapter = new CourseAdapter(mContext);
 
         // set adapter into course table view
-        m_course_table.setAdapter(m_course_adapter);
+        mCourseTable.setAdapter(mCourseAdapter);
     }
 
 }
