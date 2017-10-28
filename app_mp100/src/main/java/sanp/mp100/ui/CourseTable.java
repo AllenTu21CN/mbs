@@ -6,7 +6,10 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.View;
+import android.widget.Button;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -30,7 +33,7 @@ import sanp.mp100.integration.BusinessPlatform.TimeTable;
  * 
  */
 
-public class CourseTable extends Activity implements CourseThread.Notify {
+public class CourseTable extends Activity implements View.OnClickListener, CourseThread.Notify {
 
     private Context  mContext;
 
@@ -38,6 +41,12 @@ public class CourseTable extends Activity implements CourseThread.Notify {
     private GridView mCourseTable;
     // course table Monday's date
     private Date     mCourseTableMonday;
+
+    // course table date line bar
+    private Button   mPrevWeekBtn;
+    private Button   mNextWeekBtn;
+    private TextView mMondayDateView;
+    private TextView mSundayDataView;
 
     // course adapter
     private CourseAdapter mCourseAdapter = null;
@@ -55,6 +64,7 @@ public class CourseTable extends Activity implements CourseThread.Notify {
 
     // Implements from CourseThread.Notify
     // - The course thread is Ready
+    @Override
     public void onCourseThreadReady() {
         LogManager.i("CourseTable onCourseThreadReady, send msg to the ui thread");
 
@@ -71,12 +81,14 @@ public class CourseTable extends Activity implements CourseThread.Notify {
     }
 
     // - Something error is happened
+    @Override
     public void onError(int error) {
         //TODO
         mCourseThreadRunning = false;
     }
 
     // - Checkout courses suc
+    @Override
     public void onCheckoutCourse(List<TimeTable> list) {
         LogManager.i("CourseTable onCheckoutCourse, update courses");
 
@@ -93,7 +105,6 @@ public class CourseTable extends Activity implements CourseThread.Notify {
 
         return;
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,8 +133,59 @@ public class CourseTable extends Activity implements CourseThread.Notify {
         // set adapter into course table view
         mCourseTable.setAdapter(mCourseAdapter);
 
+        // course date line bar
+        mPrevWeekBtn = (Button) findViewById(R.id.prev_week_btn);
+        mNextWeekBtn = (Button) findViewById(R.id.next_week_btn);
+
+        mPrevWeekBtn.setOnClickListener(this);
+        mNextWeekBtn.setOnClickListener(this);
+
+        mMondayDateView = (TextView) findViewById(R.id.monday_date_view);
+        mSundayDataView = (TextView) findViewById(R.id.sunday_date_view);
+
+        // init date
+        initDate();
+
         // create a course checkout thread
         mCourseThread = new CourseThread(mCourseAdapter, this);
+    }
+
+    // @brief Init date
+    private void initDate() {
+        // current time
+        Date date = new Date();
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTime(date);
+
+        // current week: monday's date
+        mCourseTableMonday = getFirstDateOfWeek(date);
+
+        LogManager.i("Today is " +  format.format(date) + ", Monday is " +
+            format.format(mCourseTableMonday));
+
+        // set current date into date line bar
+        updateDateLineBarView();
+    }
+
+    private void updateDateLineBarView() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        // set monday's date
+        mMondayDateView.setText(format.format(mCourseTableMonday));
+
+        Calendar calendar = Calendar.getInstance();
+
+        // calc sunday's date
+        calendar.setTime(mCourseTableMonday);
+        calendar.add(Calendar.DAY_OF_YEAR, 6);
+
+        Date sunday = calendar.getTime();
+
+        // set sunday's date
+        mSundayDataView.setText(format.format(sunday));
     }
 
     // init ui message handler
@@ -147,30 +209,6 @@ public class CourseTable extends Activity implements CourseThread.Notify {
                }
            }
        };
-    }
-
-    // @brief Checkouts current time courses
-    private void checkoutCourseForCurrent() {
-        LogManager.i("Course Thread is ready, try to checkout courses");
-        // current time
-        Date date = new Date();
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-        LogManager.i("Current date is: " +  format.format(date));
-
-        Calendar calendar= Calendar.getInstance();
-        calendar.setTime(date);
-
-        // current week: monday's date
-        mCourseTableMonday = getFirstDateOfWeek(date);
-
-        LogManager.i("Current week, Monday date is: " +
-            format.format(mCourseTableMonday));
-
-        // checkout this week's courses
-        // days: 6 + include monday = 7 days
-        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
     }
 
     // @brief Updates course table
@@ -254,4 +292,77 @@ public class CourseTable extends Activity implements CourseThread.Notify {
 
         return days;
     }
+
+    // @brief Handles button click
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.prev_week_btn:
+                checkoutPrevWeekCourse();
+                break;
+            case R.id.next_week_btn:
+                checkoutNextWeekCourse();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    // @brief Checkouts current time courses
+    private void checkoutCourseForCurrent() {
+        LogManager.i("CourseTable checkout current week's courses");
+
+        // checkout this week's courses
+        // days: 6 + include monday = 7 days
+        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
+    }
+
+    // @brief Checkouts prev week courses
+    private void checkoutPrevWeekCourse() {
+        LogManager.i("CourseTable checkout prev week's courses");
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        LogManager.i("CourseTable table date: " + format.format(mCourseTableMonday));
+
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTime(mCourseTableMonday);
+
+        // calculate prev week
+        calendar.add(Calendar.DAY_OF_YEAR, -7);
+
+        mCourseTableMonday = calendar.getTime();
+        LogManager.i("CourseTable prev week: " + format.format(mCourseTableMonday));
+
+        // update date line text view
+        updateDateLineBarView();
+
+        // checkout this week's courses
+        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
+    }
+
+    // @brief Checkouts next week courses
+    private void checkoutNextWeekCourse() {
+        LogManager.i("CourseTable checkout next week's courses");
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        LogManager.i("CourseTable table date: " + format.format(mCourseTableMonday));
+
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTime(mCourseTableMonday);
+
+        // calculate prev week
+        calendar.add(Calendar.DAY_OF_YEAR, 7);
+
+        mCourseTableMonday = calendar.getTime();
+        LogManager.i("CourseTable next week: " + format.format(mCourseTableMonday));
+
+        // update date line text view
+        updateDateLineBarView();
+
+        // checkout this week's courses
+        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
+    }
 }
+

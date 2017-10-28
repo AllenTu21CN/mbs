@@ -15,22 +15,79 @@
         <!-- Dateline -->
         <LinearLayout
             android:id="@+id/course_table_dateline"
-            android:layout_width="400px"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="65px"
             android:layout_gravity="center_horizontal"
-            android:weightSum="22"
             android:orientation="horizontal"
+            android:background="#5a0ed1b8"
             >
 
-            <RelativeLayout
-                android:id="@+id/course_table_dateline01"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="21">
+            <!--
+            sidebar     date line      sidebar
+            + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
+            |260px|      1400px        |260px|
+            + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
+            -->
 
-                <!-- date and date button -->
-            </RelativeLayout>
+            <!-- Button size: 80*35 px -->
+
+            <!-- Prev week button -->
+            <Button
+                android:id="@+id/prev_week_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4px"
+                android:layout_marginTop="4px"
+                android:layout_marginBottom="4px"
+                android:background="@drawable/border_white"
+                android:text="前一周"
+                android:textColor="#ffffff"
+                android:textSize="16sp"/>
+
+
+            <!-- Shows Monday and Sunday date time -->
+            <TextView
+                android:id="@+id/monday_date_view"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_marginLeft="20px"
+                android:layout_gravity="center_vertical"
+                android:textColor="#ffffff"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:layout_gravity="center_vertical"
+                android:text=" ~ "
+                android:textColor="#ffffff"
+                android:textSize="18sp"/>
+
+            <TextView
+                android:id="@+id/sunday_date_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:layout_gravity="center_vertical"
+                android:textColor="#ffffff"
+                android:textSize="18sp"/>
+
+            <!-- Next week button -->
+            <Button
+                android:id="@+id/next_week_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20px"
+                android:layout_marginRight="4px"
+                android:layout_marginTop="4px"
+                android:layout_marginBottom="4px"
+                android:background="@drawable/border_white"
+                android:text="后一周"
+                android:textColor="#ffffff"
+                android:textSize="16sp"/>
+
 
         </LinearLayout>
 
