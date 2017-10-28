@@ -192,8 +192,6 @@ public class CourseThread implements Runnable {
         // notify to CourseTable to update table view
         mNotify.onCheckoutCourse(mCourseList);
 
-        // notify to adapter update course table
-        mCourseAdapter.notifyDataSetChanged();
         return;
     }
 }

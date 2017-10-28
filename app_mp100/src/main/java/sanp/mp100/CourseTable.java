@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.GridView;
 
+import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -76,7 +77,7 @@ public class CourseTable extends Activity implements CourseThread.Notify {
 
     // - Checkout courses suc
     public void onCheckoutCourse(List<TimeTable> list) {
-        LogManager.i("CourseTable onCheckoutCourse: " + list);
+        LogManager.i("CourseTable onCheckoutCourse, update courses");
 
         // prepare message: update course table view
         Message msg = Message.obtain();
@@ -131,13 +132,13 @@ public class CourseTable extends Activity implements CourseThread.Notify {
            public void handleMessage(Message msg) {
                switch (msg.what) {
                case MSG_COURSE_THREAD_READY:
-                   LogManager.i("Course Thread is ready, try to checkout courses");
+                   LogManager.i("Ui Thread handle MSG_COURSE_THREAD_READY");
                    mCourseThreadRunning = true;
                    checkoutCourseForCurrent();
                    break;
                case MSG_UPDATE_COURSE_TABLE:
-                   LogManager.i("Ui Thread need to update course table");
-                   //TODO, update course table view
+                   LogManager.i("Ui Thread handle MSG_UPDATE_COURSE_TABLE");
+                   updateCourseTable((List<TimeTable>)msg.obj);
                    break;
                default:
                    LogManager.w("Ui Thread handle unknown message: " + msg.what);
@@ -147,8 +148,9 @@ public class CourseTable extends Activity implements CourseThread.Notify {
        };
     }
 
-    // checkout current time courses
+    // @brief Checkouts current time courses
     private void checkoutCourseForCurrent() {
+        LogManager.i("Course Thread is ready, try to checkout courses");
         // current time
         Date date = new Date();
 
@@ -164,9 +166,32 @@ public class CourseTable extends Activity implements CourseThread.Notify {
 
         LogManager.i("Current week, Monday date is: " + format.format(monday));
 
-        int week_days = 7;
         // checkout this week's courses
-        mCourseThread.checkoutCourse(monday, week_days);
+        mCourseThread.checkoutCourse(monday, 7);
+    }
+
+    // @brief Updates course table
+    private void updateCourseTable(List<TimeTable> list) {
+        LogManager.i("CourseTable need to update course table");
+
+        String courses = "Table:\n";
+        for (TimeTable it : list) {
+            courses += "Id: " + it.id +
+                "; Type: " + it.type +
+                "; Subject Name: " + it.subject_name +
+                "; Title:  " + it.title +
+                "; Date: " + it.date +
+                "; Section: "+ it.section + "\n";
+        }
+
+        LogManager.i(courses);
+
+        //TODO, update course table view
+
+        // notify to adapter update course table
+        mCourseAdapter.notifyDataSetChanged();
+
+        return;
     }
 
 
