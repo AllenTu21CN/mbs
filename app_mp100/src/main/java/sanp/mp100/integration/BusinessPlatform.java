@@ -1,35 +1,41 @@
 package sanp.mp100.integration;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Environment;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.gson.Gson;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.crossbar.autobahn.wamp.Client;
-import io.crossbar.autobahn.wamp.Session;
-import io.crossbar.autobahn.wamp.interfaces.ISession;
-import io.crossbar.autobahn.wamp.types.CallOptions;
-import io.crossbar.autobahn.wamp.types.CallResult;
-import io.crossbar.autobahn.wamp.types.CloseDetails;
-import io.crossbar.autobahn.wamp.types.SessionDetails;
-import java8.util.concurrent.CompletableFuture;
 import sanp.avalon.libs.base.utils.LogManager;
+import sanp.mp100.MP100Application;
+import sanp.mp100.integration.BusinessPlatformPostman.BPError;
+
+import sanp.mp100.R;
 
 /**
  * Created by Tuyj on 2017/10/25.
  */
 
-public class BusinessPlatform implements Runnable {
+public class BusinessPlatform {
 
     public interface Callback {
         void done(int value, List<Object> args, Map<String, Object> kwargs);
+    }
+
+    public interface Observer {
+        void onConnectingState(boolean connected);
+        void onActivatingState(boolean activated);
+        void onBindingState(boolean bound);
     }
 
     public class Province {
@@ -77,6 +83,49 @@ public class BusinessPlatform implements Runnable {
         public String status;
     }
 
+    static public class ConnectionSettings {
+        public String WebSocketURL;
+        public String Realm;
+
+        public boolean RetryConnectEnable;
+        public int RetryConnectTimes;
+        public long RetryConnectIntervalMS;
+
+        public boolean KeepAliveEnable;
+        public int KeepAliveRetryTimes;
+        public long KeepAliveIntervalMS;
+        public long KeepAliveTimeoutMS;
+
+        boolean equals(ConnectionSettings other) {
+            return (
+                    WebSocketURL == other.WebSocketURL && Realm == other.Realm &&
+                    RetryConnectEnable == other.RetryConnectEnable &&
+                    RetryConnectTimes == other.RetryConnectTimes &&
+                    RetryConnectIntervalMS == other.RetryConnectIntervalMS &&
+                    KeepAliveEnable == other.KeepAliveEnable &&
+                    KeepAliveRetryTimes == other.KeepAliveRetryTimes &&
+                    KeepAliveIntervalMS == other.KeepAliveIntervalMS &&
+                    KeepAliveTimeoutMS == other.KeepAliveTimeoutMS
+            );
+        }
+    }
+
+    static public class ActivatingConfig {
+        // TODO:
+
+        boolean equals(ActivatingConfig other) {
+            return true;
+        }
+    }
+
+    static public class Organization {
+        public Province province;
+        public City city;
+        public District district;
+        public School school;
+        public SchoolClass schoolClass;
+    }
+
     private static BusinessPlatform gBusinessPlatform = null;
     public static BusinessPlatform getInstance() {
         if (gBusinessPlatform == null) {
@@ -89,14 +138,13 @@ public class BusinessPlatform implements Runnable {
         return gBusinessPlatform;
     }
 
-    private enum State {
-        NONE(0),
-        CONNECTING(1),
-        READY(2),
-        DISCONNECTING(3);
+    public enum State {
+        None(0),
+        Doing(1),
+        Done(2);
 
-        private int value = -1;
-        State(int value) {
+        private int value;
+        private State(int value) {
             this.value = value;
         }
         public int toValue() {
@@ -104,165 +152,7 @@ public class BusinessPlatform implements Runnable {
         }
     };
 
-    private static final int MSG_CONNECT = 0;
-    private static final int MSG_STOP_LOOP = -1;
-
-    private static final long THREAD_EXIT_TIMEOUT_MS = 1000;
-
-    private String mWebSocketURL = "";
-    private String mRealm = "";
-    private Session mWAMPSession = null;
-    private State mState = State.NONE;
-    private Object mLock = new Object();
-
-    private Thread mThread = null;
-    private boolean mRunning = false;
-    private Object mRunningLock = new Object();
-    private Handler mHandler = null;
-
-    BusinessPlatform() {
-        if (mThread == null) {
-            mThread = new Thread(this, "BusinessPlatform");
-            mThread.start();
-            waitUntilReady();
-        }
-    }
-
-    void release() {
-        if (mThread != null) {
-            mHandler.sendMessage(mHandler.obtainMessage(MSG_STOP_LOOP));
-            waitUntilOver();
-            try {
-                mThread.join(THREAD_EXIT_TIMEOUT_MS);
-            } catch (InterruptedException e) {
-                LogManager.e(e);
-            }
-            mThread = null;
-        }
-    }
-
-    /**
-     * @param onStateChanged, been called while state has been changed
-     *      @param onStateChanged::value, 0-disconnected, otherwise connected
-     *      @param onStateChanged::args, useless
-     *      @param onStateChanged::kwargs, useless
-     * */
-    public int syncConnect(String websocketURL, String realm, Callback onStateChanged) {
-        synchronized(mLock) {
-            if(mState == State.READY) {
-                LogManager.i("had connected");
-                return -1;
-            }
-            if(mState != State.NONE) {
-                LogManager.i("in busy");
-                return -2;
-            }
-
-            mRealm = realm;
-            mWebSocketURL = websocketURL;
-            mState = State.CONNECTING;
-
-            mWAMPSession = new Session();
-            mWAMPSession.addOnJoinListener((session, details) ->
-                    onReady(session, details, null, onStateChanged)
-            );
-            ISession.OnDisconnectListener dis = mWAMPSession.addOnDisconnectListener((session, wasClean) ->
-                    onDisconnected(session, wasClean, null)
-            );
-            mWAMPSession.addOnConnectListener(this::onConnecting);
-            mWAMPSession.addOnLeaveListener(this::onDisconnecting);
-
-            if(!mHandler.sendMessage(mHandler.obtainMessage(MSG_CONNECT))) {
-                LogManager.e("send looper message to try to connect failed");
-                mState = State.NONE;
-                mWAMPSession = null;
-                return -3;
-            }
-
-            while (mState == State.CONNECTING) {
-                try {
-                    mLock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    LogManager.e("connect interrupted");
-                    mState = State.NONE;
-                    mWAMPSession = null;
-                    return 4;
-                }
-            }
-
-            if(mState != State.READY) {
-                mState = State.NONE;
-                mWAMPSession = null;
-                return -5;
-            }
-
-            mWAMPSession.removeOnDisconnectListener(dis);
-            return 0;
-        }
-    }
-
-    /**
-     * @param onStateChanged, been called while state has been changed
-     *      @param onStateChanged::value, 0-disconnected, otherwise connected
-     *      @param onStateChanged::args, useless
-     *      @param onStateChanged::kwargs, useless
-     * */
-    public int asyncConnect(String websocketURL, String realm, Callback onStateChanged) {
-        synchronized(mLock) {
-            if(mState == State.READY) {
-                LogManager.i("had connected");
-                return -1;
-            }
-            if(mState != State.NONE) {
-                LogManager.i("in busy");
-                return -2;
-            }
-
-            mRealm = realm;
-            mWebSocketURL = websocketURL;
-            mState = State.CONNECTING;
-
-            mWAMPSession = new Session();
-            mWAMPSession.addOnJoinListener((session, details) ->
-                    onReady(session, details, onStateChanged, null)
-            );
-            mWAMPSession.addOnDisconnectListener((session, wasClean) ->
-                    onDisconnected(session, wasClean, onStateChanged)
-            );
-            mWAMPSession.addOnConnectListener(this::onConnecting);
-            mWAMPSession.addOnLeaveListener(this::onDisconnecting);
-
-            if(!mHandler.sendMessage(mHandler.obtainMessage(MSG_CONNECT))) {
-                mState = State.NONE;
-                mWAMPSession = null;
-                return -3;
-            }
-            return 0;
-        }
-    }
-
-    public int disconnect() {
-        synchronized(mLock) {
-            if (mState == State.NONE) {
-                LogManager.i("had disconnected");
-                return -1;
-            }
-            if (mState != State.READY) {
-                LogManager.i("in busy");
-                return -2;
-            }
-
-            mState = State.DISCONNECTING;
-            mWAMPSession.leave();
-            mWAMPSession = null;
-            return 0;
-        }
-    }
-
-    public boolean ready() {
-        return mState == State.READY;
-    }
+    private static final long THREAD_EXIT_TIMEOUT_MS = 5000;
 
     static private final String PROCEDURE_NAME_AREA_GET_PROVINCES   = "area.getProvinces";
     static private final String PROCEDURE_NAME_AREA_GET_CITIES      = "area.getCitiesByProvince";
@@ -271,10 +161,231 @@ public class BusinessPlatform implements Runnable {
     static private final String PROCEDURE_NAME_ORG_GET_CLASSES      = "org.getClassesBySchoolId";
     static private final String PROCEDURE_NAME_LESSON_GET_TIMETABLE = "lesson.getTimetable";
 
+    private boolean mInited = false;
+
+    private boolean mAllowConnect;
+    private State mActivating;
+    private State mBinding;
+
+    private boolean mHasConnectionSettings;
+    private boolean mHasActivatingConfig;
+    private boolean mHasOrganization;
+
+    private ConnectionSettings mConnectionSettings;
+    private ActivatingConfig mActivatingConfig;
+    private Organization mOrganization;
+
+    private Object mLock = new Object();
+    private Context mContext;
+    private SharedPreferences mSharedPref;
+    private BusinessPlatformPostman mPlatformPostman;
+
+    private List<Observer> mObservers = new ArrayList<>();
+
+    private int mCurrentRetryConnectTimes;
+
+    BusinessPlatform() {
+        reset();
+    }
+
+    private void reset() {
+        mAllowConnect = true;
+        mActivating = State.None;
+        mBinding = State.None;
+
+        mHasConnectionSettings = false;
+        mHasActivatingConfig = false;
+        mHasOrganization = false;
+
+        mConnectionSettings = null;
+        mActivatingConfig = null;
+        mOrganization = null;
+
+        mContext = null;
+        mSharedPref = null;
+        mPlatformPostman = null;
+
+        mCurrentRetryConnectTimes = -1;
+    }
+
+    public void init(Context context) {
+        if(mInited)
+            return;
+
+        mContext = context;
+        mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_preferences), Context.MODE_PRIVATE);
+        mPlatformPostman = new BusinessPlatformPostman();
+
+        loadPreferences();
+        mInited = true;
+
+        tryConnect();
+    }
+
+    public void release() {
+        disconnect();
+
+        synchronized (mLock) {
+            if(!mInited)
+                return;
+
+            if (!mPlatformPostman.disconnected()) {
+                try {
+                    mLock.wait(THREAD_EXIT_TIMEOUT_MS);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            mPlatformPostman.release();
+            reset();
+
+            mInited = false;
+        }
+    }
+
+    public boolean isInited() {
+        return mInited;
+    }
+
+    public void addStateObserver(Observer ob) {
+        synchronized (mLock) {
+            if(!mObservers.contains(ob))
+                mObservers.add(ob);
+        }
+    }
+
+    public void removeStateObserver(Observer ob) {
+        synchronized (mLock) {
+            if(mObservers.contains(ob))
+                mObservers.remove(ob);
+        }
+    }
+
+    public int connect() {
+        mAllowConnect = true;
+        return tryConnect();
+    }
+
+    public int connect(ConnectionSettings connectionSettings) {
+        if(mInited && mPlatformPostman.ready())
+            throw new RuntimeException("logical error: had connected");
+        synchronized (mLock) {
+            if(mConnectionSettings == null || !mConnectionSettings.equals(connectionSettings)) {
+                mConnectionSettings = connectionSettings;
+                saveConnectionSettings();
+            }
+        }
+        return connect();
+    }
+
+    public int disconnect() {
+        mAllowConnect = false;
+        if(mPlatformPostman != null)
+            return mPlatformPostman.disconnect();
+        return 0;
+    }
+
+    public void activate() {
+        if(!mInited || mActivating == State.Doing || mActivating == State.Done || !mPlatformPostman.ready())
+            return;
+        LogManager.w("TODO: try to activate on platform");
+        // mPlatformPostman.activate();
+        onActivating(true);
+    }
+
+    public void activate(ActivatingConfig activatingConfig) {
+        if(mActivating == State.Doing)
+            throw new RuntimeException("logical error: in activating");
+        if(mActivating == State.Done)
+            throw new RuntimeException("logical error: had activated");
+
+        synchronized (mLock) {
+            if(mActivatingConfig == null || !mActivatingConfig.equals(activatingConfig)) {
+                mActivatingConfig = activatingConfig;
+                saveActivatingConfig();
+            }
+        }
+        activate();
+    }
+
+    public void deactivate() {
+        if(!mInited || mActivating == State.None || !mPlatformPostman.ready())
+            throw new RuntimeException("logical error");
+
+        unbind();
+        LogManager.w("TODO: try to deactivate on platform");
+        // mPlatformPostman.deactivate();
+        onActivating(false);
+    }
+
+    public void bind() {
+        LogManager.w("TODO: try to bind the organization on platform");
+    }
+
+    public void unbind() {
+        LogManager.w("TODO: try to unbind the organization on platform");
+    }
+
+    public BusinessPlatformPostman.State connectingState() {
+        if(!mInited)
+            return BusinessPlatformPostman.State.NONE;
+        return mPlatformPostman.state();
+    }
+
+    public State activatingState() {
+        return mActivating ;
+    }
+
+    public State bindingState() {
+        return mBinding;
+    }
+
+    public BusinessPlatformPostman getmPlatformPostman() {
+        return mPlatformPostman;
+    }
+
+    public ConnectionSettings getMyConnectionSettings() {
+        return mConnectionSettings;
+    }
+
+    public ActivatingConfig getMyActivatingConfig() {
+        return mActivatingConfig;
+    }
+
+    public Organization getMyOrganization() {
+        return mOrganization;
+    }
+
+    public List<TimeTable> getMyLessonTimetable(String start_date, String end_date)
+            throws RuntimeException, InterruptedException, InternalError {
+        if(mBinding != State.Done)
+            throw new RuntimeException("logical error: bind first");
+        return getLessonTimetable(mOrganization.schoolClass.id, start_date, end_date);
+    }
+
+    /**
+     * @param start_date: e.g. "2017-10-16"
+     * @param end_date: e.g. "2017-10-22"
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *  get result(List<TimeTable>) from resultCallback::args
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
+     * */
+    public int getMyLessonTimetable(long class_id, String start_date, String end_date, Callback resultCallback) {
+        if(mBinding != State.Done)
+            throw new RuntimeException("logical error: bind first");
+        return getLessonTimetable(mOrganization.schoolClass.id, start_date, end_date, resultCallback);
+    }
+
+    // ---- get Provinces
     public List<Province> getAreaProvinces()
             throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
         List<Province> provinces = new ArrayList<>();
-        syncGetObjectList(provinces, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
+        mPlatformPostman.syncInvokeResultAsList(provinces, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
         return provinces;
     }
 
@@ -286,13 +397,19 @@ public class BusinessPlatform implements Runnable {
      *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getAreaProvinces(Callback resultCallback) {
-        return asyncGetObjectList(resultCallback, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
+        if (!mInited)
+            throw new RuntimeException("init first");
+        return mPlatformPostman.asyncInvokeResultAsList(resultCallback, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
     }
 
+
+    // ---- get Cities
     public List<City> getAreaCitiesByProvince(String province)
             throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
         List<City> cities = new ArrayList<>();
-        syncGetObjectList(cities, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
+        mPlatformPostman.syncInvokeResultAsList(cities, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
         return cities;
     }
 
@@ -304,13 +421,19 @@ public class BusinessPlatform implements Runnable {
      *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getAreaCitiesByProvince(String province, Callback resultCallback) {
-        return asyncGetObjectList(resultCallback, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
+        if (!mInited)
+            throw new RuntimeException("init first");
+        return mPlatformPostman.asyncInvokeResultAsList(resultCallback, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
     }
 
+
+    // ---- get Districts
     public List<District> getAreaDistrictsByCity(String province, String city)
             throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
         List<District> districts = new ArrayList<>();
-        syncGetObjectList(districts, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
+        mPlatformPostman.syncInvokeResultAsList(districts, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
         return districts;
     }
 
@@ -322,17 +445,31 @@ public class BusinessPlatform implements Runnable {
      *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getAreaDistrictsByCity(String province, String city, Callback resultCallback) {
-        return asyncGetObjectList(resultCallback, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
+        if (!mInited)
+            throw new RuntimeException("init first");
+        return mPlatformPostman.asyncInvokeResultAsList(resultCallback, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
     }
 
+
+    // ---- get Schools
+    /**
+     * e.g. ("北京市", "", "")
+     * e.g. ("北京市", "北京市", "")
+     * e.g. ("北京市", "北京市", "海淀区")
+     * */
     public List<School> getOrgSchoolsByArea(String province, String city, String district)
             throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
         List<School> schools = new ArrayList<>();
-        syncGetObjectList(schools, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
+        mPlatformPostman.syncInvokeResultAsList(schools, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
         return schools;
     }
 
     /**
+     * e.g. ("北京市", "", "", resultCallback)
+     * e.g. ("北京市", "北京市", "", resultCallback)
+     * e.g. ("北京市", "北京市", "海淀区", resultCallback)
      * @param resultCallback:
      *      if the resultCallback::value is 0, that means the action has been done successfully,
      *  get result(List<School>) from resultCallback::args
@@ -340,13 +477,19 @@ public class BusinessPlatform implements Runnable {
      *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getOrgSchoolsByArea(String province, String city, String district, Callback resultCallback) {
-        return asyncGetObjectList(resultCallback, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
+        if (!mInited)
+            throw new RuntimeException("init first");
+        return mPlatformPostman.asyncInvokeResultAsList(resultCallback, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
     }
 
+
+    // ---- get Classes
     public List<SchoolClass> getOrgClassesBySchoolId(long school_id)
             throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
         List<SchoolClass> classes = new ArrayList<>();
-        syncGetObjectList(classes, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
+        mPlatformPostman.syncInvokeResultAsList(classes, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
         return classes;
     }
 
@@ -358,13 +501,23 @@ public class BusinessPlatform implements Runnable {
      *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getOrgClassesBySchoolId(long school_id, Callback resultCallback) {
-        return asyncGetObjectList(resultCallback, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
+        if (!mInited)
+            throw new RuntimeException("init first");
+        return mPlatformPostman.asyncInvokeResultAsList(resultCallback, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
     }
 
+
+    // ---- get LessonTimetable
+    /**
+     * @param start_date: e.g. "2017-10-16"
+     * @param end_date: e.g. "2017-10-22"
+     * */
     public List<TimeTable> getLessonTimetable(long class_id, String start_date, String end_date)
             throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
         List<TimeTable> tables = new ArrayList<>();
-        syncGetObjectList(tables, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
+        mPlatformPostman.syncInvokeResultAsList(tables, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
         return tables;
     }
 
@@ -378,250 +531,209 @@ public class BusinessPlatform implements Runnable {
      *  resultCallback::kwargs ({"message": "..."})
      * */
     public int getLessonTimetable(long class_id, String start_date, String end_date, Callback resultCallback) {
-        return asyncGetObjectList(resultCallback, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
+        if (!mInited)
+            throw new RuntimeException("init first");
+        return mPlatformPostman.asyncInvokeResultAsList(resultCallback, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
     }
 
-    public CallResult syncInvoke(String procedureName, List<Object> args, Map<String, Object> kwargs)
-            throws RuntimeException, InterruptedException, InternalError {
+    private void loadPreferences() {
+        boolean hadActivated = mSharedPref.getBoolean(
+                mContext.getString(R.string.platform_had_activated),
+                mContext.getString(R.string.platform_had_activated_default).equals("true"));
+        mActivating = hadActivated ? State.Done : State.None;
 
-        Object lock = new Object();
-        List<Object> rets = new ArrayList<>();
-        CallResult result = new CallResult(null, null);
+        boolean hadBound = mSharedPref.getBoolean(
+                mContext.getString(R.string.platform_had_bound),
+                mContext.getString(R.string.platform_had_bound_default).equals("true"));
+        mBinding = hadBound ? State.Done : State.None;
 
-        synchronized(mLock) {
-            if (mState != State.READY) {
-                throw new RuntimeException("connnet first");
-            }
+        loadConnectionSettings();
+        loadActivatingConfig();
+        loadOrganization();
 
-            CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args, kwargs, (Class<CallResult>) null);
-            f.whenComplete((callResult, throwable) -> {
-                synchronized (lock) {
-                    if (throwable == null) {
-                        result.results = callResult.results;
-                        result.kwresults = callResult.kwresults;
-                        rets.add(0);
-                    } else {
-                        LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) fail: %s", procedureName, args, kwargs, throwable.getMessage()));
-                        rets.add(-1);
-                        rets.add(throwable.getMessage());
-                    }
-                    lock.notify();
-                }
-            });
-        }
-
-        synchronized(lock) {
-            while (rets.size() == 0) {
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) interrupted", procedureName, args, kwargs));
-                    throw e;
-                }
-            }
-            if((Integer)rets.get(0) != 0)
-                throw new InternalError((String) rets.get(1));
-            return result;
-        }
-    }
-
-    /**
-     * @param resultCallback:
-     *      if the resultCallback::value is 0, that means the action has been done successfully,
-     *  get result from resultCallback::args and resultCallback::kwargs
-     *      otherwise, the resultCallback::value indicates error code, and get error message from
-     *  resultCallback::kwargs ({"message": "..."})
-     * */
-    public int asyncInvoke(String procedureName, List<Object> args, Map<String, Object> kwargs, Callback resultCallback) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args, kwargs, (Class<CallResult>) null);
-            f.whenComplete((callResult, throwable) -> {
-                if (throwable == null) {
-                    resultCallback.done(0, callResult.results, callResult.kwresults);
-                } else {
-                    resultCallback.done(-2, null, new HashMap<String, Object>(){{put("message", throwable.getMessage());}});
-                }
-            });
-            return 0;
-        }
-    }
-
-    @Override
-    public void run() {
-        LogManager.i("BusinessPlatform thread started!");
-        Looper.prepare();
-        mHandler = new Handler() {
-            public void handleMessage(Message msg) {
-                switch (msg.what) {
-                    case MSG_CONNECT: {
-                        tryConnect();
-                        break;
-                    }
-                    case MSG_STOP_LOOP: {
-                        Looper.myLooper().quit();
-                        break;
-                    }
-                    default: {
-                        LogManager.e("Unknown message type: " + msg.what);
-                    }
-                }
-            }
-        };
-        notifyReady();
-        Looper.loop();
-        notifyOver();
-        LogManager.i("BusinessPlatform thread exit...!");
-    }
-
-    private void tryConnect() {
-        Client client = new Client(mWAMPSession, mWebSocketURL, mRealm);
-        client.connect();
-    }
-
-    private void waitUntilReady() {
-        synchronized (mRunningLock) {
-            while (!mRunning) {
-                try {
-                    mRunningLock.wait();
-                } catch (InterruptedException ie) { /* not expected */ }
-            }
-        }
-    }
-
-    private void notifyReady() {
-        synchronized (mRunningLock) {
-            mRunning = true;
-            mRunningLock.notify();
-        }
-    }
-
-    private void waitUntilOver() {
-        synchronized (mRunningLock) {
-            while (mRunning) {
-                try {
-                    mRunningLock.wait();
-                } catch (InterruptedException ie) { /* not expected */ }
-            }
-        }
-    }
-
-    private void notifyOver() {
-        synchronized (mRunningLock) {
-            mRunning = false;
-            mRunningLock.notify();
-        }
-    }
-
-    private <T> void syncGetObjectList(List<T> result, Class<T> classof, String procedureName, Object... args)
-            throws RuntimeException, InterruptedException, InternalError {
-        Object lock = new Object();
-        List<Object> rets = new ArrayList<>();
-
-        synchronized(mLock) {
-            if (mState != State.READY) {
-                throw new RuntimeException("connnet first");
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args);
-            f.whenComplete((callResult, throwable) -> {
-                synchronized (lock) {
-                    if (throwable == null) {
-                        Gson gson = new Gson();
-                        for (Object item : callResult.results) {
-                            result.add(gson.fromJson(item.toString(), classof));
-                        }
-                        rets.add(0);
-                    } else {
-                        LogManager.e(String.format("procedure(%s) error: %s", procedureName, throwable.getMessage()));
-                        rets.add(-1);
-                        rets.add(throwable.getMessage());
-                    }
-                    lock.notify();
-                }
-            });
-        }
-
-        synchronized(lock) {
-            while (rets.size() == 0) {
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    LogManager.e(procedureName + " interrupted");
-                    throw e;
-                }
-            }
-            if((Integer)rets.get(0) != 0)
-                throw new InternalError((String) rets.get(1));
-        }
-    }
-
-    private <T> int asyncGetObjectList(Callback resultCallback, Class<T> classof, String procedureName, Object... args) {
-        synchronized(mLock) {
-            if(mState != State.READY) {
-                LogManager.w("connnet first");
-                return -1;
-            }
-
-            CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args);
-            f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, classof, resultCallback));
-            return 0;
-        }
-    }
-
-    private void onCallCompleted(CallResult callResult, Throwable throwable, Class classof, Callback resultCallback) {
-        if (throwable == null) {
-            List<Object> objs = new ArrayList<>();
-            Gson gson = new Gson();
-            for(Object item: callResult.results) {
-                objs.add(gson.fromJson(item.toString(), classof));
-            }
-            resultCallback.done(0, objs, null);
+        if(hadActivated) {
+            if(!mHasConnectionSettings ||
+               !mHasActivatingConfig ||
+               mConnectionSettings == null ||
+               mActivatingConfig == null)
+                throw new RuntimeException("loadPreferences logical error 1");
         } else {
-            resultCallback.done(-2, null, new HashMap<String, Object>(){{put("message", throwable.getMessage());}});
+            if(mHasConnectionSettings && mConnectionSettings == null)
+                throw new RuntimeException("loadPreferences logical error 2");
+            if(mHasActivatingConfig && mActivatingConfig == null)
+                throw new RuntimeException("loadPreferences logical error 3");
+        }
+
+        if(hadBound) {
+            if(!mHasOrganization || mOrganization == null)
+                throw new RuntimeException("loadPreferences logical error 4");
+            if(!hadActivated)
+                throw new RuntimeException("loadPreferences logical error 5");
+        } else {
+            if(mHasOrganization && mOrganization == null)
+                throw new RuntimeException("loadPreferences logical error 6");
         }
     }
 
-    private void onReady(Session session, SessionDetails details, Callback actionCallback, Callback onStateChanged) {
-        LogManager.i("BusinessPlatform(" + session.getID() + ") onReady");
+    private void loadConnectionSettings() {
+        mHasConnectionSettings = mSharedPref.getBoolean(
+                mContext.getString(R.string.platform_has_connection_settings),
+                mContext.getString(R.string.platform_has_connection_settings_default).equals("true"));
+        if(!mHasConnectionSettings)
+            return;
+
+        String connection = mSharedPref.getString(mContext.getString(R.string.platform_connection), null);
+        if(connection == null) {
+            String tmpFile = MP100Application.TMP_FILE_PATH + "/connection.txt";
+            LogManager.w("TODO:[DEBUG] will read connection from " + tmpFile + " which is from Monica\\app_mp100\\src\\main\\res\\raw\\connection.txt");
+            connection = getSettingsFromTmpFile(tmpFile);
+            LogManager.w("TODO:[DEBUG] connection from file: \n" + connection);
+        }
+
+        Gson gson = new Gson();
+        mConnectionSettings = gson.fromJson(connection, ConnectionSettings.class);
+        mCurrentRetryConnectTimes = mConnectionSettings.RetryConnectTimes;
+    }
+
+    private void saveConnectionSettings() {
+        if(mConnectionSettings == null)
+            return;
+        SharedPreferences.Editor editor = mSharedPref.edit();
+        editor.putString(mContext.getString(R.string.platform_has_connection_settings), "true");
+        editor.putString(mContext.getString(R.string.platform_connection), new Gson().toJson(mConnectionSettings));
+        editor.commit();
+    }
+
+    private void loadActivatingConfig() {
+        mHasActivatingConfig = mSharedPref.getBoolean(
+                mContext.getString(R.string.platform_has_activating_config),
+                mContext.getString(R.string.platform_has_activating_config_default).equals("true"));
+        if(!mHasActivatingConfig)
+            return;
+
+        String activating = mSharedPref.getString(mContext.getString(R.string.platform_activating_config), null);
+        if(activating == null)
+            activating = "{}";
+
+        Gson gson = new Gson();
+        mActivatingConfig = gson.fromJson(activating, ActivatingConfig.class);
+    }
+
+    private void saveActivatingConfig() {
+        if(mActivatingConfig == null)
+            return;
+        SharedPreferences.Editor editor = mSharedPref.edit();
+        editor.putString(mContext.getString(R.string.platform_has_activating_config), "true");
+        editor.putString(mContext.getString(R.string.platform_activating_config), new Gson().toJson(mActivatingConfig));
+        editor.commit();
+    }
+
+    private void loadOrganization() {
+        mHasOrganization = mSharedPref.getBoolean(
+                mContext.getString(R.string.platform_has_organization),
+                mContext.getString(R.string.platform_has_organization_default).equals("true"));
+        if(!mHasOrganization)
+            return;
+
+        String organization = mSharedPref.getString(mContext.getString(R.string.platform_organization), null);
+        if(organization == null) {
+            String tmpFile = MP100Application.TMP_FILE_PATH + "/org.txt";
+            LogManager.w("TODO:[DEBUG] will read organization from " + tmpFile + " which is from Monica\\app_mp100\\src\\main\\res\\raw\\org.txt");
+            organization = getSettingsFromTmpFile(tmpFile);
+            LogManager.w("TODO:[DEBUG] organization from file: \n" + organization);
+        }
+
+        Gson gson = new Gson();
+        mOrganization = gson.fromJson(organization, Organization.class);
+    }
+
+    private void saveOrganization() {
+        if(mOrganization == null)
+            return;
+        SharedPreferences.Editor editor = mSharedPref.edit();
+        editor.putString(mContext.getString(R.string.platform_has_organization), "true");
+        editor.putString(mContext.getString(R.string.platform_organization), new Gson().toJson(mOrganization));
+        editor.commit();
+    }
+
+    private int tryConnect() {
         synchronized (mLock) {
-            mState = State.READY;
-            if(onStateChanged != null) {
-                mWAMPSession.addOnDisconnectListener((ses, wasClean) ->
-                        onDisconnected(ses, wasClean, onStateChanged)
-                );
+            if (!mInited || !mAllowConnect || !mPlatformPostman.disconnected() || !mHasConnectionSettings)
+                return -1;
+
+            LogManager.i("try to connect to platform");
+            if (mPlatformPostman.asyncConnect(mConnectionSettings.WebSocketURL, mConnectionSettings.Realm, this::onStateChanged) ==
+                    BPError.ERROR_IMPORTANT_DELIVER_FAIL) {
+                throw new RuntimeException("fail to asyncConnect platform");
             }
-            if(actionCallback != null) {
-                actionCallback.done(mState.toValue(), null, null);
-            } else {
-                mLock.notify();
+            return 0;
+        }
+    }
+
+    private void onActivating(boolean success) {
+        mActivating = success ? State.Done : State.None;
+        SharedPreferences.Editor editor = mSharedPref.edit();
+        editor.putString(mContext.getString(R.string.platform_had_activated), success?"true":"false");
+        editor.commit();
+
+        if(success && mBinding == State.Done && mHasOrganization)
+            bind();
+    }
+
+    private void onStateChanged(int connected, List<Object> useless1, Map<String, Object> useless2) {
+        if(connected == 0) {
+            LogManager.w("has disconnected from platform");
+            synchronized (mLock) {
+                for(Observer ob: mObservers)
+                    ob.onConnectingState(false);
+            }
+            if(!mAllowConnect) {
+                synchronized (mLock) {
+                    mLock.notifyAll();
+                }
+            } else if(mConnectionSettings.RetryConnectEnable && mCurrentRetryConnectTimes != 0) {
+                if(mCurrentRetryConnectTimes > 0)
+                    --mCurrentRetryConnectTimes;
+                LogManager.w(String.format("retry connect to platform again %s",
+                        (mCurrentRetryConnectTimes < 0 ? "forever" :
+                                ", left " + mCurrentRetryConnectTimes + " times")));
+                LogManager.w("TODO: the same thread will reentry the critical zone!!!");
+                if(mPlatformPostman.asyncConnect(mConnectionSettings.WebSocketURL, mConnectionSettings.Realm, this::onStateChanged, mConnectionSettings.RetryConnectIntervalMS) ==
+                        BPError.ERROR_IMPORTANT_DELIVER_FAIL) {
+                    LogManager.e("!!! fail to retry connect to platform");
+                }
+            }
+        } else {
+            LogManager.i("successful to connect to the platform");
+            LogManager.w("TODO: auth with the platform");
+            synchronized (mLock) {
+                for(Observer ob: mObservers)
+                    ob.onConnectingState(true);
+            }
+
+            if(mActivating == State.None && mHasActivatingConfig) {
+                activate();
             }
         }
     }
 
-    private void onDisconnected(Session session, boolean wasClean, Callback cb) {
-        LogManager.i("BusinessPlatform(" + session.getID() + ") onDisconnected with" + (wasClean?"clean":"un-clean"));
-        synchronized (mLock) {
-            mState = State.NONE;
-            if(cb != null) {
-                cb.done(mState.toValue(), null, null);
-            } else {
-                mLock.notify();
+    private String getSettingsFromTmpFile(String filename) {
+        try {
+            String settings = "";
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(filename))));
+            String line = br.readLine();
+            while(line != null) {
+                settings += line;
+                line = br.readLine();
             }
+            br.close();
+            return settings;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException("not found " + filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("read from " + filename + " fail");
         }
-    }
-
-    private void onConnecting(Session session) {
-        LogManager.i("BusinessPlatform(" + session.getID() + ") onConnecting");
-    }
-
-    private void onDisconnecting(Session session, CloseDetails closeDetails) {
-        LogManager.i(String.format("BusinessPlatform(%lld) onDisconnecting with [reason=%s] [message=%s]", session.getID(), closeDetails.reason, closeDetails.message));
     }
 }
