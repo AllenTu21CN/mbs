@@ -2,6 +2,11 @@ package sanp.mp100;
 
 import android.app.Application;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import sanp.avalon.libs.base.utils.FileSaveUtils;
+import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
 
 
@@ -11,48 +16,29 @@ import sanp.mp100.integration.BusinessPlatform;
 
 public class MP100Application extends Application {
 
+    public static final String TMP_FILE_PATH = System.getenv("EXTERNAL_STORAGE") + "/MP100/tmp";
+
+    private static final Map<String, Integer> TMP_SETTINGS_FILES = new HashMap<String, Integer>() {{
+        put("connection.txt", R.raw.connection);
+        put("org.txt", R.raw.org);
+    }};
+
     @Override
     public void onCreate() {
         super.onCreate();
-        new Thread(){
-            @Override
-            public void run() {
-                initApplication();
+
+        saveTmpSettingsFilesToStorage();
+
+        BusinessPlatform.getInstance().init(this);
+    }
+
+    private void saveTmpSettingsFilesToStorage() {
+        for(String filename: TMP_SETTINGS_FILES.keySet()) {
+            try {
+                FileSaveUtils.saveToSDCard(this, TMP_FILE_PATH, filename, TMP_SETTINGS_FILES.get(filename));
+            } catch (Throwable e) {
+                LogManager.e("saveTmpSettingsFilesToStorage error " + e);
             }
-        }.start();
-    }
-
-    private static Object gLock = new Object();
-    private static boolean gInited = false;
-
-    private void initApplication() {
-        synchronized (gLock) {
-            if(!gInited) {
-                if(BusinessPlatform.getInstance().init(this) != 0) {
-                    throw new RuntimeException("BusinessPlatform init failed");
-                }
-                gInited = true;
-            }
-            gLock.notifyAll();
-        }
-    }
-
-    static public boolean isInited() {
-        return gInited;
-    }
-
-    static public void waitUntilInited() throws InterruptedException {
-        synchronized (gLock) {
-            while(!gInited)
-                gLock.wait();
-        }
-    }
-
-    static public boolean waitInited(long timeoutMs) throws InterruptedException {
-        synchronized (gLock) {
-            if(!gInited && timeoutMs > 0)
-                gLock.wait(timeoutMs);
-            return gInited;
         }
     }
 }

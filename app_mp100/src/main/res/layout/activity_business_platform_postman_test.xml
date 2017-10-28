@@ -61,6 +61,15 @@
                         tools:layout_editor_absoluteY="247dp" />
 
                     <Button
+                        android:id="@+id/btn_connect2"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="connect2"
+                        tools:layout_editor_absoluteX="148dp"
+                        tools:layout_editor_absoluteY="247dp" />
+
+                    <Button
                         android:id="@+id/btn_disconnect"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -68,6 +77,36 @@
                         android:text="disconnect"
                         tools:layout_editor_absoluteX="148dp"
                         tools:layout_editor_absoluteY="247dp" />
+                </LinearLayout>
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_sum"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="sum"
+                        tools:layout_editor_absoluteX="0dp"
+                        tools:layout_editor_absoluteY="303dp" />
+
+                    <Button
+                        android:id="@+id/btn_sum2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="sum2"
+                        tools:layout_editor_absoluteX="0dp"
+                        tools:layout_editor_absoluteY="303dp" />
                 </LinearLayout>
 
             </TableRow>
@@ -101,6 +140,36 @@
 
                 </LinearLayout>
 
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_getCities"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="getCities"
+                        tools:layout_editor_absoluteX="384dp"
+                        tools:layout_editor_absoluteY="74dp" />
+
+                    <Button
+                        android:id="@+id/btn_getCities2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="getCities2"
+                        tools:layout_editor_absoluteX="384dp"
+                        tools:layout_editor_absoluteY="74dp" />
+
+                </LinearLayout>
             </TableRow>
 
             <TableRow

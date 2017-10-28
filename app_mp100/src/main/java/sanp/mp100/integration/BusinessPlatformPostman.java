@@ -1,7 +1,5 @@
 package sanp.mp100.integration;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -22,7 +20,7 @@ import io.crossbar.autobahn.wamp.types.SessionDetails;
 import java8.util.concurrent.CompletableFuture;
 import sanp.avalon.libs.base.utils.LogManager;
 
-import sanp.mp100.R;
+import sanp.mp100.integration.BusinessPlatform.Callback;
 
 /**
  * Created by Tuyj on 2017/10/27.
@@ -30,7 +28,17 @@ import sanp.mp100.R;
 
 public class BusinessPlatformPostman implements Runnable {
 
-    private enum State {
+    public static class BPError {
+        public static final int ACTION_SUCCESS = 0;
+        public static final int ERROR_IMPORTANT_START = -100;
+        public static final int ERROR_IMPORTANT_LOGICAL_ERROR   =  ERROR_IMPORTANT_START - 1;
+        public static final int ERROR_IMPORTANT_ACTION_SKIP     =  ERROR_IMPORTANT_START - 2;
+        public static final int ERROR_IMPORTANT_ACTION_FAIL     =  ERROR_IMPORTANT_START - 3;
+        public static final int ERROR_IMPORTANT_INTERRUPTED     =  ERROR_IMPORTANT_START - 4;
+        public static final int ERROR_IMPORTANT_DELIVER_FAIL    =  ERROR_IMPORTANT_START - 5;
+    }
+
+    public enum State {
         NONE(0),
         CONNECTING(1),
         READY(2),
@@ -61,7 +69,7 @@ public class BusinessPlatformPostman implements Runnable {
     private Object mRunningLock = new Object();
     private Handler mHandler = null;
 
-    BusinessPlatformPostman() {
+    public BusinessPlatformPostman() {
         if (mThread == null) {
             mThread = new Thread(this, "BusinessPlatformPostman");
             mThread.start();
@@ -82,38 +90,6 @@ public class BusinessPlatformPostman implements Runnable {
         }
     }
 
-    public int init(Context context) {
-        synchronized (mInited) {
-            if(!mInited) {
-                mContext = context;
-                mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_preferences), Context.MODE_PRIVATE);
-
-                mActivated = mSharedPref.getBoolean(mContext.getString(R.string.has_activated), false);
-                if(mActivated) {
-
-                    ...; 将BusinessPlatform拆分成postman和BusinessPlatforml
-
-                            mOrganization = new Organization();
-                }
-
-                mInited = true;
-            }
-            return 0;
-        }
-    }
-
-    public boolean inited() {
-        return mInited;
-    }
-
-    public boolean activated() {
-        return mActivated;
-    }
-
-    public boolean bound() {
-        return mBound;
-    }
-
     /**
      * @param onStateChanged, been called while state has been changed
      *      @param onStateChanged::value, 0-disconnected, otherwise connected
@@ -124,11 +100,11 @@ public class BusinessPlatformPostman implements Runnable {
         synchronized(mLock) {
             if(mState == State.READY) {
                 LogManager.i("had connected");
-                return -1;
+                return BPError.ERROR_IMPORTANT_ACTION_SKIP;
             }
             if(mState != State.NONE) {
                 LogManager.i("in busy");
-                return -2;
+                return BPError.ERROR_IMPORTANT_LOGICAL_ERROR;
             }
 
             mRealm = realm;
@@ -149,7 +125,7 @@ public class BusinessPlatformPostman implements Runnable {
                 LogManager.e("send looper message to try to connect failed");
                 mState = State.NONE;
                 mWAMPSession = null;
-                return -3;
+                return BPError.ERROR_IMPORTANT_DELIVER_FAIL;
             }
 
             while (mState == State.CONNECTING) {
@@ -160,18 +136,18 @@ public class BusinessPlatformPostman implements Runnable {
                     LogManager.e("connect interrupted");
                     mState = State.NONE;
                     mWAMPSession = null;
-                    return 4;
+                    return BPError.ERROR_IMPORTANT_INTERRUPTED;
                 }
             }
 
             if(mState != State.READY) {
                 mState = State.NONE;
                 mWAMPSession = null;
-                return -5;
+                return BPError.ERROR_IMPORTANT_ACTION_FAIL;
             }
 
             mWAMPSession.removeOnDisconnectListener(dis);
-            return 0;
+            return BPError.ACTION_SUCCESS;
         }
     }
 
@@ -182,14 +158,17 @@ public class BusinessPlatformPostman implements Runnable {
      *      @param onStateChanged::kwargs, useless
      * */
     public int asyncConnect(String websocketURL, String realm, Callback onStateChanged) {
+        return asyncConnect(websocketURL, realm, onStateChanged, 0);
+    }
+    public int asyncConnect(String websocketURL, String realm, Callback onStateChanged, long actionDelayMs) {
         synchronized(mLock) {
             if(mState == State.READY) {
                 LogManager.i("had connected");
-                return -1;
+                return BPError.ERROR_IMPORTANT_ACTION_SKIP;
             }
             if(mState != State.NONE) {
                 LogManager.i("in busy");
-                return -2;
+                return BPError.ERROR_IMPORTANT_LOGICAL_ERROR;
             }
 
             mRealm = realm;
@@ -206,12 +185,12 @@ public class BusinessPlatformPostman implements Runnable {
             mWAMPSession.addOnConnectListener(this::onConnecting);
             mWAMPSession.addOnLeaveListener(this::onDisconnecting);
 
-            if(!mHandler.sendMessage(mHandler.obtainMessage(MSG_CONNECT))) {
+            if(!mHandler.sendMessageDelayed(mHandler.obtainMessage(MSG_CONNECT), actionDelayMs)) {
                 mState = State.NONE;
                 mWAMPSession = null;
-                return -3;
+                return BPError.ERROR_IMPORTANT_DELIVER_FAIL;
             }
-            return 0;
+            return BPError.ACTION_SUCCESS;
         }
     }
 
@@ -219,22 +198,30 @@ public class BusinessPlatformPostman implements Runnable {
         synchronized(mLock) {
             if (mState == State.NONE) {
                 LogManager.i("had disconnected");
-                return -1;
+                return BPError.ERROR_IMPORTANT_ACTION_SKIP;
             }
             if (mState != State.READY) {
                 LogManager.i("in busy");
-                return -2;
+                return BPError.ERROR_IMPORTANT_LOGICAL_ERROR;
             }
 
             mState = State.DISCONNECTING;
             mWAMPSession.leave();
             mWAMPSession = null;
-            return 0;
+            return BPError.ACTION_SUCCESS;
         }
     }
 
     public boolean ready() {
         return mState == State.READY;
+    }
+
+    public boolean disconnected() {
+        return mState == State.NONE;
+    }
+
+    public State state() {
+        return mState;
     }
 
     public CallResult syncInvoke(String procedureName, List<Object> args, Map<String, Object> kwargs)
@@ -255,10 +242,10 @@ public class BusinessPlatformPostman implements Runnable {
                     if (throwable == null) {
                         result.results = callResult.results;
                         result.kwresults = callResult.kwresults;
-                        rets.add(0);
+                        rets.add(BPError.ACTION_SUCCESS);
                     } else {
                         LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) fail: %s", procedureName, args, kwargs, throwable.getMessage()));
-                        rets.add(-1);
+                        rets.add(BPError.ERROR_IMPORTANT_ACTION_FAIL);
                         rets.add(throwable.getMessage());
                     }
                     lock.notify();
@@ -293,7 +280,7 @@ public class BusinessPlatformPostman implements Runnable {
         synchronized(mLock) {
             if(mState != State.READY) {
                 LogManager.w("connnet first");
-                return -1;
+                return BPError.ERROR_IMPORTANT_LOGICAL_ERROR;
             }
 
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args, kwargs, (Class<CallResult>) null);
@@ -304,7 +291,7 @@ public class BusinessPlatformPostman implements Runnable {
                     resultCallback.done(-2, null, new HashMap<String, Object>(){{put("message", throwable.getMessage());}});
                 }
             });
-            return 0;
+            return BPError.ACTION_SUCCESS;
         }
     }
 
@@ -329,10 +316,10 @@ public class BusinessPlatformPostman implements Runnable {
                         for (Object item : callResult.results) {
                             result.add(gson.fromJson(item.toString(), classof));
                         }
-                        rets.add(0);
+                        rets.add(BPError.ACTION_SUCCESS);
                     } else {
                         LogManager.e(String.format("procedure(%s) error: %s", procedureName, throwable.getMessage()));
-                        rets.add(-1);
+                        rets.add(BPError.ERROR_IMPORTANT_ACTION_FAIL);
                         rets.add(throwable.getMessage());
                     }
                     lock.notify();
@@ -366,155 +353,14 @@ public class BusinessPlatformPostman implements Runnable {
         synchronized(mLock) {
             if(mState != State.READY) {
                 LogManager.w("connnet first");
-                return -1;
+                return BPError.ERROR_IMPORTANT_LOGICAL_ERROR;
             }
 
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args);
             f.whenComplete((callResult, throwable) -> onCallCompleted(callResult, throwable, classof, resultCallback));
-            return 0;
+            return BPError.ACTION_SUCCESS;
         }
     }
-
-    static private final String PROCEDURE_NAME_AREA_GET_PROVINCES   = "area.getProvinces";
-    static private final String PROCEDURE_NAME_AREA_GET_CITIES      = "area.getCitiesByProvince";
-    static private final String PROCEDURE_NAME_AREA_GET_DISTRICTS   = "area.getDistrictsByCity";
-    static private final String PROCEDURE_NAME_ORG_GET_SCHOOLS      = "org.getSchoolsByArea";
-    static private final String PROCEDURE_NAME_ORG_GET_CLASSES      = "org.getClassesBySchoolId";
-    static private final String PROCEDURE_NAME_LESSON_GET_TIMETABLE = "lesson.getTimetable";
-
-    // ---- get Provinces
-    public List<Province> getAreaProvinces()
-            throws RuntimeException, InterruptedException, InternalError {
-        List<Province> provinces = new ArrayList<>();
-        syncInvokeResultAsList(provinces, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
-        return provinces;
-    }
-
-    /**
-     * @param resultCallback:
-     *      if the resultCallback::value is 0, that means the action has been done successfully,
-     *  get result(List<Province>) from resultCallback::args
-     *      otherwise, the resultCallback::value indicates error code, and get error message from
-     *  resultCallback::kwargs ({"message": "..."})
-     * */
-    public int getAreaProvinces(Callback resultCallback) {
-        return asyncInvokeResultAsList(resultCallback, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
-    }
-
-
-    // ---- get Cities
-    public List<City> getAreaCitiesByProvince(String province)
-            throws RuntimeException, InterruptedException, InternalError {
-        List<City> cities = new ArrayList<>();
-        syncInvokeResultAsList(cities, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
-        return cities;
-    }
-
-    /**
-     * @param resultCallback:
-     *      if the resultCallback::value is 0, that means the action has been done successfully,
-     *  get result(List<City>) from resultCallback::args
-     *      otherwise, the resultCallback::value indicates error code, and get error message from
-     *  resultCallback::kwargs ({"message": "..."})
-     * */
-    public int getAreaCitiesByProvince(String province, Callback resultCallback) {
-        return asyncInvokeResultAsList(resultCallback, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
-    }
-
-
-    // ---- get Districts
-    public List<District> getAreaDistrictsByCity(String province, String city)
-            throws RuntimeException, InterruptedException, InternalError {
-        List<District> districts = new ArrayList<>();
-        syncInvokeResultAsList(districts, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
-        return districts;
-    }
-
-    /**
-     * @param resultCallback:
-     *      if the resultCallback::value is 0, that means the action has been done successfully,
-     *  get result(List<District>) from resultCallback::args
-     *      otherwise, the resultCallback::value indicates error code, and get error message from
-     *  resultCallback::kwargs ({"message": "..."})
-     * */
-    public int getAreaDistrictsByCity(String province, String city, Callback resultCallback) {
-        return asyncInvokeResultAsList(resultCallback, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
-    }
-
-
-    // ---- get Schools
-    /**
-     * e.g. ("北京市", "", "")
-     * e.g. ("北京市", "北京市", "")
-     * e.g. ("北京市", "北京市", "海淀区")
-     * */
-    public List<School> getOrgSchoolsByArea(String province, String city, String district)
-            throws RuntimeException, InterruptedException, InternalError {
-        List<School> schools = new ArrayList<>();
-        syncInvokeResultAsList(schools, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
-        return schools;
-    }
-
-    /**
-     * e.g. ("北京市", "", "", resultCallback)
-     * e.g. ("北京市", "北京市", "", resultCallback)
-     * e.g. ("北京市", "北京市", "海淀区", resultCallback)
-     * @param resultCallback:
-     *      if the resultCallback::value is 0, that means the action has been done successfully,
-     *  get result(List<School>) from resultCallback::args
-     *      otherwise, the resultCallback::value indicates error code, and get error message from
-     *  resultCallback::kwargs ({"message": "..."})
-     * */
-    public int getOrgSchoolsByArea(String province, String city, String district, Callback resultCallback) {
-        return asyncInvokeResultAsList(resultCallback, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
-    }
-
-
-    // ---- get Classes
-    public List<SchoolClass> getOrgClassesBySchoolId(long school_id)
-            throws RuntimeException, InterruptedException, InternalError {
-        List<SchoolClass> classes = new ArrayList<>();
-        syncInvokeResultAsList(classes, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
-        return classes;
-    }
-
-    /**
-     * @param resultCallback:
-     *      if the resultCallback::value is 0, that means the action has been done successfully,
-     *  get result(List<SchoolClass>) from resultCallback::args
-     *      otherwise, the resultCallback::value indicates error code, and get error message from
-     *  resultCallback::kwargs ({"message": "..."})
-     * */
-    public int getOrgClassesBySchoolId(long school_id, Callback resultCallback) {
-        return asyncInvokeResultAsList(resultCallback, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
-    }
-
-
-    // ---- get LessonTimetable
-    /**
-     * @param start_date: e.g. "2017-10-16"
-     * @param end_date: e.g. "2017-10-22"
-     * */
-    public List<TimeTable> getLessonTimetable(long class_id, String start_date, String end_date)
-            throws RuntimeException, InterruptedException, InternalError {
-        List<TimeTable> tables = new ArrayList<>();
-        syncInvokeResultAsList(tables, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
-        return tables;
-    }
-
-    /**
-     * @param start_date: e.g. "2017-10-16"
-     * @param end_date: e.g. "2017-10-22"
-     * @param resultCallback:
-     *      if the resultCallback::value is 0, that means the action has been done successfully,
-     *  get result(List<TimeTable>) from resultCallback::args
-     *      otherwise, the resultCallback::value indicates error code, and get error message from
-     *  resultCallback::kwargs ({"message": "..."})
-     * */
-    public int getLessonTimetable(long class_id, String start_date, String end_date, Callback resultCallback) {
-        return asyncInvokeResultAsList(resultCallback, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
-    }
-
 
     @Override
     public void run() {

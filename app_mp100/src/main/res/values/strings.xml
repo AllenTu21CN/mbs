@@ -4,6 +4,63 @@
     <string name="button_send">Send</string>
 
     <string name="my_preferences">sanp.mp100.my_preferences</string>
-    <string name="has_activated">has_activated</string>
-    <string name="my_organization">my_org</string>
+
+    <string name="platform_had_activated">platform_had_activated</string>
+    <string name="platform_had_activated_default">true</string>
+
+    <string name="platform_had_bound">platform_had_bound</string>
+    <string name="platform_had_bound_default">true</string>
+
+    <string name="platform_has_connection_settings">platform_has_connection_settings</string>
+    <string name="platform_has_connection_settings_default">true</string>
+    <string name="platform_connection">platform_connection</string>
+
+    <string name="platform_has_activating_config">platform_has_activating_config</string>
+    <string name="platform_has_activating_config_default">true</string>
+    <string name="platform_activating_config">platform_activating_config</string>
+
+    <string name="platform_has_organization">platform_has_organization</string>
+    <string name="platform_has_organization_default">true</string>
+    <string name="platform_organization">platform_organization</string>
+
+    <string name="platform_connection_default">{
+        "WebSocketURL": "ws://lbblscy.3322.org:8085/device-hub",
+        "Realm": "ebp.daemon",
+        "RetryConnectEnable": true,
+        "RetryConnectTimes": -1,
+        "RetryConnectIntervalMS": 7000,
+        "KeepAliveEnable": true,
+        "KeepAliveRetryTimes": 3,
+        "KeepAliveIntervalMS": 10000,
+        "KeepAliveTimeoutMS": 5000
+     }</string>
+    <string name="platform_activating_config_default">{}</string>
+    <string name="platform_organization_default">{
+        "province": {
+            "id": "P110000",
+            "province": "北京市"
+        },
+        "city": {
+            "id": "C110000",
+            "province": "北京市",
+            "city": "北京市"
+        },
+        "district": {
+            "id": "D110108",
+            "province": "北京市",
+            "city": "北京市",
+            "district": "海淀区"
+        },
+        "school": {
+            "id": 1,
+            "name": "中国人民大学附属中学（初中部）",
+            "type": "初中",
+            "role": "主讲学校"
+        },
+        "schoolClass": {
+            "id": 1,
+            "name": "初一（1）班",
+            "type": "精品录播"
+        }
+    }</string>
 </resources>
