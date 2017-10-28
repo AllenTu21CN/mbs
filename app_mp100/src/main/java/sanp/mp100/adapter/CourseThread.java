@@ -24,15 +24,29 @@ import sanp.mp100.integration.BusinessPlatform.TimeTable;
 
 public class CourseThread implements Runnable {
 
+    public interface Notify {
+        // The course thread is Ready
+        void onCourseThreadReady();
+
+        // Something error is happened
+        void onError(int error);
+
+        // Checkout courses suc
+        void onCheckoutCourse(List<TimeTable> list);
+    };
+
     // course call method message
     public static final int MSG_CHECKOUT_COURSE = 0;
-    public static final int MSG_STOP = 1;
+    public static final int MSG_STOP_THREAD = 1;
 
     private Thread mCourseThread = null;
 //  private Object mLock = new Object();
 
     // course table view adapter
     private BaseAdapter mCourseAdapter;
+    // notify, CourseTable activity
+    private Notify      mNotify;
+
     // course lesson list
     private List<TimeTable>  mCourseList = null;
     // classroom, which is connect with service
@@ -42,8 +56,9 @@ public class CourseThread implements Runnable {
     private Handler mHandler = null;
 
 
-    public CourseThread(BaseAdapter adapter) {
+    public CourseThread(BaseAdapter adapter, Notify notify) {
         mCourseAdapter = adapter;
+        mNotify = notify;
 
         // init the thread
         init();
@@ -54,7 +69,6 @@ public class CourseThread implements Runnable {
         mCourseThread = new Thread(this, "Course Thread");
         mCourseThread.start();
 
-        //TODO synchronized, wait thread runnning
         return;
     }
 
@@ -70,7 +84,7 @@ public class CourseThread implements Runnable {
     //
     // @return 0, suc to call; or -1 is failed
     public int checkoutCourse(Date date, int days) {
-        LogManager.i("Try to checkout course date: " + date + "for " + days + " days");
+        LogManager.i("Try to checkout course date: " + date + " for " + days + " days");
 
         // prepare checkout course message
         Message message = Message.obtain();
@@ -92,10 +106,10 @@ public class CourseThread implements Runnable {
 
         // prepare stop message
         Message message = Message.obtain();
-        message.what = MSG_STOP;
+        message.what = MSG_STOP_THREAD;
 
         if (!mHandler.sendMessage(message)) {
-            LogManager.e("Send MSG_STOP message failed");
+            LogManager.e("Send MSG_STOP_THREAD message failed");
             return 1;
         }
 
@@ -117,16 +131,20 @@ public class CourseThread implements Runnable {
 
         LogManager.i("Enter course table thread process function");
 
+        // notify CourseTable thread is ready.
+        mNotify.onCourseThreadReady();
+
         Looper.prepare();
 
         // new a message handler
         mHandler = new Handler() {
+            @Override
             public void handleMessage(Message msg) {
                 switch(msg.what) {
                 case MSG_CHECKOUT_COURSE: /* checkout course message */
                     onCheckoutCourseMsg((Date)msg.obj, msg.arg1);
                     break;
-                case MSG_STOP: /* stop course thread message */
+                case MSG_STOP_THREAD: /* stop course thread message */
                     Looper.myLooper().quit();
                     break;
                 default:
@@ -154,10 +172,13 @@ public class CourseThread implements Runnable {
         Date end = calendar.getTime();
 
         // convert data into string format: "yyyy-MM-dd"
-        SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-        String date_string = date_format.format(date);
-        String end_string  = date_format.format(date);
+        String date_string = format.format(date);
+        String end_string  = format.format(end);
+
+        LogManager.i("onCheckoutCourseMsg: try to checkout courses(" +
+                date_string + " ~ " + end_string  + ") from service");
 
         long class_id = 1;  //TODO, needn't this
         try {
@@ -167,6 +188,9 @@ public class CourseThread implements Runnable {
             LogManager.e("onCheckoutCourse checkout courses failed: " + e);
             return;
         }
+
+        // notify to CourseTable to update table view
+        mNotify.onCheckoutCourse(mCourseList);
 
         // notify to adapter update course table
         mCourseAdapter.notifyDataSetChanged();
