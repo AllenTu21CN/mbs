@@ -168,7 +168,8 @@ public class CourseTable extends Activity implements CourseThread.Notify {
             format.format(mCourseTableMonday));
 
         // checkout this week's courses
-        mCourseThread.checkoutCourse(mCourseTableMonday, 7);
+        // days: 6 + include monday = 7 days
+        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
     }
 
     // @brief Updates course table
