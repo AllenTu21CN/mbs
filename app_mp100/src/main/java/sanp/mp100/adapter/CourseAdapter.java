@@ -80,7 +80,7 @@ public class CourseAdapter extends BaseAdapter {
 
             // calc days from monday in week
             int days = CourseTable.daysBetween(monday, date);
-            if (days < 0 || days > 7) {
+            if (days < 0 || days >= 7) {
                 LogManager.w("Course: " + it.subject_name  + ", Section: " +
                     it.section + ", date: " + it.date + " is not in this week");
                 continue;
