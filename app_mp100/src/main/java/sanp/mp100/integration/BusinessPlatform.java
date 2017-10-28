@@ -63,7 +63,7 @@ public class BusinessPlatform implements Runnable {
         public String type;
     }
 
-    public class TimeTable {
+    public static class TimeTable {
         public long id;
         public String type;
         public String subject_id;

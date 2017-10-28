@@ -8,9 +8,11 @@ import android.widget.BaseAdapter;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.logging.LogManager;
+import java.util.List;
 
+import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
+import sanp.mp100.integration.BusinessPlatform.TimeTable;
 
 /**
  * @file  CourseThread.java
@@ -157,8 +159,14 @@ public class CourseThread implements Runnable {
         String date_string = date_format.format(date);
         String end_string  = date_format.format(date);
 
-        // checkout courses from classroom(BusinessPlatform) 
-        mCourseList = mClassRoom.getLessonTimetable(0, date_string, end_string);
+        long class_id = 0;
+        try {
+            // checkout courses from classroom(BusinessPlatform)
+            mCourseList = mClassRoom.getLessonTimetable(class_id, date_string, end_string);
+        } catch (Exception e) {
+            LogManager.e("onCheckoutCourse checkout courses failed: " + e);
+            return;
+        }
 
         // notify to adapter update course table
         mCourseAdapter.notifyDataSetChanged();

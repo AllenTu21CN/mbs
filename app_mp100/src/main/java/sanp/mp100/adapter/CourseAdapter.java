@@ -1,7 +1,6 @@
 package sanp.mp100.adapter; 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +10,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import sanp.mp100.integration.BusinessPlatform;
+import sanp.mp100.R;
+import sanp.mp100.integration.BusinessPlatform.TimeTable;
 
 /**
  * @brief Course adapter. Checkouts course and show them on the view. 
@@ -49,8 +49,8 @@ public class CourseAdapter extends BaseAdapter {
                 TimeTable course = new TimeTable();
 
                 course.id           = -1; 
-                course.section      = new String(isection);
-                course.subject_name = new String("");
+                course.section      = String.valueOf(isection);
+                course.subject_name = "";
 
                 mEmptyCourseList.add(course);
             }
@@ -63,7 +63,7 @@ public class CourseAdapter extends BaseAdapter {
     }
 
     @Override
-    public Course getItem(int position) {
+    public TimeTable getItem(int position) {
         return mEmptyCourseList.get(position);
     }
 
@@ -88,8 +88,8 @@ public class CourseAdapter extends BaseAdapter {
 
         // find course and set into the view
         if (mEmptyCourseList != null && !mEmptyCourseList.isEmpty()) {
-            Course course = mEmptyCourseList.get(position);
-            holder.mCourseView.setText(course.getName());
+            TimeTable course = mEmptyCourseList.get(position);
+            holder.mCourseView.setText(course.subject_name);
         }
 
         return convertView;
