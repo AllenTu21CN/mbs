@@ -16,8 +16,8 @@ import sanp.mp100.integration.BusinessPlatform;
 
 public class MP100Application extends Application {
 
-//  public static final String TMP_FILE_PATH = System.getenv("EXTERNAL_STORAGE") + "/MP100/tmp";
-    public static final String TMP_FILE_PATH = "/data/app/MP100";
+    public static final String TMP_FILE_PATH = System.getenv("EXTERNAL_STORAGE") + "/MP100/tmp";
+//  public static final String TMP_FILE_PATH = "/data/app/MP100";
 
     private static final Map<String, Integer> TMP_SETTINGS_FILES = new HashMap<String, Integer>() {{
         put("connection.txt", R.raw.connection);
