@@ -3,7 +3,8 @@
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send</string>
 
-    <string name="my_preferences">sanp.mp100.my_preferences</string>
+    <!--preferences for platform-->
+    <string name="my_platform_preferences">sanp.mp100.my_platform_preferences</string>
 
     <string name="platform_had_activated">platform_had_activated</string>
     <string name="platform_had_activated_default">true</string>
@@ -63,4 +64,11 @@
             "type": "精品录播"
         }
     }</string>
+
+
+    <!--preferences for local video-->
+    <string name="my_local_video_preferences">sanp.mp100.my_local_video_preferences</string>
+
+    <string name="video_sources">video_sources</string>
+    <string name="video_scenes">video_scenes</string>
 </resources>

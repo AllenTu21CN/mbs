@@ -539,7 +539,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         private Map<Integer, MediaSink<MediaEngine.VideoSinkConfig>> mVideoSinks = new HashMap<>(MediaEngine.MAXIMUM_VIDEO_SINK_COUNT);
         private Map<Integer, MediaSink<MediaEngine.AudioSinkConfig>> mAudioSinks = new HashMap<>(MediaEngine.MAXIMUM_AUDIO_SINK_COUNT);
 
-        private ScreeLayout.LayoutMode mCurrentMode = ScreeLayout.LayoutMode.UNSPECIFIED;
+        private ScreenLayout.LayoutMode mCurrentMode = ScreenLayout.LayoutMode.UNSPECIFIED;
         private int mCurrentSubScreenCnt = -1;
 
         private class VideoStreamRef {
@@ -563,7 +563,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             private int mWidth = 1920;
             private int mHeight = 1080;
             private Position mExpectedDstPos = new Position();
-            private ScreeLayout.FillPattern mPattern = ScreeLayout.FillPattern.FILL_PATTERN_NONE;
+            private ScreenLayout.FillPattern mPattern = ScreenLayout.FillPattern.FILL_PATTERN_NONE;
 
             public VideoStream mVideoStream = null;
 
@@ -635,7 +635,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                 }
             }
 
-            public void setPosition(ScreeLayout.FillPattern newPattern, Position pos) {
+            public void setPosition(ScreenLayout.FillPattern newPattern, Position pos) {
                 if (mPattern != newPattern || !mExpectedDstPos.isEqual(pos)) {
                     mPattern = newPattern;
                     mExpectedDstPos.update(pos);
@@ -700,7 +700,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 
             public void onResolutionChanged(int newWidth, int newHeight) {
                 if (!mExpectedDstPos.isValid() ||
-                        mPattern == ScreeLayout.FillPattern.FILL_PATTERN_NONE ||
+                        mPattern == ScreenLayout.FillPattern.FILL_PATTERN_NONE ||
                         isSimilarRatio(newWidth, newHeight, mWidth, mHeight)) {
                     mWidth = newWidth;
                     mHeight = newHeight;
@@ -798,11 +798,11 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             }
 
             private void flushPosition() {
-                if (mPattern == ScreeLayout.FillPattern.FILL_PATTERN_ADAPTING)
+                if (mPattern == ScreenLayout.FillPattern.FILL_PATTERN_ADAPTING)
                     adapte();
-                else if (mPattern == ScreeLayout.FillPattern.FILL_PATTERN_STRETCHED)
+                else if (mPattern == ScreenLayout.FillPattern.FILL_PATTERN_STRETCHED)
                     stretch();
-                else if (mPattern == ScreeLayout.FillPattern.FILL_PATTERN_CROPPING)
+                else if (mPattern == ScreenLayout.FillPattern.FILL_PATTERN_CROPPING)
                     crop();
                 else
                     throw new RuntimeException("Unknow pattern: " + mPattern);
@@ -847,8 +847,8 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             private List<String> toDstPositionCmds() {
                 List<String> cmds = new ArrayList<>();
                 cmds.add(String.format("set stream %d dst-rect %s", mStreamID, mDstPosition.toString()));
-                if (mCurrentMode == ScreeLayout.LayoutMode.ASYMMETRY_OVERLAPPING) {
-                    String zero_string = ScreeLayout.getSubScreenPosition(mCurrentMode, mCurrentSubScreenCnt, 0);
+                if (mCurrentMode == ScreenLayout.LayoutMode.ASYMMETRY_OVERLAPPING) {
+                    String zero_string = ScreenLayout.getSubScreenPosition(mCurrentMode, mCurrentSubScreenCnt, 0);
                     Position zero_pos = new Position(zero_string);
                     cmds.add(String.format("set stream %d z-index %d", mStreamID, zero_pos.isEqual(mExpectedDstPos) ? 0 : 1));
                 }
@@ -893,7 +893,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             ID = -1;
         }
 
-        public void autoShow(ScreeLayout.LayoutMode mode, ScreeLayout.FillPattern pattern) {
+        public void autoShow(ScreenLayout.LayoutMode mode, ScreenLayout.FillPattern pattern) {
             int streamCnt = mVideoStreams.size();
             if (streamCnt > 0) {
                 hideAllStreams();
@@ -903,9 +903,9 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                 Collections.sort(idss);
                 Integer[] streamIds = (Integer[]) idss.toArray();
 
-                int subScreenCnt = ScreeLayout.getSubScreenCnt(mode, streamCnt);
+                int subScreenCnt = ScreenLayout.getSubScreenCnt(mode, streamCnt);
                 streamCnt = subScreenCnt > streamCnt ? streamCnt : subScreenCnt;
-                String[] XYs = ScreeLayout.getLayouts(mode, subScreenCnt);
+                String[] XYs = ScreenLayout.getLayouts(mode, subScreenCnt);
 
                 setLayout(mode, subScreenCnt);
                 for (int i = 0; i < streamCnt; ++i) {
@@ -914,15 +914,15 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             }
         }
 
-        public void setLayout(ScreeLayout.LayoutMode mode, int subScreenCnt) {
-            if (mode == ScreeLayout.LayoutMode.UNSPECIFIED)
+        public void setLayout(ScreenLayout.LayoutMode mode, int subScreenCnt) {
+            if (mode == ScreenLayout.LayoutMode.UNSPECIFIED)
                 throw new RuntimeException("non-supported layout mode: " + mode);
             if (mCurrentMode == mode && mCurrentSubScreenCnt == subScreenCnt)
                 return;
 
             mCurrentMode = mode;
             mCurrentSubScreenCnt = subScreenCnt;
-            String bgName = ScreeLayout.getBackground(mCurrentMode, mCurrentSubScreenCnt);
+            String bgName = ScreenLayout.getBackground(mCurrentMode, mCurrentSubScreenCnt);
             if (bgName != null)
                 setBackgroundImage("file:///" + SAVE_PATH + "/" + bgName, true);
             else
@@ -1019,7 +1019,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             getStreamRef(stream).displayName(visible, immediate);
         }
 
-        public void setStreamPosition(VideoStream stream, ScreeLayout.FillPattern pattern, Position pos) {
+        public void setStreamPosition(VideoStream stream, ScreenLayout.FillPattern pattern, Position pos) {
             getStreamRef(stream).setPosition(pattern, pos);
         }
 
@@ -1492,11 +1492,11 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
     }
 
     /* 根据分屏模式和当前源数量自动展示默认(本地)画面 */
-    public void autoShow(ScreeLayout.LayoutMode mode, ScreeLayout.FillPattern pattern) {
+    public void autoShow(ScreenLayout.LayoutMode mode, ScreenLayout.FillPattern pattern) {
         autoShow(SCENE_IDX_LOCAL_DISPLAY, mode, pattern);
     }
     /* 根据分屏模式和当前源数量自动展示指定画面 */
-    public void autoShow(int sceneIdx, ScreeLayout.LayoutMode mode, ScreeLayout.FillPattern pattern) {
+    public void autoShow(int sceneIdx, ScreenLayout.LayoutMode mode, ScreenLayout.FillPattern pattern) {
         Scene scene = mScenes[sceneIdx];
         if(scene == null) {
             LogManager.w("logical error: can't find the scene-idx-" + sceneIdx);
@@ -1509,11 +1509,11 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
      *  subScreenCnt -- 对于画中画,为小画面位置编号(1-4);其他情况为子分屏数
      * */
     /* 设置默认(本地)画面上的布局 */
-    public void setLayout(ScreeLayout.LayoutMode mode, int subScreenCnt) {
+    public void setLayout(ScreenLayout.LayoutMode mode, int subScreenCnt) {
         setLayout(SCENE_IDX_LOCAL_DISPLAY, mode, subScreenCnt);
     }
     /* 设置指定画面上的布局 */
-    public void setLayout(int sceneIdx, ScreeLayout.LayoutMode mode, int subScreenCnt) {
+    public void setLayout(int sceneIdx, ScreenLayout.LayoutMode mode, int subScreenCnt) {
         Scene scene = mScenes[sceneIdx];
         if(scene == null) {
             LogManager.w("logical error: can't find the scene-idx-" + sceneIdx);
@@ -1771,34 +1771,34 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 
     /* 在默认(本地)画面上 以默认(适应/充满)模式设置源位置 */
     public int setSourcePosition(int sourceId, String pos) {
-        return setSourcePosition(sourceId, ScreeLayout.FillPattern.FILL_PATTERN_STRETCHED, new Position(pos));
+        return setSourcePosition(sourceId, ScreenLayout.FillPattern.FILL_PATTERN_STRETCHED, new Position(pos));
     }
     /* 在默认(本地)画面上 以默认(适应/充满)模式设置源位置 */
     public int setSourcePosition(int sourceId, Position pos) {
-        return setSourcePosition(sourceId, ScreeLayout.FillPattern.FILL_PATTERN_STRETCHED, pos);
+        return setSourcePosition(sourceId, ScreenLayout.FillPattern.FILL_PATTERN_STRETCHED, pos);
     }
     /* 在默认(本地)画面上 设置源位置 */
-    public int setSourcePosition(int sourceId, ScreeLayout.FillPattern pattern, String pos) {
+    public int setSourcePosition(int sourceId, ScreenLayout.FillPattern pattern, String pos) {
         return setSourcePosition(sourceId, pattern, new Position(pos));
     }
     /* 在默认(本地)画面上 设置源位置 */
-    public int setSourcePosition(int sourceId, ScreeLayout.FillPattern pattern, Position pos) {
+    public int setSourcePosition(int sourceId, ScreenLayout.FillPattern pattern, Position pos) {
         return setSourcePosition(SCENE_IDX_LOCAL_DISPLAY, sourceId, pattern, pos);
     }
     /* 在指定画面上 以适应/充满模式设置源位置 */
     public int setSourcePosition(int sceneIdx, int sourceId, String pos) {
-        return setSourcePosition(sceneIdx, sourceId, ScreeLayout.FillPattern.FILL_PATTERN_STRETCHED, new Position(pos));
+        return setSourcePosition(sceneIdx, sourceId, ScreenLayout.FillPattern.FILL_PATTERN_STRETCHED, new Position(pos));
     }
     /* 在指定画面上 以适应/充满模式设置源位置 */
     public int setSourcePosition(int sceneIdx, int sourceId, Position pos) {
-        return setSourcePosition(sceneIdx, sourceId, ScreeLayout.FillPattern.FILL_PATTERN_STRETCHED, pos);
+        return setSourcePosition(sceneIdx, sourceId, ScreenLayout.FillPattern.FILL_PATTERN_STRETCHED, pos);
     }
     /* 在指定画面上 设置源位置 */
-    public int setSourcePosition(int sceneIdx, int sourceId, ScreeLayout.FillPattern pattern, String pos) {
+    public int setSourcePosition(int sceneIdx, int sourceId, ScreenLayout.FillPattern pattern, String pos) {
         return setSourcePosition(sceneIdx, sourceId, pattern, new Position(pos));
     }
     /* 在指定画面上 设置源位置 */
-    public int setSourcePosition(int sceneIdx, int sourceId, ScreeLayout.FillPattern pattern, Position pos) {
+    public int setSourcePosition(int sceneIdx, int sourceId, ScreenLayout.FillPattern pattern, Position pos) {
         Scene scene = mScenes[sceneIdx];
         if(scene == null) {
             LogManager.w("logical error: can't find the scene-idx-" + sceneIdx);
@@ -3075,18 +3075,18 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                     }
                 } else {
                     if (mTestingStep == 4) {
-                        mMediaController.autoShow(ScreeLayout.LayoutMode.ASYMMETRY_FIXED, ScreeLayout.FillPattern.FILL_PATTERN_STRETCHED);
+                        mMediaController.autoShow(ScreenLayout.LayoutMode.ASYMMETRY_FIXED, ScreenLayout.FillPattern.FILL_PATTERN_STRETCHED);
                     } else if (mTestingStep == 3) {
-                        mMediaController.autoShow(ScreeLayout.LayoutMode.ASYMMETRY_FIXED, ScreeLayout.FillPattern.FILL_PATTERN_CROPPING);
+                        mMediaController.autoShow(ScreenLayout.LayoutMode.ASYMMETRY_FIXED, ScreenLayout.FillPattern.FILL_PATTERN_CROPPING);
                     } else if (mTestingStep == 2) {
-                        mMediaController.autoShow(ScreeLayout.LayoutMode.ASYMMETRY_FIXED, ScreeLayout.FillPattern.FILL_PATTERN_ADAPTING);
+                        mMediaController.autoShow(ScreenLayout.LayoutMode.ASYMMETRY_FIXED, ScreenLayout.FillPattern.FILL_PATTERN_ADAPTING);
                     } else if (mTestingStep == 1) {
                         int idx = 0;
-                        mMediaController.setLayout(ScreeLayout.LayoutMode.ASYMMETRY_OVERLAPPING, 2);
-                        String poss[] = ScreeLayout.getLayouts(ScreeLayout.LayoutMode.ASYMMETRY_OVERLAPPING, 2);
+                        mMediaController.setLayout(ScreenLayout.LayoutMode.ASYMMETRY_OVERLAPPING, 2);
+                        String poss[] = ScreenLayout.getLayouts(ScreenLayout.LayoutMode.ASYMMETRY_OVERLAPPING, 2);
                         for (int id : mSourceIds) {
                             if (id < 0) continue;
-                            mMediaController.setSourcePosition(id, ScreeLayout.FillPattern.FILL_PATTERN_ADAPTING, poss[idx++]);
+                            mMediaController.setSourcePosition(id, ScreenLayout.FillPattern.FILL_PATTERN_ADAPTING, poss[idx++]);
                             if (idx == 2)
                                 break;
                         }
@@ -3148,14 +3148,14 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         public void onSourceAdded(int id, String url, int result) {
             if (result == 0) {
                 mMediaController.addSource2Scene(id);
-                mMediaController.autoShow(ScreeLayout.LayoutMode.SYMMETRICAL, ScreeLayout.FillPattern.FILL_PATTERN_ADAPTING);
+                mMediaController.autoShow(ScreenLayout.LayoutMode.SYMMETRICAL, ScreenLayout.FillPattern.FILL_PATTERN_ADAPTING);
             }
         }
 
         @Override
         public void onSourceLost(int id, String url, int result) {
             mMediaController.cleanSceneSource(id);
-            mMediaController.autoShow(ScreeLayout.LayoutMode.SYMMETRICAL, ScreeLayout.FillPattern.FILL_PATTERN_ADAPTING);
+            mMediaController.autoShow(ScreenLayout.LayoutMode.SYMMETRICAL, ScreenLayout.FillPattern.FILL_PATTERN_ADAPTING);
         }
 
         @Override

@@ -1,0 +1,23 @@
+[
+    {
+        "url": "capture://none?type=video&id=0",
+        "pattern": "FILL_PATTERN_ADAPTING",
+        "roles": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
+        "id": -1,
+        "state": "None"
+    },
+    {
+        "url": "MP100/tmp/test_1080p_24fps_2mbps_32secs.mp4?loop=true",
+        "pattern": "FILL_PATTERN_ADAPTING",
+        "roles": ["StudentFullView", "StudentFeature"],
+        "id": -1,
+        "state": "None"
+    },
+    {
+        "url": "MP100/tmp/test_720p_24fps_1mbps_17secs.mp4?loop=true",
+        "pattern": "FILL_PATTERN_ADAPTING",
+        "roles": ["Courseware"],
+        "id": -1,
+        "state": "None"
+    }
+]

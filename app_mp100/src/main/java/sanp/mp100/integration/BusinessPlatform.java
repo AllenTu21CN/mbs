@@ -5,11 +5,13 @@ import android.content.SharedPreferences;
 import android.os.Environment;
 
 import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -213,7 +215,7 @@ public class BusinessPlatform {
             return;
 
         mContext = context;
-        mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_preferences), Context.MODE_PRIVATE);
+        mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_platform_preferences), Context.MODE_PRIVATE);
         mPlatformPostman = new BusinessPlatformPostman();
 
         loadPreferences();
@@ -584,14 +586,11 @@ public class BusinessPlatform {
 
         String connection = mSharedPref.getString(mContext.getString(R.string.platform_connection), null);
         if(connection == null) {
-            String tmpFile = MP100Application.TMP_FILE_PATH + "/connection.txt";
-            LogManager.w("TODO:[DEBUG] will read connection from " + tmpFile + " which is from Monica\\app_mp100\\src\\main\\res\\raw\\connection.txt");
-            connection = getSettingsFromTmpFile(tmpFile);
-            LogManager.w("TODO:[DEBUG] connection from file: \n" + connection);
+            mConnectionSettings = MP100Application.loadSettingsFromTmpFile("connection.json", ConnectionSettings.class);
+        } else {
+            mConnectionSettings = new Gson().fromJson(connection, ConnectionSettings.class);
         }
-
-        Gson gson = new Gson();
-        mConnectionSettings = gson.fromJson(connection, ConnectionSettings.class);
+        LogManager.i("loaded connection settings: \n" + new Gson().toJson(mConnectionSettings));
         mCurrentRetryConnectTimes = mConnectionSettings.RetryConnectTimes;
     }
 
@@ -615,8 +614,7 @@ public class BusinessPlatform {
         if(activating == null)
             activating = "{}";
 
-        Gson gson = new Gson();
-        mActivatingConfig = gson.fromJson(activating, ActivatingConfig.class);
+        mActivatingConfig = new Gson().fromJson(activating, ActivatingConfig.class);
     }
 
     private void saveActivatingConfig() {
@@ -637,14 +635,11 @@ public class BusinessPlatform {
 
         String organization = mSharedPref.getString(mContext.getString(R.string.platform_organization), null);
         if(organization == null) {
-            String tmpFile = MP100Application.TMP_FILE_PATH + "/org.txt";
-            LogManager.w("TODO:[DEBUG] will read organization from " + tmpFile + " which is from Monica\\app_mp100\\src\\main\\res\\raw\\org.txt");
-            organization = getSettingsFromTmpFile(tmpFile);
-            LogManager.w("TODO:[DEBUG] organization from file: \n" + organization);
+            mOrganization = MP100Application.loadSettingsFromTmpFile("org.json", Organization.class);
+        } else {
+            mOrganization = new Gson().fromJson(organization, Organization.class);
         }
-
-        Gson gson = new Gson();
-        mOrganization = gson.fromJson(organization, Organization.class);
+        LogManager.i("loaded organization: \n" + new Gson().toJson(mOrganization));
     }
 
     private void saveOrganization() {

@@ -1,0 +1,11 @@
+{
+    "WebSocketURL": "ws://lbblscy.3322.org:8085/device-hub",
+    "Realm": "ebp.daemon",
+    "RetryConnectEnable": true,
+    "RetryConnectTimes": -1,
+    "RetryConnectIntervalMS": 5000,
+    "KeepAliveEnable": true,
+    "KeepAliveRetryTimes": 3,
+    "KeepAliveIntervalMS": 10000,
+    "KeepAliveTimeoutMS": 5000
+}
