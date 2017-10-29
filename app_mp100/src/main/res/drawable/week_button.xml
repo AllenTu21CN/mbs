@@ -1,13 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- see ：http://www.jianshu.com/p/e5e8a98fc5d9 -->
-<!--圆角矩形白色背景-->
+<!-- see ：http://www.jianshu.com/p/e5e8a98fc5d9 --><!--圆角矩形白色背景-->
+
+
+<!-- see: http://www.cnblogs.com/yangykaifa/p/7085764.html -->
 
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="#5088f9e1" />
-    <corners
-        android:topLeftRadius="10dip"
-        android:topRightRadius="10dip"
-        android:bottomRightRadius="10dip"
-        android:bottomLeftRadius="10dip" />
+
+    <!-- 实心 -->
+    <!-- solid android:color="@android:color/white" / -->
+
+    <!-- 边框 -->
+    <stroke
+        android:width="1.0dp"
+        android:color="@android:color/white" />
+
+    <!-- 圆角 -->
+    <!-- corners android:radius="3dp" / -->
+
+    <!-- 边距 -->
+    <!-- padding
+        android:bottom="5dp"
+        android:left="5dp"
+        android:right="5dp"
+        android:top="5dp" / -->
+
+    <!-- 渐变 -->
+    <!-- gradient
+        android:angle="270"
+        android:endColor="#FFFF72"
+        android:startColor="#13C7AF" / -->
 </shape>

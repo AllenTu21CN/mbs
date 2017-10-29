@@ -6,6 +6,8 @@
 
     <!-- 实心 -->
     <!-- solid android:color="@android:color/white" / -->
+    <solid
+        android:color="@android:color/transparent"/>
 
     <!-- 边框 -->
     <stroke

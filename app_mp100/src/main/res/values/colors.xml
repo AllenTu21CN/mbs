@@ -17,6 +17,14 @@
     <color name="course_item_selected_color">#56f7a5a8</color>
 
 
+    <!-- course date bar color -->
+    <color name="date_bar_color">#500ed1b8</color>
+    <!--
+    <color name="week_button_selected_color">#f9babc</color>
+    -->
+    <color name="week_button_selected_color">#67f592</color>
+
+
 
 
     <!-- Copy -->

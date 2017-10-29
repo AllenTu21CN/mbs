@@ -20,7 +20,7 @@
             android:layout_marginTop="40px"
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
-            android:background="#500ed1b8"
+            android:background="@color/date_bar_color"
             >
 
             <!--
@@ -40,9 +40,9 @@
                 android:layout_marginLeft="3px"
                 android:layout_marginBottom="3px"
                 android:layout_marginTop="3px"
-                android:background="@drawable/border_white"
+                android:background="@drawable/week_button_selector"
                 android:text="前一周"
-                android:textColor="#ffffff"
+                android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
 
@@ -53,7 +53,7 @@
                 android:layout_width="wrap_content"
                 android:layout_marginLeft="20px"
                 android:layout_gravity="center_vertical"
-                android:textColor="#ffffff"
+                android:textColor="@android:color/white"
                 android:textSize="18sp"/>
 
             <TextView
@@ -62,7 +62,7 @@
                 android:layout_marginLeft="10px"
                 android:layout_gravity="center_vertical"
                 android:text=" ~ "
-                android:textColor="#ffffff"
+                android:textColor="@android:color/white"
                 android:textSize="18sp"/>
 
             <TextView
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10px"
                 android:layout_gravity="center_vertical"
-                android:textColor="#ffffff"
+                android:textColor="@android:color/white"
                 android:textSize="18sp"/>
 
             <!-- Next week button -->
@@ -83,9 +83,9 @@
                 android:layout_marginRight="3px"
                 android:layout_marginTop="3px"
                 android:layout_marginBottom="3px"
-                android:background="@drawable/border_white"
+                android:background="@drawable/week_button_selector"
                 android:text="后一周"
-                android:textColor="#ffffff"
+                android:textColor="@android:color/white"
                 android:textSize="16sp"/>
 
 
