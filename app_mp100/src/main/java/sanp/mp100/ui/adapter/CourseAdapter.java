@@ -160,8 +160,8 @@ public class CourseAdapter extends BaseAdapter {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item, null);
             holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view);
 
-            //convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item_2, null);
-            //holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view_2);
+            //convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item_bak, null);
+            //holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view_bak);
 
             convertView.setTag(holder);
         } else {
@@ -172,6 +172,8 @@ public class CourseAdapter extends BaseAdapter {
         if (mCourseList != null && !mCourseList.isEmpty()) {
             TimeTable course = mCourseList.get(position);
             holder.mCourseView.setText(course.subject_name);
+
+            //if (course.id == -1) holder.mCourseView.setEnabled(false);
         }
 
         return convertView;

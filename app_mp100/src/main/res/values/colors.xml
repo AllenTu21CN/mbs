@@ -10,6 +10,14 @@
     <color name="week_text_color">#6ce4f4</color>
     <color name="table_time_text_color">#6ce4f4</color>
 
+    <color name="course_item_stroke_color">#96d9dbdc</color>
+    <!--
+    <color name="course_item_selected_color">#96d9dbdc</color>
+    -->
+    <color name="course_item_selected_color">#56f7a5a8</color>
+
+
+
 
     <!-- Copy -->
 

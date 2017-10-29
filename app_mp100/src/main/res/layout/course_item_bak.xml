@@ -9,6 +9,8 @@
  Course Table: 7 x 8 => 1400px * 640px
  Course Item: 200px * 80px
 
+ 2px is divider line
+
  TODO:
     android:layout_width="@dimen/course_table_item_width"
     android:layout_height="@dimen/course_table_item_height"
@@ -16,17 +18,18 @@
  -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/course_item_bak"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:layout_margin="0px"
     android:padding="0px"
     android:background="@drawable/course_selector">
 
     <TextView
         android:id="@+id/course_name_view_bak"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="198px"
+        android:layout_height="78px"
         android:layout_gravity="center"
+        android:gravity="center"
         android:text="未知"
         android:textSize="22sp"
         android:textColor="#88dca2"
