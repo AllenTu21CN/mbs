@@ -22,7 +22,7 @@
     android:id="@+id/course_item"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/course_item_selector">
+    android:background="@drawable/course_item_selector" >
 
     <!-- Cell contents -->
     <TextView

@@ -1,5 +1,6 @@
 package sanp.mp100.ui.adapter; 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.R;
+import sanp.mp100.ui.CourseDialog;
 import sanp.mp100.ui.CourseTable;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
 
@@ -147,9 +149,7 @@ public class CourseAdapter extends BaseAdapter {
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    public long getItemId(int position) { return position; }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -173,19 +173,49 @@ public class CourseAdapter extends BaseAdapter {
             TimeTable course = mCourseList.get(position);
             holder.mCourseView.setText(course.subject_name);
 
+            /* TODO, disable item if the course is null
             // check whether the course is valid
             if (course.id != -1) {
-                LogManager.i("Course: " + course.subject_name + " is valid");
-                holder.mCourseView.setEnabled(true);
-                holder.mCourseView.setFocusable(true);
+                //LogManager.i("Course: " + course.subject_name + " is valid");
+                convertView.setEnabled(true);
+                convertView.setFocusable(true);
             } else {
-                LogManager.i("Course[" + position + "] is invalid");
-                holder.mCourseView.setEnabled(false);
-                holder.mCourseView.setFocusable(false);
+                //LogManager.i("Course[" + position + "] is invalid");
+                convertView.setEnabled(false);
+                convertView.setFocusable(false);
             }
+            */
+
+            setCourseViewClickHandle(convertView, course);
         }
 
         return convertView;
+    }
+
+    // Set course view item click handler
+    private void setCourseViewClickHandle(View view, TimeTable course) {
+
+        if (course.id == -1) return;
+
+        view.setOnClickListener((View v) -> {
+            CourseDialog dialog = new CourseDialog(mContext);
+            dialog.setTitle("提示");
+            dialog.setMessage("是否开课");
+
+            dialog.setYesOnclickListener("确定", () -> {
+                LogManager.i("CourseAdapter: start course[" + course.subject_name + "]");
+                //TODO, start class, 2017/10/29
+                dialog.dismiss();
+            });
+
+            dialog.setNoOnclickListener("取消", () -> {
+                LogManager.i("CourseAdapter: CANCEL");
+                // do nothing
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        });
     }
 
     private class ViewHolder {
