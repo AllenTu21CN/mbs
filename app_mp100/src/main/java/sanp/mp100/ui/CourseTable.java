@@ -138,6 +138,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         mPrevWeekBtn = (Button) findViewById(R.id.prev_week_btn);
         mNextWeekBtn = (Button) findViewById(R.id.next_week_btn);
         mRefreshBtn  = (Button) findViewById(R.id.refresh_btn);
+        //mRefreshBtn.setEnabled(false); //TODO: enable after course thread is running
 
         mPrevWeekBtn.setOnClickListener(this);
         mNextWeekBtn.setOnClickListener(this);

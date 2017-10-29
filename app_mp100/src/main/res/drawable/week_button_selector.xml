@@ -10,5 +10,8 @@
     <item android:state_focused="true"
         android:drawable="@drawable/week_button_selected"/>
 
+    <item android:state_enabled="false"
+        android:drawable="@drawable/week_button_disabled" />
+
     <item android:drawable="@drawable/week_button"/>
 </selector>
