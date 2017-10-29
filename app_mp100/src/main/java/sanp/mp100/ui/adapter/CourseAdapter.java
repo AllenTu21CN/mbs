@@ -1,5 +1,6 @@
 package sanp.mp100.ui.adapter; 
 
+import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.R;
+import sanp.mp100.ui.CourseDialog;
 import sanp.mp100.ui.CourseTable;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
 
@@ -147,18 +149,19 @@ public class CourseAdapter extends BaseAdapter {
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    public long getItemId(int position) { return position; }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder = null;
         if (convertView == null) {
             holder = new ViewHolder();
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item, null);
 
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item, null);
             holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view);
+
+            //convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item_bak, null);
+            //holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view_bak);
 
             convertView.setTag(holder);
         } else {
@@ -169,9 +172,53 @@ public class CourseAdapter extends BaseAdapter {
         if (mCourseList != null && !mCourseList.isEmpty()) {
             TimeTable course = mCourseList.get(position);
             holder.mCourseView.setText(course.subject_name);
+
+            /* TODO, disable item if the course is null
+            // check whether the course is valid
+            if (course.id != -1) {
+                //LogManager.i("Course: " + course.subject_name + " is valid");
+                convertView.setEnabled(true);
+                convertView.setFocusable(true);
+            } else {
+                //LogManager.i("Course[" + position + "] is invalid");
+                convertView.setEnabled(false);
+                convertView.setFocusable(false);
+            }
+            */
+
+            setCourseViewClickHandle(convertView, course);
         }
 
         return convertView;
+    }
+
+    // Set course view item click handler
+    private void setCourseViewClickHandle(View view, TimeTable course) {
+
+        if (course.id == -1) return;
+
+        view.setOnClickListener((View v) -> {
+            CourseDialog dialog = new CourseDialog(mContext);
+
+            dialog.setCourseName(course.subject_name);
+            dialog.setCourseTeacher(course.teacher_name);
+            dialog.setCourseTime(course.date + " 第" + course.section + "节");
+            dialog.setCourseContent(course.title);
+
+            dialog.setYesOnclickListener("确定", () -> {
+                LogManager.i("CourseAdapter: start course[" + course.subject_name + "]");
+                //TODO, start class, 2017/10/29
+                dialog.dismiss();
+            });
+
+            dialog.setNoOnclickListener("取消", () -> {
+                LogManager.i("CourseAdapter: CANCEL");
+                // do nothing
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        });
     }
 
     private class ViewHolder {

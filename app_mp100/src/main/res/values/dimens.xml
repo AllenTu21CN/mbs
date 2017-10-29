@@ -9,17 +9,22 @@
 
          sidebar      table         sidebar
          + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
-    week |260px|      1400px        |260px|
+    week |258px|      1400px        |260px|
          + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
          |     |                    |     |
          |Time |    Course Table    |EMPTY|
          |     |                    |     |
-           ...         ...            ...
-
+           ... |       ...            ...
+              2px: divider line
 
          Table: 7 x 8 => 1400px * 640px
 
          Course Item: 200px * 80px
+         200px = 198px + 2px
+         80px  = 78px  + 2px
+
+         Total canvas:
+         (258px + 2px + 1400px) * week-height * (2px + 640px)
      -->
 
     <dimen name="course_table_width">1400px</dimen>
@@ -30,9 +35,14 @@
     <dimen name="course_table_sidebar_width">260px</dimen>
     <dimen name="course_table_with_sidebar_width">1660px</dimen>
 
-    <!-- Time canvas: (260px-16px)244px * 640px: -->
+    <dimen name="course_table_divider_width">2px</dimen>
+    <dimen name="course_table_width_with_divider">1402px</dimen>
+    <dimen name="course_table_height_with_divider">642px</dimen>
+
+    <!-- Time canvas: (260px-14px-2px)244px * 640px: -->
+    <!-- Divider width: 2px -->
     <dimen name="course_table_time_width">244px</dimen>
-    <dimen name="course_table_time_margin_right">16px</dimen>
+    <dimen name="course_table_time_margin_right">14px</dimen>
 
     <!-- TODO: why 27px -->
     <dimen name="course_table_layout_margin_top_date">27px</dimen>

@@ -15,4 +15,22 @@
         <item name="android:windowAnimationStyle">@anim/alpha_in</item>
     </style>
 
+
+    <!-- course table styles, will@1dao2.com, 2017/10/29 -->
+
+    <!-- see: http://blog.csdn.net/oqihaogongyuan/article/details/50958659 -->
+
+    <!--自定义dialog背景全透明无边框theme -->
+    <style name="CourseDialog" parent="android:style/Theme.Dialog">
+        <!--背景颜色及和透明程度-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--是否去除标题 -->
+        <item name="android:windowNoTitle">true</item>
+        <!--是否去除边框-->
+        <item name="android:windowFrame">@null</item>
+        <!--是否浮现在activity之上-->
+        <item name="android:windowIsFloating">true</item>
+        <!--是否模糊-->
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>
