@@ -1,6 +1,5 @@
 package sanp.mp100.ui.adapter; 
 
-import android.app.Dialog;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -186,39 +185,45 @@ public class CourseAdapter extends BaseAdapter {
             }
             */
 
-            setCourseViewClickHandle(convertView, course);
+            setCourseViewClickHandler(convertView, course);
         }
 
         return convertView;
     }
 
     // Set course view item click handler
-    private void setCourseViewClickHandle(View view, TimeTable course) {
+    private void setCourseViewClickHandler(View view, TimeTable course) {
 
         if (course.id == -1) return;
 
-        view.setOnClickListener((View v) -> {
-            CourseDialog dialog = new CourseDialog(mContext);
+        // set on click listener: show a course dialog
+        view.setOnClickListener((View v) -> { showCourseDialog(course); });
 
-            dialog.setCourseName(course.subject_name);
-            dialog.setCourseTeacher(course.teacher_name);
-            dialog.setCourseTime(course.date + " 第" + course.section + "节");
-            dialog.setCourseContent(course.title);
+        return;
+    }
 
-            dialog.setYesOnclickListener("确定", () -> {
-                LogManager.i("CourseAdapter: start course[" + course.subject_name + "]");
-                //TODO, start class, 2017/10/29
-                dialog.dismiss();
-            });
+    // Shows course dialog
+    private void showCourseDialog(TimeTable course) {
+        CourseDialog dialog = new CourseDialog(mContext);
 
-            dialog.setNoOnclickListener("取消", () -> {
-                LogManager.i("CourseAdapter: CANCEL");
-                // do nothing
-                dialog.dismiss();
-            });
+        dialog.setCourseName(course.subject_name);
+        dialog.setCourseTeacher(course.teacher_name);
+        dialog.setCourseTime(course.date + " 第" + course.section + "节");
+        dialog.setCourseContent(course.title);
 
-            dialog.show();
+        dialog.setYesOnclickListener("确定", () -> {
+            LogManager.i("CourseAdapter: start course[" + course.subject_name + "]");
+            //TODO, start class, 2017/10/29
+            dialog.dismiss();
         });
+
+        dialog.setNoOnclickListener("取消", () -> {
+            LogManager.i("CourseAdapter: CANCEL");
+            // do nothing
+            dialog.dismiss();
+        });
+
+        dialog.show();
     }
 
     private class ViewHolder {
