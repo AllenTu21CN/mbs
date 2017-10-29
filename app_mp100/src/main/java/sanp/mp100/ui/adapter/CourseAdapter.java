@@ -199,8 +199,11 @@ public class CourseAdapter extends BaseAdapter {
 
         view.setOnClickListener((View v) -> {
             CourseDialog dialog = new CourseDialog(mContext);
-            dialog.setTitle("提示");
-            dialog.setMessage("是否开课");
+
+            dialog.setCourseName(course.subject_name);
+            dialog.setCourseTeacher(course.teacher_name);
+            dialog.setCourseTime(course.date + " 第" + course.section + "节");
+            dialog.setCourseContent(course.title);
 
             dialog.setYesOnclickListener("确定", () -> {
                 LogManager.i("CourseAdapter: start course[" + course.subject_name + "]");

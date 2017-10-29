@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import sanp.mp100.R;
+import sanp.mp100.integration.BusinessPlatform;
 
 /**
  * 创建自定义的dialog，主要学习其实现原理
@@ -24,10 +25,21 @@ public class CourseDialog extends Dialog {
 
     private Button yes;//确定按钮
     private Button no;//取消按钮
-    private TextView titleTv;//消息标题文本
-    private TextView messageTv;//消息提示文本
-    private String titleStr;//从外界设置的title文本
-    private String messageStr;//从外界设置的消息文本
+//  private TextView titleTv;//消息标题文本
+//  private TextView messageTv;//消息提示文本
+//  private String titleStr;//从外界设置的title文本
+//  private String messageStr;//从外界设置的消息文本
+
+    private TextView mCourseNameView;
+    private TextView mCourseTeacherView;
+    private TextView mCourseTimeView;
+    private TextView mCourseContentView;
+
+    private String   mCourseName;
+    private String   mCourseTeacher;
+    private String   mCourseTime;
+    private String   mCourseContent;
+
     //确定文本和取消文本的显示内容
     private String yesStr, noStr;
 
@@ -105,12 +117,19 @@ public class CourseDialog extends Dialog {
      */
     private void initData() {
         //如果用户自定了title和message
+        /*
         if (titleStr != null) {
             titleTv.setText(titleStr);
         }
         if (messageStr != null) {
             messageTv.setText(messageStr);
-        }
+        } */
+
+        if (mCourseName != null)    mCourseNameView.setText(mCourseName);
+        if (mCourseTeacher != null) mCourseTeacherView.setText(mCourseTeacher);
+        if (mCourseTime != null)    mCourseTimeView.setText(mCourseTime);
+        if (mCourseContent != null) mCourseContentView.setText(mCourseContent);
+
         //如果设置按钮的文字
         if (yesStr != null) {
             yes.setText(yesStr);
@@ -126,27 +145,41 @@ public class CourseDialog extends Dialog {
     private void initView() {
         yes = (Button) findViewById(R.id.yes);
         no = (Button) findViewById(R.id.no);
+
+        /*
         titleTv = (TextView) findViewById(R.id.title);
         messageTv = (TextView) findViewById(R.id.message);
+        */
+
+        mCourseNameView    = (TextView) findViewById(R.id.course_name);
+        mCourseTeacherView = (TextView) findViewById(R.id.course_teacher);
+        mCourseTimeView    = (TextView) findViewById(R.id.course_time);
+        mCourseContentView = (TextView) findViewById(R.id.course_content);
     }
 
     /**
      * 从外界Activity为Dialog设置标题
      *
      * @param title
-     */
     public void setTitle(String title) {
         titleStr = title;
     }
+     */
 
     /**
      * 从外界Activity为Dialog设置dialog的message
      *
      * @param message
-     */
     public void setMessage(String message) {
         messageStr = message;
     }
+     */
+
+    public void setCourseName(String name) { mCourseName = name; }
+    public void setCourseTeacher(String teacher) { mCourseTeacher = teacher; }
+    public void setCourseTime(String time) { mCourseTime = time; }
+    public void setCourseContent(String content) { mCourseContent = content; }
+
 
     /**
      * 设置确定按钮和取消被点击的接口
