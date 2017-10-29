@@ -1,4 +1,6 @@
 <resources>
+    <dimen name="action_text_size">16dp</dimen>
+
     <!-- author: will@1dao2.com
          date:   2017/10/22
 

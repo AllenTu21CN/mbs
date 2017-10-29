@@ -10,4 +10,42 @@
     <color name="week_text_color">#6ce4f4</color>
     <color name="table_time_text_color">#6ce4f4</color>
 
+
+    <!-- Copy -->
+
+    <color name="red">#f16d7a</color>
+    <color name="green">#b7d28d</color>
+    <color name="blue">#b8f1ed</color>
+
+    <color name="transparent">#00000000</color>
+
+    <color name="bg_blue">#e04f71f2</color>
+    <color name="bg_blue_rg">#1984d6</color>
+
+    <color name="word_pre_red">#FF0000</color>
+    <color name="word_red">#FF00ee</color>
+    <color name="white">#ffffff</color>
+    <color name="white_one">#b6c9ec</color>
+    <color name="nav_bg">#f0f0f0</color>
+    <color name="word_color">#3e3e3e</color>
+    <color name="word_gray">#646464</color>
+    <color name="word_blue">#2c5ac3</color>
+    <color name="white_gray">#dddddd</color>
+    <!--星期的背景颜色-->
+    <color name="week">#12c0f7</color>
+    <color name="lesson">#6e6e6e</color>
+
+    <!--课表颜色-->
+    <color name="timetable_blue">#1088f4</color>
+    <color name="timetable_black">#333333</color>
+    <color name="timetable_black_2">#555555</color>
+    <color name="timetable_gray">#9dafde</color>
+
+    <color name="btn_bg_press">#A8A8A8</color>
+    <color name="btn_bg_norml">#1c82ea</color>
+
+    <color name="lesson_txt_0">#a5f8ff</color>
+    <color name="lesson_txt_1">#ffffff</color>
+    <color name="lesson_txt_2">#ffeeee</color>
+    <color name="lessoning">#5adb9c</color>
 </resources>

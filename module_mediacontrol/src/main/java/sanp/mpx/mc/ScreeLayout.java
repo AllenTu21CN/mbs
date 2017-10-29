@@ -7,19 +7,45 @@ import java.util.Map;
 public class ScreeLayout {
 
     public enum LayoutMode {
-        SYMMETRICAL,             //等分屏
-        ASYMMETRY_FIXED,         //1+n式的不等分屏
-        ASYMMETRY_OVERLAPPING,   //1+4式的画中画
-        UNSPECIFIED,             //未定义
+        UNSPECIFIED(0, "未定义"),
+        SYMMETRICAL(1, "等分屏"),
+        ASYMMETRY_FIXED(2, "不等分屏"),
+        ASYMMETRY_OVERLAPPING(3, "画中画"),
         @Deprecated
-        ASYMMETRY_SPECIFIED,
+        FREE_STYLE(10, "任意");
+
+        private int value;
+        private String dsp;
+        private LayoutMode(int value, String dsp) {
+            this.value = value;
+            this.dsp = dsp;
+        }
+        public String toString() {
+            return dsp;
+        }
+        public int toValue() {
+            return value;
+        }
     }
 
     public enum FillPattern {
-        FILL_PATTERN_NONE,
-        FILL_PATTERN_ADAPTING,  // 适应/完整模式
-        FILL_PATTERN_STRETCHED, // 拉伸/充满模式
-        FILL_PATTERN_CROPPING,  // 裁剪模式
+        FILL_PATTERN_NONE(0, "无"),
+        FILL_PATTERN_ADAPTING(1, "适应/完整"),
+        FILL_PATTERN_STRETCHED(2, "拉伸/充满"),
+        FILL_PATTERN_CROPPING(3, "裁剪");
+
+        private int value;
+        private String dsp;
+        private FillPattern(int value, String dsp) {
+            this.value = value;
+            this.dsp = dsp;
+        }
+        public String toString() {
+            return dsp;
+        }
+        public int toValue() {
+            return value;
+        }
     }
 
     static public int getSubScreenCnt(LayoutMode mode, int sourceCnt) {
@@ -77,7 +103,7 @@ public class ScreeLayout {
                 }}
         );
 
-        put(LayoutMode.ASYMMETRY_SPECIFIED,
+        put(LayoutMode.FREE_STYLE,
                 new HashMap<Integer, String>() {{
                     put(-1,  "video_bg.jpg");        //单分屏
                 }}

@@ -8,16 +8,24 @@
     android:orientation="vertical">
 
     <Button
+        android:id="@+id/button_entry_home"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClick"
+        android:text="entry_home" />
+
+    <Button
         android:id="@+id/button_test_business_platform"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onClick"
         android:text="test_business_platform" />
 
     <Button
         android:id="@+id/button_test_business_platform_postman"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:onClick="onClick"
         android:text="test_business_platform_postman" />
+
 </LinearLayout>
