@@ -88,6 +88,20 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp"/>
 
+            <!-- refresh button -->
+            <Button
+                android:id="@+id/refresh_btn"
+                android:layout_width="134px"
+                android:layout_height="50px"
+                android:layout_marginLeft="20px"
+                android:layout_marginRight="3px"
+                android:layout_marginTop="3px"
+                android:layout_marginBottom="3px"
+                android:background="@drawable/week_button_selector"
+                android:text="刷新课表"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"/>
+
 
         </LinearLayout>
 

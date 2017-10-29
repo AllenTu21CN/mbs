@@ -45,6 +45,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     // course table date line bar
     private Button   mPrevWeekBtn;
     private Button   mNextWeekBtn;
+    private Button   mRefreshBtn;
     private TextView mMondayDateView;
     private TextView mSundayDataView;
 
@@ -136,9 +137,11 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         // course date line bar
         mPrevWeekBtn = (Button) findViewById(R.id.prev_week_btn);
         mNextWeekBtn = (Button) findViewById(R.id.next_week_btn);
+        mRefreshBtn  = (Button) findViewById(R.id.refresh_btn);
 
         mPrevWeekBtn.setOnClickListener(this);
         mNextWeekBtn.setOnClickListener(this);
+        mRefreshBtn.setOnClickListener(this);
 
         mMondayDateView = (TextView) findViewById(R.id.monday_date_view);
         mSundayDataView = (TextView) findViewById(R.id.sunday_date_view);
@@ -301,6 +304,10 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
                 break;
             case R.id.next_week_btn:
                 checkoutNextWeekCourse();
+                break;
+
+            case R.id.refresh_btn:
+                checkoutCourseForCurrent();
                 break;
 
             default:
