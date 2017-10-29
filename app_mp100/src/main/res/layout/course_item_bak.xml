@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!-- see: https://stackoverflow.com/questions/7132030/android-gridview-draw-dividers -->
-
 <!-- author: will@1dao2.com
      date:   2017/10/22
 
@@ -14,17 +12,18 @@
  TODO:
     android:layout_width="@dimen/course_table_item_width"
     android:layout_height="@dimen/course_table_item_height"
+
  -->
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/course_item"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@drawable/course_item_selector">
+    android:id="@+id/course_item_bak"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="0px"
+    android:padding="0px"
+    android:background="@drawable/course_selector">
 
-    <!-- Cell contents -->
     <TextView
-        android:id="@+id/course_name_view"
+        android:id="@+id/course_name_view_bak"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -32,6 +31,7 @@
         android:textSize="22sp"
         android:textColor="#88dca2"
         android:maxLines="1"
-        android:padding="10dp" />
+        android:padding="10dp"
+        />
 
 </FrameLayout>

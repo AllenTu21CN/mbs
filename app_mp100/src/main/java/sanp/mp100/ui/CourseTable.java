@@ -125,7 +125,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     // init course table view
     private void initView() {
         // find the course tables
-        mCourseTable  = (GridView) findViewById(R.id.course_table_gird_view);
+        mCourseTable  = (GridView) findViewById(R.id.course_table_grid_view);
 
         // course adapter
         mCourseAdapter = new CourseAdapter(mContext);

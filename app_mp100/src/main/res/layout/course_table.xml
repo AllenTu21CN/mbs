@@ -323,27 +323,49 @@
 
                 </LinearLayout>
 
-                <!-- course table canvas
-
-                     canvas: 1400px * 640px
-                -->
+                <!-- course table canvas: 1400px * 640px -->
                 <LinearLayout
                     android:id="@+id/course_table_grid_canvas"
                     android:layout_width="@dimen/course_table_width"
                     android:layout_height="@dimen/course_table_height">
 
-                    <!-- course table -->
+                    <!-- course table
+
+                     columns divider width: 2px
+                     line divider width: 2px
+
+                     -->
+
+                    <!-- backup
                     <GridView
-                        android:id="@+id/course_table_gird_view"
-                        android:layout_width="@dimen/course_table_width"
-                        android:layout_height="@dimen/course_table_height"
+                        android:id="@+id/course_table_grid_view"
+                        android:layout_width="1400px"
+                        android:layout_height="640px"
+                        android:layout_marginLeft="-2px"
                         android:numColumns="7"
                         android:stretchMode="columnWidth"
 
                         android:background="#96d9dbdc"
                         android:horizontalSpacing="2px"
                         android:verticalSpacing="2px"
-                        android:padding="2px"/>
+                        android:padding="2px"
+                        />
+                      -->
+
+                    <GridView
+                        android:id="@+id/course_table_grid_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginLeft="-1px"
+                        android:layout_marginRight="-1px"
+                        android:padding="2px"
+
+                        android:numColumns="7"
+                        android:stretchMode="columnWidth"
+
+                        android:listSelector="@android:color/transparent"
+                        />
+
                 </LinearLayout>
 
             </LinearLayout>

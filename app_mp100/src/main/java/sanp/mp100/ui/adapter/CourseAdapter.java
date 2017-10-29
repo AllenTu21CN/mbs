@@ -156,9 +156,12 @@ public class CourseAdapter extends BaseAdapter {
         ViewHolder holder = null;
         if (convertView == null) {
             holder = new ViewHolder();
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item, null);
 
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item, null);
             holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view);
+
+            //convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item_2, null);
+            //holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view_2);
 
             convertView.setTag(holder);
         } else {
