@@ -112,6 +112,9 @@
          Total canvas:
          (258px + 2px + 1400px) * week-height * (2px + 640px)
 
+         width: 258px + 2px(divider) + (199px + 1px) * 7
+         height: 2px(divider) + (79px + 1px) * 8
+
          -->
         <LinearLayout
             android:id="@+id/course_table_canvas_layout"
