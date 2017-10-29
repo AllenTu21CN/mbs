@@ -21,7 +21,7 @@
             android:layout_margin="15dp"
             android:gravity="center"
             android:text="消息提示"
-            android:textColor="#38ADFF"
+            android:textColor="#FFFFFF"
             android:textSize="16sp" />
 
         <TextView
@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
+            android:textColor="#FFFFFF"
             android:text="提示消息" />
 
         <View
@@ -53,7 +54,7 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="No"
-                android:textColor="#7D7D7D"
+                android:textColor="#FFFFFF"
                 android:textSize="16sp" />
 
             <View
@@ -71,7 +72,7 @@
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="Yes"
-                android:textColor="#38ADFF"
+                android:textColor="#FFFFFF"
                 android:textSize="16sp" />
         </LinearLayout>
     </LinearLayout>

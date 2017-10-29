@@ -85,21 +85,17 @@ public class CourseDialog extends Dialog {
      */
     private void initEvent() {
         //设置确定按钮被点击后，向外界提供监听
-        yes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (yesOnclickListener != null) {
-                    yesOnclickListener.onYesClick();
-                }
+        //yes.setOnClickListener(new View.OnClickListener() {
+        yes.setOnClickListener((View v) -> {
+            if (yesOnclickListener != null) {
+                yesOnclickListener.onYesClick();
             }
         });
+
         //设置取消按钮被点击后，向外界提供监听
-        no.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (noOnclickListener != null) {
-                    noOnclickListener.onNoClick();
-                }
+        no.setOnClickListener((View v) -> {
+            if (noOnclickListener != null) {
+                noOnclickListener.onNoClick();
             }
         });
     }
