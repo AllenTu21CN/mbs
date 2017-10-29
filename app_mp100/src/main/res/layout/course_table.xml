@@ -43,7 +43,10 @@
                 android:background="@drawable/week_button_selector"
                 android:text="前一周"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                android:nextFocusLeft="@id/refresh_btn"
+                android:nextFocusDown="@id/course_table_grid_view"
+                android:nextFocusUp="@id/course_table_grid_view"/>
 
 
             <!-- Shows Monday and Sunday date time -->
@@ -86,7 +89,9 @@
                 android:background="@drawable/week_button_selector"
                 android:text="后一周"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:nextFocusDown="@id/course_table_grid_view"
+                android:nextFocusUp="@id/course_table_grid_view"/>
 
             <!-- refresh button -->
             <Button
@@ -100,7 +105,10 @@
                 android:background="@drawable/week_button_selector"
                 android:text="刷新课表"
                 android:textColor="@android:color/white"
-                android:textSize="16sp"/>
+                android:textSize="16sp"
+                android:nextFocusRight="@id/prev_week_btn"
+                android:nextFocusDown="@id/course_table_grid_view"
+                android:nextFocusUp="@id/course_table_grid_view"/>
 
 
         </LinearLayout>

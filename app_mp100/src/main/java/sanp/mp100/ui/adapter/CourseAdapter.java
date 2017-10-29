@@ -173,7 +173,16 @@ public class CourseAdapter extends BaseAdapter {
             TimeTable course = mCourseList.get(position);
             holder.mCourseView.setText(course.subject_name);
 
-            //if (course.id == -1) holder.mCourseView.setEnabled(false);
+            // check whether the course is valid
+            if (course.id != -1) {
+                LogManager.i("Course: " + course.subject_name + " is valid");
+                holder.mCourseView.setEnabled(true);
+                holder.mCourseView.setFocusable(true);
+            } else {
+                LogManager.i("Course[" + position + "] is invalid");
+                holder.mCourseView.setEnabled(false);
+                holder.mCourseView.setFocusable(false);
+            }
         }
 
         return convertView;
