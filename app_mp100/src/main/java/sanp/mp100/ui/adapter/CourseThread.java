@@ -180,10 +180,9 @@ public class CourseThread implements Runnable {
         LogManager.i("onCheckoutCourseMsg: try to checkout courses(" +
                 date_string + " ~ " + end_string  + ") from service");
 
-        long class_id = 1;  //TODO, needn't this
         try {
             // checkout courses from classroom(BusinessPlatform)
-            mCourseList = mClassRoom.getLessonTimetable(class_id, date_string, end_string);
+            mCourseList = mClassRoom.getLessonTimetable(1, date_string, end_string);
         } catch (Exception e) {
             LogManager.e("onCheckoutCourse checkout courses failed: " + e);
             return;

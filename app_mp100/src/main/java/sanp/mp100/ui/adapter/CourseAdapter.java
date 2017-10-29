@@ -62,10 +62,22 @@ public class CourseAdapter extends BaseAdapter {
         }
     }
 
+    // @brief Reset course list
+    private void resetCourseList() {
+        for(TimeTable it : mCourseList) {
+            it.id           = -1;
+            it.subject_name = "";
+        }
+    }
+
     // @brief Update adapter course list
     public void updateCourseList(List<TimeTable> list, Date monday) {
         LogManager.i("CourseAdapter update course list");
 
+        // reset the old course list
+        resetCourseList();
+
+        // update new course list
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
         for(TimeTable it : list) {
