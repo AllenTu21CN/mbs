@@ -20,7 +20,7 @@
             android:layout_marginTop="65px"
             android:layout_gravity="center_horizontal"
             android:orientation="horizontal"
-            android:background="#5a0ed1b8"
+            android:background="#500ed1b8"
             >
 
             <!--
@@ -35,15 +35,15 @@
             <!-- Prev week button -->
             <Button
                 android:id="@+id/prev_week_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4px"
-                android:layout_marginTop="4px"
-                android:layout_marginBottom="4px"
+                android:layout_width="100px"
+                android:layout_height="50px"
+                android:layout_marginLeft="3px"
+                android:layout_marginBottom="3px"
+                android:layout_marginTop="3px"
                 android:background="@drawable/border_white"
                 android:text="前一周"
                 android:textColor="#ffffff"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
 
             <!-- Shows Monday and Sunday date time -->
@@ -77,12 +77,12 @@
             <!-- Next week button -->
             <Button
                 android:id="@+id/next_week_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="100px"
+                android:layout_height="50px"
                 android:layout_marginLeft="20px"
-                android:layout_marginRight="4px"
-                android:layout_marginTop="4px"
-                android:layout_marginBottom="4px"
+                android:layout_marginRight="3px"
+                android:layout_marginTop="3px"
+                android:layout_marginBottom="3px"
                 android:background="@drawable/border_white"
                 android:text="后一周"
                 android:textColor="#ffffff"
@@ -340,7 +340,7 @@
                         android:numColumns="7"
                         android:stretchMode="columnWidth"
 
-                        android:background="#26d9dbdc"
+                        android:background="#96d9dbdc"
                         android:horizontalSpacing="2px"
                         android:verticalSpacing="2px"
                         android:padding="2px"/>
