@@ -23,25 +23,23 @@ import sanp.mp100.integration.BusinessPlatform;
  */
 public class CourseDialog extends Dialog {
 
-    private Button yes;//确定按钮
-    private Button no;//取消按钮
-//  private TextView titleTv;//消息标题文本
-//  private TextView messageTv;//消息提示文本
-//  private String titleStr;//从外界设置的title文本
-//  private String messageStr;//从外界设置的消息文本
+    private Button mYesBtn;//确定按钮
+    private Button mNoBtn;//取消按钮
 
+    // course information text views
     private TextView mCourseNameView;
     private TextView mCourseTeacherView;
     private TextView mCourseTimeView;
     private TextView mCourseContentView;
 
+    // course information: name, teacher, time, content
     private String   mCourseName;
     private String   mCourseTeacher;
     private String   mCourseTime;
     private String   mCourseContent;
 
     //确定文本和取消文本的显示内容
-    private String yesStr, noStr;
+    private String mYesText, mNoText;
 
     private onNoOnclickListener noOnclickListener;//取消按钮被点击了的监听器
     private onYesOnclickListener yesOnclickListener;//确定按钮被点击了的监听器
@@ -53,9 +51,8 @@ public class CourseDialog extends Dialog {
      * @param onNoOnclickListener
      */
     public void setNoOnclickListener(String str, onNoOnclickListener onNoOnclickListener) {
-        if (str != null) {
-            noStr = str;
-        }
+        if (str != null) mNoText = str;
+
         this.noOnclickListener = onNoOnclickListener;
     }
 
@@ -66,9 +63,8 @@ public class CourseDialog extends Dialog {
      * @param onYesOnclickListener
      */
     public void setYesOnclickListener(String str, onYesOnclickListener onYesOnclickListener) {
-        if (str != null) {
-            yesStr = str;
-        }
+        if (str != null) mYesText = str;
+
         this.yesOnclickListener = onYesOnclickListener;
     }
 
@@ -97,15 +93,15 @@ public class CourseDialog extends Dialog {
      */
     private void initEvent() {
         //设置确定按钮被点击后，向外界提供监听
-        //yes.setOnClickListener(new View.OnClickListener() {
-        yes.setOnClickListener((View v) -> {
+        //mYesBtn.setOnClickListener(new View.OnClickListener() {
+        mYesBtn.setOnClickListener((View v) -> {
             if (yesOnclickListener != null) {
                 yesOnclickListener.onYesClick();
             }
         });
 
         //设置取消按钮被点击后，向外界提供监听
-        no.setOnClickListener((View v) -> {
+        mNoBtn.setOnClickListener((View v) -> {
             if (noOnclickListener != null) {
                 noOnclickListener.onNoClick();
             }
@@ -116,40 +112,22 @@ public class CourseDialog extends Dialog {
      * 初始化界面控件的显示数据
      */
     private void initData() {
-        //如果用户自定了title和message
-        /*
-        if (titleStr != null) {
-            titleTv.setText(titleStr);
-        }
-        if (messageStr != null) {
-            messageTv.setText(messageStr);
-        } */
-
         if (mCourseName != null)    mCourseNameView.setText(mCourseName);
         if (mCourseTeacher != null) mCourseTeacherView.setText(mCourseTeacher);
         if (mCourseTime != null)    mCourseTimeView.setText(mCourseTime);
         if (mCourseContent != null) mCourseContentView.setText(mCourseContent);
 
         //如果设置按钮的文字
-        if (yesStr != null) {
-            yes.setText(yesStr);
-        }
-        if (noStr != null) {
-            no.setText(noStr);
-        }
+        if (mYesText != null) mYesBtn.setText(mYesText);
+        if (mNoText != null)  mNoBtn.setText(mNoText);
     }
 
     /**
      * 初始化界面控件
      */
     private void initView() {
-        yes = (Button) findViewById(R.id.yes);
-        no = (Button) findViewById(R.id.no);
-
-        /*
-        titleTv = (TextView) findViewById(R.id.title);
-        messageTv = (TextView) findViewById(R.id.message);
-        */
+        mYesBtn = (Button) findViewById(R.id.course_dialog_yes);
+        mNoBtn  = (Button) findViewById(R.id.course_dialog_no);
 
         mCourseNameView    = (TextView) findViewById(R.id.course_name);
         mCourseTeacherView = (TextView) findViewById(R.id.course_teacher);
@@ -158,23 +136,10 @@ public class CourseDialog extends Dialog {
     }
 
     /**
-     * 从外界Activity为Dialog设置标题
+     * Sets course information: name, teacher, time and content
      *
-     * @param title
-    public void setTitle(String title) {
-        titleStr = title;
-    }
+     * @param name/teacher/time/content
      */
-
-    /**
-     * 从外界Activity为Dialog设置dialog的message
-     *
-     * @param message
-    public void setMessage(String message) {
-        messageStr = message;
-    }
-     */
-
     public void setCourseName(String name) { mCourseName = name; }
     public void setCourseTeacher(String teacher) { mCourseTeacher = teacher; }
     public void setCourseTime(String time) { mCourseTime = time; }
@@ -185,11 +150,11 @@ public class CourseDialog extends Dialog {
      * 设置确定按钮和取消被点击的接口
      */
     public interface onYesOnclickListener {
-        public void onYesClick();
+        void onYesClick();
     }
 
     public interface onNoOnclickListener {
-        public void onNoClick();
+        void onNoClick();
     }
 }
 

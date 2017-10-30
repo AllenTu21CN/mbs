@@ -118,12 +118,12 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/no"
+                android:id="@+id/course_dialog_no"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
-                android:background="@null"
+                android:background="@drawable/course_dialog_button_selector"
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="No"
@@ -136,12 +136,12 @@
                 android:background="#E4E4E4" />
 
             <Button
-                android:id="@+id/yes"
+                android:id="@+id/course_dialog_yes"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:background="@null"
+                android:background="@drawable/course_dialog_button_selector"
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="Yes"
