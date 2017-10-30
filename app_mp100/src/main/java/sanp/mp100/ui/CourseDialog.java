@@ -1,7 +1,7 @@
 package sanp.mp100.ui;
 
 /**
- * Created by will@1dao2.com on 2017/10/29.
+ * Modified by will@1dao2.com on 2017/10/29.
  *
  * see: http://blog.csdn.net/oqihaogongyuan/article/details/50958659
  */
@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import sanp.mp100.R;
-import sanp.mp100.integration.BusinessPlatform;
 
 /**
  * 创建自定义的dialog，主要学习其实现原理

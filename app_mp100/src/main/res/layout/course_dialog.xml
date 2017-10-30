@@ -10,7 +10,7 @@
         android:layout_width="260dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="@drawable/course_dialog_bg"
+        android:background="@drawable/course_dialog_background"
         android:orientation="vertical">
 
         <TextView
@@ -121,9 +121,8 @@
                 android:id="@+id/course_dialog_no"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginLeft="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/course_dialog_button_selector"
+                android:background="@drawable/course_dialog_button_no_selector"
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="No"
@@ -139,9 +138,8 @@
                 android:id="@+id/course_dialog_yes"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_marginRight="10dp"
                 android:layout_weight="1"
-                android:background="@drawable/course_dialog_button_selector"
+                android:background="@drawable/course_dialog_button_yes_selector"
                 android:gravity="center"
                 android:singleLine="true"
                 android:text="Yes"
