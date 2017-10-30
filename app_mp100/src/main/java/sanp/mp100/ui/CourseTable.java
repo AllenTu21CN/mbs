@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -63,7 +64,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     private static final int MSG_COURSE_THREAD_READY = 0;
     private static final int MSG_UPDATE_COURSE_TABLE = 1;
 
-    // Implements from CourseThread.Notify
+    // @brief Implements from CourseThread.Notify
     // - The course thread is Ready
     @Override
     public void onCourseThreadReady() {
@@ -107,6 +108,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         return;
     }
 
+    // @brief Implements, method is in Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -123,16 +125,10 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         initView();
     }
 
-    // init course table view
+    // @brief Init course table view
     private void initView() {
         // find the course tables
         mCourseTable  = (GridView) findViewById(R.id.course_table_grid_view);
-
-        // course adapter
-        mCourseAdapter = new CourseAdapter(mContext);
-
-        // set adapter into course table view
-        mCourseTable.setAdapter(mCourseAdapter);
 
         // course date line bar
         mPrevWeekBtn = (Button) findViewById(R.id.prev_week_btn);
@@ -151,11 +147,29 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         mMondayDateView = (TextView) findViewById(R.id.monday_date_view);
         mSundayDataView = (TextView) findViewById(R.id.sunday_date_view);
 
+        // init course table gridview
+        initCourseTableGridView();
+
         // init date
         initDate();
 
         // create a course checkout thread
         mCourseThread = new CourseThread(mCourseAdapter, this);
+    }
+
+    // @brief Init course table grid view
+    private void initCourseTableGridView() {
+        // course adapter
+        mCourseAdapter = new CourseAdapter(mContext);
+
+        // set adapter into course table view
+        mCourseTable.setAdapter(mCourseAdapter);
+
+        // set gridview item click handler
+        mCourseTable.setOnItemClickListener(
+                (AdapterView<?> parent, View view, int position, long id) -> {
+                    mCourseAdapter.showCourseDialog(position);
+                });
     }
 
     // @brief Init date

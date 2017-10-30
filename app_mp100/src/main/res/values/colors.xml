@@ -25,6 +25,11 @@
     <color name="week_button_selected_color">#67f592</color>
     <color name="week_button_disabled_color">#d6d6d6</color>
 
+    <!-- course dialog color -->
+    <color name="course_dialog_button_selected_color">#567cf799</color>
+    <color name="course_dialog_line_color">#E4E4E4</color>
+    <color name="course_dialog_background_color">#9678aff2</color>
+
 
 
     <!-- Copy -->
