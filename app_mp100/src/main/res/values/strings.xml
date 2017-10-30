@@ -71,4 +71,5 @@
 
     <string name="video_sources">video_sources</string>
     <string name="video_scenes">video_scenes</string>
+    <string name="video_output_formats">video_output_formats</string>
 </resources>

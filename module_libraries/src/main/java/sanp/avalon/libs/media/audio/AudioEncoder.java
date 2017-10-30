@@ -44,7 +44,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
         static public final int ENC_AAC_PROFILE_HE = MediaCodecInfo.CodecProfileLevel.AACObjectHE;
         static public final int ENC_AAC_PROFILE_HEv2 = MediaCodecInfo.CodecProfileLevel.AACObjectHE_PS;
         static public final int ENC_AAC_PROFILE_LD = MediaCodecInfo.CodecProfileLevel.AACObjectLD;
-        static public final int ENC_AAC_PROFILE_RECOMMENDED = ENC_AAC_PROFILE_LD;
+        static public final int ENC_AAC_PROFILE_RECOMMENDED = ENC_AAC_PROFILE_LC;
         static public final List<Integer> ENC_AAC_PROFILEs = Arrays.asList(ENC_AAC_PROFILE_LC, ENC_AAC_PROFILE_HE, ENC_AAC_PROFILE_HEv2, ENC_AAC_PROFILE_LD);
 
         static public final int ENC_G711_SAMPLERATE = 8000;

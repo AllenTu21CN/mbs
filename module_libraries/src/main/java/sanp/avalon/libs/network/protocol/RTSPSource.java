@@ -199,7 +199,7 @@ public class RTSPSource implements RTSPClient.Callback {
             try {
                 pkt = ch.pollIdlePacket(WAIT_PKT_TIMEOUT_MS);
                 if(pkt == null) {
-                    LogManager.i("has no ilde item");
+                    LogManager.i("rtsp rx channel has no ilde item");
                     return;
                 }
                 

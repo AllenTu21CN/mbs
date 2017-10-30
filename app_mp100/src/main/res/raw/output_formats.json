@@ -1,0 +1,53 @@
+{
+    "High": {
+        "video": {
+            "width": 1920,
+            "height": 1088,
+            "frameRate": 25,
+            "mimeType": "video/avc",
+            "bitrate": 2097152,
+            "keyFrameInterval": 7
+        },
+        "audio": {
+            "encFormat": {
+                "CodecName": "audio/mp4a-latm",
+                "Bitrate": 64000,
+                "Profile": 2
+            }
+        }
+    },
+    "Middle": {
+        "video": {
+            "width": 1280,
+            "height": 720,
+            "frameRate": 25,
+            "mimeType": "video/avc",
+            "bitrate": 1048576,
+            "keyFrameInterval": 7
+        },
+        "audio": {
+            "encFormat": {
+                "CodecName": "audio/mp4a-latm",
+                "Bitrate": 64000,
+                "Profile": 2
+            }
+        }
+    },
+    "Low": {
+        "video": {
+            "width": 856,
+            "height": 480,
+            "frameRate": 25,
+            "mimeType": "video/avc",
+            "bitrate": 524288,
+            "keyFrameInterval": 7
+        },
+        "audio": {
+            "encFormat": {
+                "CodecName": "audio/mp4a-latm",
+                "Bitrate": 64000,
+                "Profile": 2
+            }
+        }
+    }
+}

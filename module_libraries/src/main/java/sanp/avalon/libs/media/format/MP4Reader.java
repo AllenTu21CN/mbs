@@ -163,7 +163,7 @@ public class MP4Reader implements Runnable {
                 try {
                     pkt = ch.pollIdlePacket(WAIT_PKT_TIMEOUT_MS);
                     if(pkt == null) {
-                        LogManager.i("has no ilde item");
+                        LogManager.i("mp4 tx channel has no ilde item");
                         continue;
                     }
                 } catch (InterruptedException e) {

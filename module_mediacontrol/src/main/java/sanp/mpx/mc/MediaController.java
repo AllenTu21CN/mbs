@@ -2835,7 +2835,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                 /*3*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1920, 1088, 10, 1 * 1024 * 1024, 10),
                 /*4*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1280, 720, 10, 1 * 1024 * 1024, 10),
         };
-        static private MediaEngine.AudioSinkConfig mAudioSinkConf = new MediaEngine.AudioSinkConfig(AudioEncoder.Supporting.ENC_NAME_AAC, 64000, AudioEncoder.Supporting.ENC_AAC_PROFILE_LC);
+        static private MediaEngine.AudioSinkConfig mAudioSinkConf = new MediaEngine.AudioSinkConfig(AudioEncoder.Supporting.ENC_NAME_AAC, 64000, AudioEncoder.Supporting.ENC_AAC_PROFILE_RECOMMENDED);
 
         private MediaController mMediaController = null;
         private List<Integer> mOutputIds = new ArrayList<>();

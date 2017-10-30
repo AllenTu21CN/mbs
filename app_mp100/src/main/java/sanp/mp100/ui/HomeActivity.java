@@ -108,6 +108,7 @@ public class HomeActivity extends FragmentActivity {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             mRBUtil.init(holder);
+            mRBUtil.setScene(RBUtil.Scene.Home);
         }
 
         @Override

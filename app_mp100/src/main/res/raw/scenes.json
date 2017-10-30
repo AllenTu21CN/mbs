@@ -4,7 +4,7 @@
             "name": "单分屏",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 1,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard", "StudentFullView", "StudentFeature", "Courseware"]
             }
         }
@@ -14,7 +14,7 @@
             "name": "单分屏",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 1,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard", "StudentFullView", "StudentFeature", "Courseware"]
             }
         }
@@ -24,7 +24,7 @@
             "name": "单分屏",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 1,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard", "StudentFullView", "StudentFeature", "Courseware"]
             }
         },
@@ -32,7 +32,7 @@
             "name": "老师+学生(等分屏)",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 2,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
                 "1": ["StudentFullView", "StudentFeature"]
             }
@@ -41,7 +41,7 @@
             "name": "老师+课件(等分屏)",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 2,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
                 "1": ["Courseware"]
             }
@@ -50,7 +50,7 @@
             "name": "学生+课件(等分屏)",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 2,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["StudentFullView", "StudentFeature"],
                 "1": ["Courseware"]
             }
@@ -59,7 +59,7 @@
             "name": "三等分屏",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 3,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
                 "1": ["StudentFullView", "StudentFeature"],
                 "2": ["Courseware"]
@@ -69,7 +69,7 @@
             "name": "老师+学生(画中画-右下)",
             "layout": "ASYMMETRY_OVERLAPPING",
             "subScreenCnt": 5,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
                 "4": ["StudentFullView", "StudentFeature"]
             }
@@ -78,7 +78,7 @@
             "name": "老师+课件(画中画-右下)",
             "layout": "ASYMMETRY_OVERLAPPING",
             "subScreenCnt": 5,
-            "roleList": {
+            "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
                 "4": ["Courseware"]
             }
