@@ -9,7 +9,7 @@
         android:id="@+id/course_table_layout"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:background="@drawable/course_table_bk"
+        android:background="@drawable/bk_cyan_1440_900"
         android:orientation="vertical">
 
         <!-- Dateline -->
@@ -46,7 +46,7 @@
                 android:textSize="16sp"
                 android:nextFocusLeft="@id/refresh_btn"
                 android:nextFocusDown="@id/course_table_grid_view"
-                android:nextFocusUp="@id/course_table_grid_view"/>
+                android:nextFocusUp="@null"/>
 
 
             <!-- Shows Monday and Sunday date time -->
@@ -91,7 +91,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="16sp"
                 android:nextFocusDown="@id/course_table_grid_view"
-                android:nextFocusUp="@id/course_table_grid_view"/>
+                android:nextFocusUp="@null"/>
 
             <!-- refresh button -->
             <Button
@@ -108,7 +108,7 @@
                 android:textSize="16sp"
                 android:nextFocusRight="@id/prev_week_btn"
                 android:nextFocusDown="@id/course_table_grid_view"
-                android:nextFocusUp="@id/course_table_grid_view"/>
+                android:nextFocusUp="@null"/>
 
 
         </LinearLayout>

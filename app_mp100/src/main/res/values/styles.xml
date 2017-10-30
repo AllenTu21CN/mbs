@@ -11,7 +11,7 @@
     <style name="StartTheme" parent="AppTheme">
         <item name="windowNoTitle">true</item>
         <item name="android:windowFullscreen">true</item>
-        <item name="android:windowBackground">@mipmap/welcome_icon</item>
+        <item name="android:windowBackground">@drawable/bk_cyan_1440_900</item>
         <item name="android:windowAnimationStyle">@anim/alpha_in</item>
     </style>
 
