@@ -8,10 +8,10 @@
         android:color="#ffffff" />
      -->
 
-    <solid android:color="#9678aff2" />
+    <solid android:color="@color/course_dialog_background_color" />
     <stroke
         android:width="0.8dp"
-        android:color="#9678aff2" />
+        android:color="@color/course_dialog_background_color" />
 
     <!-- 圆角 -->
     <corners android:radius="6dp" />
