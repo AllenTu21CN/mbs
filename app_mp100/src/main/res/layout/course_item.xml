@@ -32,7 +32,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:text="未知"
-        android:textSize="22sp"
+        android:textSize="16sp"
         android:textColor="#88dca2"
         android:maxLines="1"
         android:padding="10dp" />
