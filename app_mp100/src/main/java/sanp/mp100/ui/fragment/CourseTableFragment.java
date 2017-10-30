@@ -1,12 +1,13 @@
-package sanp.mp100.ui;
+package sanp.mp100.ui.fragment;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
@@ -34,11 +35,16 @@ import sanp.mp100.integration.BusinessPlatform.TimeTable;
  * 
  */
 
-public class CourseTable extends Activity implements View.OnClickListener, CourseThread.Notify {
+public class CourseTableFragment extends BaseFragment implements View.OnClickListener, CourseThread.Notify {
+
+    public static final String TAG = "CourseTableFragment";
 
     private Context  mContext;
 
-    // course table view
+    // course table layout view: see course_table.xml
+    private View     mCourseLayoutView;
+
+    // course table view: see course_table.xml:gridview
     private GridView mCourseTable;
     // course table Monday's date
     private Date     mCourseTableMonday;
@@ -64,18 +70,27 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     private static final int MSG_COURSE_THREAD_READY = 0;
     private static final int MSG_UPDATE_COURSE_TABLE = 1;
 
+    // course table fragment single instance
+    private static CourseTableFragment mCourseTableFragment = null;
+    public static CourseTableFragment getInstance() {
+        if (mCourseTableFragment == null)
+            mCourseTableFragment = new CourseTableFragment();
+
+        return mCourseTableFragment;
+    }
+
     // @brief Implements from CourseThread.Notify
     // - The course thread is Ready
     @Override
     public void onCourseThreadReady() {
-        LogManager.i("CourseTable onCourseThreadReady, send msg to the ui thread");
+        LogManager.i("CourseTableFragment onCourseThreadReady, send msg to the ui thread");
 
         // prepare message: ready
         Message msg = Message.obtain();
         msg.what = MSG_COURSE_THREAD_READY;
 
         if (!mHandler.sendMessage(msg)) {
-            LogManager.e("CourseTable onCourseThreadReady, send message failed");
+            LogManager.e("CourseTableFragment onCourseThreadReady, send message failed");
             return;
         }
 
@@ -92,7 +107,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     // - Checkout courses suc
     @Override
     public void onCheckoutCourse(List<TimeTable> list) {
-        LogManager.i("CourseTable onCheckoutCourse, update courses");
+        LogManager.i("CourseTableFragment onCheckoutCourse, update courses");
 
         // prepare message: update course table view
         Message msg = Message.obtain();
@@ -101,48 +116,65 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         msg.obj  = list;
 
         if (!mHandler.sendMessage(msg)) {
-            LogManager.e("CourseTable onCheckoutCourse, send message failed");
+            LogManager.e("CourseTableFragment onCheckoutCourse, send message failed");
             return;
         }
 
         return;
     }
 
-    // @brief Implements, methods are defined in Activity
-    // - Activity onCreate
+    // @brief Implements, method is defined in Fragment
+    // - Fragment onCreate
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // set screen orientation: landscape
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
-        setContentView(R.layout.course_table);
+        // course layout view
+        mCourseLayoutView = View.inflate(getActivity(), R.layout.course_table, null);
 
-        mContext = this;
+        mContext = getActivity();
 
-        initUiMessageHandler();
-
-        initView();
+        return;
     }
 
-    // - Activity onDestroy
+    // - Fragment onCreateView
+    @Override 
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // init message handler
+        initUiMessageHandler();
+
+        // load all view: date line bar, course table gridview and so on.
+        initView();
+
+        return mCourseLayoutView;
+    }
+
+    // - Fragment onDestroyView
     @Override
-    protected void onDestroy() {
+    public void onDestroyView() {
         // stop course thread
-        super.onDestroy();
+        super.onDestroyView();
         mCourseThread.stopCourseThread();
+    }
+
+    // - Fragment onDestroy
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //TODO: release all resources
     }
 
     // @brief Init course table view
     private void initView() {
         // find the course tables
-        mCourseTable  = (GridView) findViewById(R.id.course_table_grid_view);
+        mCourseTable  = (GridView) mCourseLayoutView.findViewById(R.id.course_table_grid_view);
 
         // course date line bar
-        mPrevWeekBtn = (Button) findViewById(R.id.prev_week_btn);
-        mNextWeekBtn = (Button) findViewById(R.id.next_week_btn);
-        mRefreshBtn  = (Button) findViewById(R.id.refresh_btn);
+        mPrevWeekBtn = (Button) mCourseLayoutView.findViewById(R.id.prev_week_btn);
+        mNextWeekBtn = (Button) mCourseLayoutView.findViewById(R.id.next_week_btn);
+        mRefreshBtn  = (Button) mCourseLayoutView.findViewById(R.id.refresh_btn);
 
         //TODO: enable after course thread is running
         //mRefreshBtn.setEnabled(false);
@@ -153,8 +185,8 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         mNextWeekBtn.setOnClickListener(this);
         mRefreshBtn.setOnClickListener(this);
 
-        mMondayDateView = (TextView) findViewById(R.id.monday_date_view);
-        mSundayDataView = (TextView) findViewById(R.id.sunday_date_view);
+        mMondayDateView = (TextView) mCourseLayoutView.findViewById(R.id.monday_date_view);
+        mSundayDataView = (TextView) mCourseLayoutView.findViewById(R.id.sunday_date_view);
 
         // init course table gridview
         initCourseTableGridView();
@@ -244,7 +276,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
 
     // @brief Updates course table
     private void updateCourseTable(List<TimeTable> list) {
-        LogManager.i("CourseTable need to update course table");
+        LogManager.i("CourseTableFragment need to update course table");
 
         /* Debug output course list. Don't output here,
          * it'll be output in CourseAdapter.updateCourseList()
@@ -345,7 +377,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
 
     // @brief Checkouts current time courses
     private void checkoutCourseForCurrent() {
-        LogManager.i("CourseTable checkout current week's courses");
+        LogManager.i("CourseTableFragment checkout current week's courses");
 
         // checkout this week's courses
         // days: 6 + include monday = 7 days
@@ -354,11 +386,11 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
 
     // @brief Checkouts prev week courses
     private void checkoutPrevWeekCourse() {
-        LogManager.i("CourseTable checkout prev week's courses");
+        LogManager.i("CourseTableFragment checkout prev week's courses");
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-        LogManager.i("CourseTable table date: " + format.format(mCourseTableMonday));
+        LogManager.i("CourseTableFragment table date: " + format.format(mCourseTableMonday));
 
         Calendar calendar= Calendar.getInstance();
         calendar.setTime(mCourseTableMonday);
@@ -367,7 +399,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         calendar.add(Calendar.DAY_OF_YEAR, -7);
 
         mCourseTableMonday = calendar.getTime();
-        LogManager.i("CourseTable prev week: " + format.format(mCourseTableMonday));
+        LogManager.i("CourseTableFragment prev week: " + format.format(mCourseTableMonday));
 
         // update date line text view
         updateDateLineBarView();
@@ -378,11 +410,11 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
 
     // @brief Checkouts next week courses
     private void checkoutNextWeekCourse() {
-        LogManager.i("CourseTable checkout next week's courses");
+        LogManager.i("CourseTableFragment checkout next week's courses");
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-        LogManager.i("CourseTable table date: " + format.format(mCourseTableMonday));
+        LogManager.i("CourseTableFragment table date: " + format.format(mCourseTableMonday));
 
         Calendar calendar= Calendar.getInstance();
         calendar.setTime(mCourseTableMonday);
@@ -391,7 +423,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         calendar.add(Calendar.DAY_OF_YEAR, 7);
 
         mCourseTableMonday = calendar.getTime();
-        LogManager.i("CourseTable next week: " + format.format(mCourseTableMonday));
+        LogManager.i("CourseTableFragment next week: " + format.format(mCourseTableMonday));
 
         // update date line text view
         updateDateLineBarView();
