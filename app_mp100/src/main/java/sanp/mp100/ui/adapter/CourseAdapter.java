@@ -191,7 +191,7 @@ public class CourseAdapter extends BaseAdapter {
         return convertView;
     }
 
-    // Set course view item click handler
+    // @brief Sets course view item click handler
     private void setCourseViewClickHandler(View view, TimeTable course) {
 
         if (course.id == -1) return;
@@ -202,7 +202,7 @@ public class CourseAdapter extends BaseAdapter {
         return;
     }
 
-    // Shows course dialog
+    // @brief Shows course dialog
     private void showCourseDialog(TimeTable course) {
         CourseDialog dialog = new CourseDialog(mContext);
 
@@ -224,6 +224,17 @@ public class CourseAdapter extends BaseAdapter {
         });
 
         dialog.show();
+    }
+
+    // @brief Shows course dialog according to item position
+    public void showCourseDialog(int position) {
+        TimeTable course = mCourseList.get(position);
+
+        if (course.id == -1) return;
+
+        showCourseDialog(course);
+
+        return;
     }
 
     private class ViewHolder {
