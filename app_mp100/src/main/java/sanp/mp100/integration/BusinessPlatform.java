@@ -2,23 +2,23 @@ package sanp.mp100.integration;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Environment;
 
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import sanp.avalon.libs.base.utils.LogManager;
+import sanp.avalon.libs.base.utils.Tuple3;
 import sanp.mp100.MP100Application;
 import sanp.mp100.integration.BusinessPlatformPostman.BPError;
 
@@ -84,6 +84,15 @@ public class BusinessPlatform {
         public String duration;
         public String status;
     }
+
+    public class LessonInfo {
+        public String program_uuid;
+        public String stream_name;
+        public LessonInfo(String pgm_uuid, String stream_name) {
+            this.program_uuid = pgm_uuid;
+            this.stream_name = stream_name;
+        }
+    };
 
     static public class ConnectionSettings {
         public String WebSocketURL;
@@ -162,6 +171,8 @@ public class BusinessPlatform {
     static private final String PROCEDURE_NAME_ORG_GET_SCHOOLS      = "org.getSchoolsByArea";
     static private final String PROCEDURE_NAME_ORG_GET_CLASSES      = "org.getClassesBySchoolId";
     static private final String PROCEDURE_NAME_LESSON_GET_TIMETABLE = "lesson.getTimetable";
+    static private final String PROCEDURE_NAME_LESSON_START_PLANNED = "lesson.startPlanned";
+    static private final String PROCEDURE_NAME_LESSON_STOP_PLANNED  = "lesson.stopPlanned";
 
     private boolean mInited = false;
 
@@ -185,6 +196,8 @@ public class BusinessPlatform {
     private List<Observer> mObservers = new ArrayList<>();
 
     private int mCurrentRetryConnectTimes;
+
+    private Tuple3<Long/*timetable_id*/, Integer/*output_id*/, String/*url*/> inClassLesson = null;
 
     BusinessPlatform() {
         reset();
@@ -538,6 +551,101 @@ public class BusinessPlatform {
         return mPlatformPostman.asyncInvokeResultAsList(resultCallback, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
     }
 
+
+    // ---- start planned
+    public void startPlanned(long timetable_id)
+            throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
+        if(inClassLesson != null) {
+            if(inClassLesson.first == timetable_id) {
+                LogManager.w(String.format("the class[%lld] had been started", timetable_id));
+                return;
+            } else {
+                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%lld)",
+                        inClassLesson.first, inClassLesson.second, inClassLesson.third, timetable_id));
+            }
+        }
+
+        List<LessonInfo> infos = new ArrayList<>();
+        mPlatformPostman.syncInvokeResultAsList(infos, LessonInfo.class, PROCEDURE_NAME_LESSON_START_PLANNED, timetable_id);
+        startRtmpOutput(infos.get(0), timetable_id);
+    }
+
+    /**
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
+     * */
+    public int startPlanned(long timetable_id, Callback resultCallback) {
+        if (!mInited)
+            throw new RuntimeException("init first");
+        if(inClassLesson != null) {
+            if(inClassLesson.first == timetable_id) {
+                LogManager.w(String.format("the class[%lld] had been started", timetable_id));
+                return BPError.ERROR_IMPORTANT_ACTION_SKIP;
+            } else {
+                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%lld)",
+                        inClassLesson.first, inClassLesson.second, inClassLesson.third, timetable_id));
+            }
+        }
+
+        return mPlatformPostman.asyncInvokeResultAsList(
+                ((value, args, kwargs) -> {
+                    if(value == 0) {
+                        try {
+                            startRtmpOutput((LessonInfo) args.get(0), timetable_id);
+                            resultCallback.done(0, null, null);
+                        } catch (InternalError e) {
+                            resultCallback.done(-3, null, new HashMap<String, Object>(){{put("message", e.getMessage());}});
+                        }
+                    } else {
+                        resultCallback.done(value, args, kwargs);
+                    }
+                }),
+                LessonInfo.class,
+                PROCEDURE_NAME_LESSON_START_PLANNED,
+                timetable_id);
+    }
+
+
+    // ---- stop planned
+    public void stopPlanned(long timetable_id)
+            throws RuntimeException, InterruptedException, InternalError {
+        if (!mInited)
+            throw new RuntimeException("init first");
+        if(inClassLesson == null)
+            throw new RuntimeException(String.format("logical error: the class[%lld] has not been started", timetable_id));
+        if(inClassLesson.first != timetable_id)
+            throw new RuntimeException(String.format("logical error: the timetable_id[%lld] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
+                    timetable_id, inClassLesson.first, inClassLesson.second, inClassLesson.third));
+
+        RBUtil.getInstance().removeOutput(inClassLesson.second);
+        mPlatformPostman.syncInvoke(PROCEDURE_NAME_LESSON_STOP_PLANNED, Arrays.asList(timetable_id), null);
+        inClassLesson = null;
+    }
+
+    /**
+     * @param resultCallback:
+     *      if the resultCallback::value is 0, that means the action has been done successfully,
+     *      otherwise, the resultCallback::value indicates error code, and get error message from
+     *  resultCallback::kwargs ({"message": "..."})
+     * */
+    public int stopPlanned(long timetable_id, Callback resultCallback) {
+        if (!mInited)
+            throw new RuntimeException("init first");
+        if(inClassLesson == null)
+            throw new RuntimeException(String.format("logical error: the class[%lld] has not been started", timetable_id));
+        if(inClassLesson.first != timetable_id)
+            throw new RuntimeException(String.format("logical error: the timetable_id[%lld] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
+                    timetable_id, inClassLesson.first, inClassLesson.second, inClassLesson.third));
+
+        RBUtil.getInstance().removeOutput(inClassLesson.second);
+        return mPlatformPostman.asyncInvoke(PROCEDURE_NAME_LESSON_STOP_PLANNED, Arrays.asList(timetable_id), null, resultCallback);
+    }
+
+
     private void loadPreferences() {
         boolean hadActivated = mSharedPref.getBoolean(
                 mContext.getString(R.string.platform_had_activated),
@@ -730,5 +838,13 @@ public class BusinessPlatform {
             e.printStackTrace();
             throw new RuntimeException("read from " + filename + " fail");
         }
+    }
+
+    private void startRtmpOutput(LessonInfo info, long timetable_id) throws InternalError {
+        String url = "rtmp://lbblscy.3322.org:8085/live/" + info.program_uuid + "?s=" + info.stream_name;
+        int id = RBUtil.getInstance().addOutput(url);
+        if(id < 0)
+            throw new InternalError(String.format("create rtmp[%s] output failed with %d", url, id));
+        inClassLesson = new Tuple3<>(timetable_id, id, url);
     }
 }

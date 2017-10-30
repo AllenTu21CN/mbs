@@ -72,4 +72,6 @@
     <string name="video_sources">video_sources</string>
     <string name="video_scenes">video_scenes</string>
     <string name="video_output_formats">video_output_formats</string>
+    <string name="video_output_default_quality">video_output_default_quality</string>
+    <string name="video_output_default_quality_default">High</string>
 </resources>
