@@ -3,7 +3,7 @@ package sanp.mp100.ui.adapter;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.widget.BaseAdapter;
+import android.support.annotation.Nullable;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -13,6 +13,7 @@ import java.util.List;
 import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
+import sanp.mp100.integration.RBUtil;
 
 /**
  * @file  CourseThread.java
@@ -33,19 +34,31 @@ public class CourseThread implements Runnable {
 
         // Checkout courses suc
         void onCheckoutCourse(List<TimeTable> list);
-    };
+    }
+
+    public interface ClassNotify {
+        // Note: @result: 0 is success, or failed
+
+        // Notify the result of start class
+        void onStartClass(int result);
+
+        // Notify the result of stop class
+        void onStopClass(int result);
+    }
 
     // course call method message
     public static final int MSG_CHECKOUT_COURSE = 0;
-    public static final int MSG_STOP_THREAD = 1;
+    public static final int MSG_STOP_THREAD     = 1;
+    public static final int MSG_START_CLASS     = 2;
+    public static final int MSG_STOP_CLASS      = 3;
 
     private Thread mCourseThread = null;
 //  private Object mLock = new Object();
 
-    // course table view adapter
-    private BaseAdapter mCourseAdapter;
     // notify, CourseTable activity
     private Notify      mNotify;
+
+    private ClassNotify mClassNotify;
 
     // course lesson list
     private List<TimeTable>  mCourseList = null;
@@ -56,8 +69,7 @@ public class CourseThread implements Runnable {
     private Handler mHandler = null;
 
 
-    public CourseThread(BaseAdapter adapter, Notify notify) {
-        mCourseAdapter = adapter;
+    public CourseThread(Notify notify) {
         mNotify = notify;
 
         // init the thread
@@ -116,9 +128,45 @@ public class CourseThread implements Runnable {
         return 0;
     }
 
-    // @brief Obtains course list directly
-    // Obtains course list after mCourseAdapter.notifyDataSetChanged()
-    public List<TimeTable> obtainCourseList() { return mCourseList;}
+    // @brief Starts class
+    // @param course [IN] start class' course
+    public int startClass(TimeTable course) {
+        LogManager.i("Try to start class: " + course.subject_name);
+
+        // prepare start class
+        Message message = Message.obtain();
+        message.what = MSG_START_CLASS;
+        message.obj  = course;
+
+        if (!mHandler.sendMessage(message)) {
+            LogManager.e("Send MSG_START_CLASS message failed");
+            return 1;
+        }
+
+        return 0;
+    }
+
+    // @brief Stops class
+    public int stopClass(TimeTable course) {
+        LogManager.i("Try to stop class: " + course.subject_name);
+
+        // prepare stop class
+        Message message = Message.obtain();
+        message.what = MSG_STOP_CLASS;
+        message.obj  = course;
+
+        if (!mHandler.sendMessage(message)) {
+            LogManager.i("Send MSG_STOP_CLASS message failed");
+            return 1;
+        }
+
+        return 0;
+    }
+
+    // @brief Sets class notifier
+    public void setClassNotify(@Nullable  ClassNotify notify) {
+        mClassNotify = notify;
+    }
 
     // @brief course thread entry and process funcion
     @Override 
@@ -146,6 +194,12 @@ public class CourseThread implements Runnable {
                     break;
                 case MSG_STOP_THREAD: /* stop course thread message */
                     Looper.myLooper().quit();
+                    break;
+                case MSG_START_CLASS:
+                    onStartClassMsg((TimeTable)msg.obj);
+                    break;
+                case MSG_STOP_CLASS:
+                    onStopClassMsg((TimeTable)msg.obj);
                     break;
                 default:
                     LogManager.w("Unknown message: " + msg.what);
@@ -185,6 +239,7 @@ public class CourseThread implements Runnable {
             mCourseList = mClassRoom.getLessonTimetable(1, date_string, end_string);
         } catch (Exception e) {
             LogManager.e("onCheckoutCourse checkout courses failed: " + e);
+            //TODO, 2017/10/31, need to notify the failed
             return;
         }
 
@@ -192,5 +247,43 @@ public class CourseThread implements Runnable {
         mNotify.onCheckoutCourse(mCourseList);
 
         return;
+    }
+
+    // process start class message
+    private void onStartClassMsg(TimeTable course) {
+        int result = 0;
+
+        LogManager.i("CourseThread onStartClass: start class");
+
+        RBUtil.getInstance().setScene(RBUtil.Scene.InClass);
+
+        try {
+            BusinessPlatform.getInstance().startPlanned(course.id);
+        } catch (Exception e) {
+            LogManager.w("onStartClass start class failed: " + e);
+            result = -1;
+        }
+
+        // notify the result of start class
+        if (mClassNotify != null) mClassNotify.onStartClass(result);
+    }
+
+    // process stop class message
+    private void onStopClassMsg(TimeTable course) {
+        int result = 0;
+
+        LogManager.i("CourseThread onStopClass: stop class");
+
+        RBUtil.getInstance().setScene(RBUtil.Scene.ShowTimeTable);
+
+        try {
+            BusinessPlatform.getInstance().stopPlanned(course.id);
+        } catch (Exception e) {
+            LogManager.w("onStopClass stop class failed: " + e);
+            result = -1;
+        }
+
+        // notify the result of stop class
+        if (mClassNotify != null) mClassNotify.onStopClass(result);
     }
 }

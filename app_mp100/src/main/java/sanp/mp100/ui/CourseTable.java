@@ -163,7 +163,7 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         initDate();
 
         // create a course checkout thread
-        mCourseThread = new CourseThread(mCourseAdapter, this);
+        mCourseThread = new CourseThread(this);
     }
 
     // @brief Init course table grid view

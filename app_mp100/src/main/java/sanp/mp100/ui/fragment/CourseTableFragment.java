@@ -191,7 +191,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         initDate();
 
         // create a course checkout thread
-        mCourseThread = new CourseThread(mCourseAdapter, this);
+        mCourseThread = new CourseThread(this);
     }
 
     // @brief Init course table grid view
@@ -432,6 +432,8 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     public void enterTakingClassFragment(@NonNull TimeTable course) {
         ClassFragment fragment = ClassFragment.getInstance();
 
+        // set course thread
+        fragment.setCourseThread(mCourseThread);
         // set current course
         fragment.setClassCourse(course);
 
