@@ -237,7 +237,7 @@ public class CourseThread implements Runnable {
         try {
             // checkout courses from classroom(BusinessPlatform)
             mCourseList = mClassRoom.getLessonTimetable(1, date_string, end_string);
-        } catch (Exception e) {
+        } catch (InternalError|Exception e) {
             LogManager.e("onCheckoutCourse checkout courses failed: " + e);
             //TODO, 2017/10/31, need to notify the failed
             return;
@@ -259,7 +259,7 @@ public class CourseThread implements Runnable {
 
         try {
             BusinessPlatform.getInstance().startPlanned(course.id);
-        } catch (Exception e) {
+        } catch (InternalError|Exception e) {
             LogManager.w("onStartClass start class failed: " + e);
             result = -1;
         }
@@ -278,7 +278,7 @@ public class CourseThread implements Runnable {
 
         try {
             BusinessPlatform.getInstance().stopPlanned(course.id);
-        } catch (Exception e) {
+        } catch (InternalError|Exception e) {
             LogManager.w("onStopClass stop class failed: " + e);
             result = -1;
         }
