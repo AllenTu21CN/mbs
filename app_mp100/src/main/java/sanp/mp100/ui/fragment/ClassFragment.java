@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatform;
 
@@ -19,20 +20,20 @@ import sanp.mp100.integration.BusinessPlatform;
  * @date   2017/10/30
  */
 
-public class TakingClassFragment extends BaseFragment implements View.OnClickListener  {
+public class ClassFragment extends BaseFragment implements View.OnClickListener  {
 
-    public static final String TAG = "TakingClassFragment";
-    public static TakingClassFragment mTakingClassFragment;
+    public static final String TAG = "ClassFragment";
+    public static ClassFragment mClassFragment;
 
-    public static TakingClassFragment getInstance() {
-        if (mTakingClassFragment == null)
-            mTakingClassFragment = new TakingClassFragment();
+    public static ClassFragment getInstance() {
+        if (mClassFragment == null)
+            mClassFragment = new ClassFragment();
 
-        return mTakingClassFragment;
+        return mClassFragment;
     }
 
     // see: taking_class.xml
-    private View mTakingClassViewGroup;
+    private View mClassViewGroup;
 
     private TextView mClassStatusView;
 
@@ -54,29 +55,31 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mTakingClassViewGroup = View.inflate(getActivity(), R.layout.taking_class, null);
+        mClassViewGroup = View.inflate(getActivity(), R.layout.course_class, null);
+
+        LogManager.i("ClassFragment onCreate: init view group(layout/course_class.xml)");
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        LogManager.i("ClassFragment: onCreateView: init all views(Text, Btn, ..)");
 
-        mIsTakingClass = true;
-
+        mIsTakingClass = false;
         initView();
 
-        return mTakingClassViewGroup;
+        return mClassViewGroup;
     }
 
     private void initView() {
-        mClassStatusView  = (TextView) mTakingClassViewGroup.findViewById(R.id.taking_class_status);
+        mClassStatusView  = (TextView) mClassViewGroup.findViewById(R.id.class_status);
 
-        mClassNameView    = (TextView) mTakingClassViewGroup.findViewById(R.id.class_name);
-        mClassTeacherView = (TextView) mTakingClassViewGroup.findViewById(R.id.class_teacher);
-        mClassTimeView    = (TextView) mTakingClassViewGroup.findViewById(R.id.class_time);
-        mClassContentView = (TextView) mTakingClassViewGroup.findViewById(R.id.class_content);
+        mClassNameView    = (TextView) mClassViewGroup.findViewById(R.id.class_name);
+        mClassTeacherView = (TextView) mClassViewGroup.findViewById(R.id.class_teacher);
+        mClassTimeView    = (TextView) mClassViewGroup.findViewById(R.id.class_time);
+        mClassContentView = (TextView) mClassViewGroup.findViewById(R.id.class_content);
 
-        mTakingClassCtrlBtn = (Button) mTakingClassViewGroup.findViewById(R.id.taking_class_ctrl);
-        mHiddenThisView     = (Button) mTakingClassViewGroup.findViewById(R.id.hidden_this_view);
+        mTakingClassCtrlBtn = (Button) mClassViewGroup.findViewById(R.id.taking_class_ctrl);
+        mHiddenThisView     = (Button) mClassViewGroup.findViewById(R.id.hidden_this_view);
 
         mTakingClassCtrlBtn.setOnClickListener(this);
         mHiddenThisView.setOnClickListener(this);
@@ -86,7 +89,7 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
             mClassStatusView.setText("正在上课");
             mTakingClassCtrlBtn.setText("结束上课");
         } else {
-            mClassStatusView.setText("课程结束");
+            mClassStatusView.setText("课程信息");
             mTakingClassCtrlBtn.setText("开始上课");
         }
 
@@ -116,17 +119,16 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
     }
 
     // @brief Starts taking class
-    public int startTakingClass() {
+    private int startTakingClass() {
         //todo
         return 0;
     }
 
     // @brief Stops taking class
-    public int StopTakingClass() {
+    private int StopTakingClass() {
         //todo
         return 0;
     }
-
 
     // @brief Updates class' course info
     private void updateClassCourseInfo() {
@@ -137,5 +139,4 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
         mClassTimeView.setText(mCourse.date + " 第" + mCourse.section + "节");
         mClassContentView.setText(mCourse.title);
     }
-
 }

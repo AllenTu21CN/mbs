@@ -17,6 +17,7 @@ import sanp.mp100.R;
 import sanp.mp100.ui.CourseDialog;
 import sanp.mp100.ui.CourseTable;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
+import sanp.mp100.ui.fragment.CourseTableFragment;
 
 /**
  * @brief Course adapter. Checkouts course and show them on the view. 
@@ -211,14 +212,16 @@ public class CourseAdapter extends BaseAdapter {
         dialog.setCourseTime(course.date + " 第" + course.section + "节");
         dialog.setCourseContent(course.title);
 
-        dialog.setYesOnclickListener("确定", () -> {
-            LogManager.i("CourseAdapter: start course[" + course.subject_name + "]");
-            //TODO, start class, 2017/10/29
+        dialog.setYesOnclickListener("进入", () -> {
+            LogManager.i("CourseAdapter: start course: " + course.subject_name);
             dialog.dismiss();
+
+            // start to taking course_class
+            CourseTableFragment.getInstance().enterTakingClassFragment(course);
         });
 
         dialog.setNoOnclickListener("取消", () -> {
-            LogManager.i("CourseAdapter: CANCEL");
+            LogManager.i("CourseAdapter: Cancel, Do nothing");
             // do nothing
             dialog.dismiss();
         });

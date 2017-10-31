@@ -1,10 +1,10 @@
 package sanp.mp100.ui.fragment;
 
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -426,6 +426,17 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
         // checkout this week's courses
         mCourseThread.checkoutCourse(mCourseTableMonday, 6);
+    }
+
+    //@brief Enter course's course_class to decide taking course_class
+    public void enterTakingClassFragment(@NonNull TimeTable course) {
+        ClassFragment fragment = ClassFragment.getInstance();
+
+        // set current course
+        fragment.setClassCourse(course);
+
+        // show class fragment
+        showFragment(TAG, R.id.fragmentLayout, fragment, ClassFragment.TAG);
     }
 }
 
