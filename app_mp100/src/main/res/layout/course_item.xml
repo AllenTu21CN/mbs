@@ -27,8 +27,8 @@
     <!-- Cell contents -->
     <TextView
         android:id="@+id/course_name_view"
-        android:layout_width="199px"
-        android:layout_height="79px"
+        android:layout_width="200px"
+        android:layout_height="80px"
         android:layout_gravity="center"
         android:gravity="center"
         android:text="未知"

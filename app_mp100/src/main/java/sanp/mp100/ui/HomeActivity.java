@@ -55,7 +55,7 @@ public class HomeActivity extends FragmentActivity {
         mHomeFragment = HomeFragment.getInstance();
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.add(R.id.mFragmentLayout, mHomeFragment, HomeFragment.TAG);
+        mFragmentTransaction.add(R.id.fragmentLayout, mHomeFragment, HomeFragment.TAG);
         mFragmentTransaction.addToBackStack(null);
         mFragmentTransaction.commit();
     }
