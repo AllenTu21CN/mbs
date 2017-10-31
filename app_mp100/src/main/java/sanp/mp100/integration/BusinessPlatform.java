@@ -841,7 +841,7 @@ public class BusinessPlatform {
     }
 
     private void startRtmpOutput(LessonInfo info, long timetable_id) throws InternalError {
-        String url = "rtmp://lbblscy.3322.org:8085/live/" + info.program_uuid + "?s=" + info.stream_name;
+        String url = "rtmp://lbblscy.3322.org/live/" + info.program_uuid + "?s=" + info.stream_name;
         int id = RBUtil.getInstance().addOutput(url);
         if(id < 0)
             throw new InternalError(String.format("create rtmp[%s] output failed with %d", url, id));

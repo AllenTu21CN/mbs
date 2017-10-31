@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ import sanp.avalon.libs.media.base.AVDefines.DataType;
 public class MediaController implements MediaEngine.Callback, IOEngine.IOSession.Observer, Runnable {
     private static final String TAG = "MediaController";
 
+    public static final boolean DEBUG = true;
     public static final String SAVE_PATH = System.getenv("EXTERNAL_STORAGE") + "/MPX";
     public static final String BACKGROUND_DEFAULT_COLOR = "#121212";
     public static final String BACKGROUND_DEFAULT_IMAGE = "none";
@@ -1469,26 +1471,37 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
     ///////////////////////////////////////////////////////////////////////////
 
     /* 创建额外的画面,如发送给远程的 */
-    public void createExtraScene(int sceneIdx) {
-        LogManager.e("!!!!Tuyj Debug here");
-//        Scene scene = mScenes[sceneIdx];
-//        if(scene == null) {
-//            scene = new Scene(mMediaEngine, null);
-//            scene.setBackgroundColor(BACKGROUND_DEFAULT_COLOR, false);
-//            scene.flush();
-//            mScenes[sceneIdx] = scene;
-//        }
+    public void createExtraScene(int sceneIdx, SurfaceHolder holder) {
+        if(DEBUG) {
+            LogManager.e("!!!!Tuyj Debug here");
+            return;
+        }
+
+        Scene scene = mScenes[sceneIdx];
+        if(scene == null) {
+            if(holder != null)
+                scene = new Scene(mMediaEngine, holder.getSurface());
+            else
+                scene = new Scene(mMediaEngine, null);
+            scene.setBackgroundColor(BACKGROUND_DEFAULT_COLOR, false);
+            scene.flush();
+            mScenes[sceneIdx] = scene;
+        }
     }
     public void releaseExtraScene(int sceneIdx) {
-        LogManager.e("!!!!Tuyj Debug here");
-//        if(sceneIdx == SCENE_IDX_LOCAL_DISPLAY) {
-//            throw new RuntimeException("logical error: can't release local display scene");
-//        }
-//        Scene scene = mScenes[sceneIdx];
-//        if(scene != null) {
-//            scene.release();
-//            mScenes[sceneIdx] = null;
-//        }
+        if(DEBUG) {
+            LogManager.e("!!!!Tuyj Debug here");
+            return;
+        }
+
+        if(sceneIdx == SCENE_IDX_LOCAL_DISPLAY) {
+            throw new RuntimeException("logical error: can't release local display scene");
+        }
+        Scene scene = mScenes[sceneIdx];
+        if(scene != null) {
+            scene.release();
+            mScenes[sceneIdx] = null;
+        }
     }
 
     /* 根据分屏模式和当前源数量自动展示默认(本地)画面 */
@@ -1929,8 +1942,17 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
     }
 
     public void changeSurface(SurfaceHolder holder, int format, int width, int height) {
-        LogManager.d("surfaceChanged fmt=" + format + " size=" + width + "x" + height + " surface=" + holder);
-        mMediaEngine.notifyDisplaySurfaceChanged(mScenes[SCENE_IDX_LOCAL_DISPLAY].ID, format, width, height);
+        changeSurface(SCENE_IDX_LOCAL_DISPLAY, holder, format, width, height);
+    }
+
+    public void changeSurface(int sceneIdx, SurfaceHolder holder, int format, int width, int height) {
+        LogManager.d(String.format("scene-idx-%d changeSurface fmt=%d size=%dx%d surface=%s", sceneIdx, format, width, height, holder));
+        Scene scene = mScenes[sceneIdx];
+        if(scene == null) {
+            LogManager.w("logical error: can't find the scene-idx-" + sceneIdx);
+            return;
+        }
+        mMediaEngine.notifyDisplaySurfaceChanged(scene.ID, format, width, height);
     }
 
     private class AddingSourceParams {
@@ -2924,11 +2946,11 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                 index = index.trim();
                 if (index.equals("") || index.equals("-"))
                     continue;
-                int id = mMediaController.addSource(gCaptureUrls[Integer.valueOf(index)], MediaController.RECOMMENDED_REOPEN_CNT);
+                int id = mMediaController.addSource(gCaptureUrls[Integer.valueOf(index)], Arrays.asList(DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
                 mSourceIds.add(id);
             }
             for(int i = 0 ; i < decodingCnt ; ++i) {
-                int id = mMediaController.addSource(gDecodingUrls[i], MediaController.RECOMMENDED_REOPEN_CNT);
+                int id = mMediaController.addSource(gDecodingUrls[i], Arrays.asList(DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
                 mSourceIds.add(id);
             }
 
@@ -2975,7 +2997,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                     while(in_url != null) {
                         in_url = in_url.trim();
                         if(!in_url.equals("")) {
-                            int id = mMediaController.addSource(in_url, MediaController.RECOMMENDED_REOPEN_CNT);
+                            int id = mMediaController.addSource(in_url,  Arrays.asList(DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
                             mSourceIds.add(id);
                         }
                         in_url = br.readLine();
@@ -2988,7 +3010,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                 }
             } else {
                 for (int i = 0; i < sourceUrls.length; ++i) {
-                    int id = mMediaController.addSource(sourceUrls[i], MediaController.RECOMMENDED_REOPEN_CNT);
+                    int id = mMediaController.addSource(sourceUrls[i],  Arrays.asList(DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
                     mSourceIds.add(id);
                 }
             }

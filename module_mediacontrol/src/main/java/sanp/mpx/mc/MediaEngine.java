@@ -1223,10 +1223,16 @@ public final class MediaEngine implements Choreographer.FrameCallback {
 
         private void removeSink(int sinkId) {
             // Remove sink from scenes
+            boolean removed = false;
             for (int i = 0; i < MAXIMUM_VIDEO_SCENE_COUNT; ++i) {
                 if (mVideoScenes[i] != null) {
-                    mVideoScenes[i].removeSink(sinkId);
+                    removed = mVideoScenes[i].removeSink(sinkId);
+                    if(removed)
+                        break;
                 }
+            }
+            if(!removed) {
+                LogManager.i("Sink #" + sinkId + " not found in any video scene");
             }
 
             // Release sink object
@@ -2143,16 +2149,17 @@ public final class MediaEngine implements Choreographer.FrameCallback {
                 LogManager.e("Add sink to video scene failed!");
             }
 
-            private void removeSink(int sinkId) {
+            private boolean removeSink(int sinkId) {
                 for (int i = 0; i < MAXIMUM_VIDEO_SINK_COUNT; ++i) {
                     if (mSinks[i] != null && mSinks[i].getId() == sinkId) {
                         LogManager.i("Removed sink #" + sinkId + " from scene #" + mId);
                         mSinks[i] = null;
-                        return;
+                        return true;
                     }
                 }
 
-                LogManager.e("Sink #" + sinkId + " not found in video scene #" + mId);
+                LogManager.i("Sink #" + sinkId + " not found in video scene #" + mId);
+                return false;
             }
 
             private void updateSinkConfig(int sinkId) {
