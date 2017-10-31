@@ -11,10 +11,11 @@ import android.widget.TextView;
 import sanp.mp100.R;
 
 /**
- * Created by will@1dao2.com on 2017/10/30.
- *
- *
+ * @brief Created by will@1dao2.com on 2017/10/30.
  * Take class card view overlap on view surface view.
+ *
+ * @author will@1dao2.com
+ * @date   2017/10/30
  */
 
 public class TakingClassFragment extends BaseFragment implements View.OnClickListener  {
@@ -29,6 +30,7 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
         return mTakingClassFragment;
     }
 
+    // see: taking_class.xml
     private View mTakingClassViewGroup;
 
     private TextView mClassStatusView;
