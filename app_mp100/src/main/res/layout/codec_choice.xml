@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout   xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/capture_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/collection"
+            android:textSize="@dimen/text_size_22" />
+
+        <CheckBox
+            android:id="@+id/checkbox_zero"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/zero"
+            android:textSize="@dimen/text_size_22" />
+
+        <CheckBox
+            android:id="@+id/checkbox_one"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/one"
+            android:textSize="@dimen/text_size_22" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/decoding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/decoding"
+            android:textSize="@dimen/text_size_22" />
+
+        <Spinner
+            android:id="@+id/decoding_spinner"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/decoding_px_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_23"
+            android:text="@string/decoding_ppxx"/>
+        <RadioGroup
+            android:id="@+id/radio_group"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/high_px_radio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/high_px"
+                android:checked="true"
+                android:textSize="@dimen/text_size_22"
+                android:layout_weight="1"/>
+            <RadioButton
+                android:id="@+id/middle_px_radio"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/middle_px"
+                android:textSize="@dimen/text_size_22"
+                android:layout_weight="1"/>
+        </RadioGroup>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/encoding_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="5"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/encoding_first"
+                android:textSize="@dimen/text_size_24" />
+
+            <Spinner
+                android:id="@+id/endcoing_spinner_one"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/encoding_second"
+                android:textSize="@dimen/text_size_24" />
+
+            <Spinner
+                android:id="@+id/endcoing_spinner_two"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/encoding_third"
+                android:textSize="@dimen/text_size_24" />
+
+            <Spinner
+                android:id="@+id/endcoing_spinner_three"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/encoding_fourth"
+                android:textSize="@dimen/text_size_24" />
+
+            <Spinner
+                android:id="@+id/endcoing_spinner_four"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/confirm_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/choice_ok"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dialog_focus"
+            android:text="@string/ok"
+            android:textColor="@drawable/bg_btn_text_sele"
+            android:textSize="@dimen/text_size_24" />
+
+        <Button
+            android:id="@+id/choice_cancel"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_dialog_focus"
+            android:text="@string/cancel"
+            android:textColor="@drawable/bg_btn_text_sele"
+            android:textSize="@dimen/text_size_24" />
+
+    </LinearLayout>
+</LinearLayout>

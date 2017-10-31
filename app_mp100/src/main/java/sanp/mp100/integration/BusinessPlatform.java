@@ -2,8 +2,10 @@ package sanp.mp100.integration;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.JsonToken;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -11,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,9 +23,8 @@ import java.util.Map;
 import sanp.avalon.libs.base.utils.LogManager;
 import sanp.avalon.libs.base.utils.Tuple3;
 import sanp.mp100.MP100Application;
-import sanp.mp100.integration.BusinessPlatformPostman.BPError;
-
 import sanp.mp100.R;
+import sanp.mp100.integration.BusinessPlatformPostman.BPError;
 
 /**
  * Created by Tuyj on 2017/10/25.
@@ -187,6 +189,7 @@ public class BusinessPlatform {
     private ConnectionSettings mConnectionSettings;
     private ActivatingConfig mActivatingConfig;
     private Organization mOrganization;
+    private String mRtmpPrefix;
 
     private Object mLock = new Object();
     private Context mContext;
@@ -215,6 +218,7 @@ public class BusinessPlatform {
         mConnectionSettings = null;
         mActivatingConfig = null;
         mOrganization = null;
+        mRtmpPrefix = null;
 
         mContext = null;
         mSharedPref = null;
@@ -664,6 +668,7 @@ public class BusinessPlatform {
         if(hadActivated) {
             if(!mHasConnectionSettings ||
                !mHasActivatingConfig ||
+               mRtmpPrefix == null ||
                mConnectionSettings == null ||
                mActivatingConfig == null)
                 throw new RuntimeException("loadPreferences logical error 1");
@@ -700,6 +705,14 @@ public class BusinessPlatform {
         }
         LogManager.i("loaded connection settings: \n" + new Gson().toJson(mConnectionSettings));
         mCurrentRetryConnectTimes = mConnectionSettings.RetryConnectTimes;
+
+        mRtmpPrefix = mSharedPref.getString(mContext.getString(R.string.platform_rtmp_prefix), null);
+        if(mRtmpPrefix == null) {
+            Type type = new TypeToken<Map<String, String>>(){}.getType();
+            Map<String, String> rtmpConfig = MP100Application.loadSettingsFromTmpFile("rtmp_config.json", type);
+            mRtmpPrefix = rtmpConfig.get("rtmp_prefix");
+        }
+        LogManager.i("loaded rtmp prefix: " + mRtmpPrefix);
     }
 
     private void saveConnectionSettings() {
@@ -841,7 +854,7 @@ public class BusinessPlatform {
     }
 
     private void startRtmpOutput(LessonInfo info, long timetable_id) throws InternalError {
-        String url = "rtmp://lbblscy.3322.org/live/" + info.program_uuid + "?s=" + info.stream_name;
+        String url = mRtmpPrefix + info.program_uuid + "?s=" + info.stream_name;
         int id = RBUtil.getInstance().addOutput(url);
         if(id < 0)
             throw new InternalError(String.format("create rtmp[%s] output failed with %d", url, id));

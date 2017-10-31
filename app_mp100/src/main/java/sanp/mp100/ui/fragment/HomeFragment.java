@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import sanp.mp100.R;
+import sanp.mp100.test.ui.fragment.DeviceTestFragment;
 
 /**
  * Created by Tuyj on 2017/10/30.
@@ -46,6 +47,7 @@ public class HomeFragment extends BaseFragment {
 
     public void initView(View view) {
         showCourseTable();
+        //showDeviceTest();
     }
 
     @Override
@@ -63,5 +65,10 @@ public class HomeFragment extends BaseFragment {
     public void showCourseTable() {
         CourseTableFragment fragment = CourseTableFragment.getInstance();
         showFragment(TAG, R.id.fragmentLayout, fragment, CourseTableFragment.TAG);
+    }
+
+    public void showDeviceTest() {
+        DeviceTestFragment fragment = new DeviceTestFragment();
+        showFragment(TAG, R.id.fragmentLayout, fragment, DeviceTestFragment.TAG);
     }
 }

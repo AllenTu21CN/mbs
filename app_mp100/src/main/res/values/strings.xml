@@ -24,47 +24,7 @@
     <string name="platform_has_organization_default">true</string>
     <string name="platform_organization">platform_organization</string>
 
-    <string name="platform_connection_default">{
-        "WebSocketURL": "ws://lbblscy.3322.org:8085/device-hub",
-        "Realm": "ebp.daemon",
-        "RetryConnectEnable": true,
-        "RetryConnectTimes": -1,
-        "RetryConnectIntervalMS": 7000,
-        "KeepAliveEnable": true,
-        "KeepAliveRetryTimes": 3,
-        "KeepAliveIntervalMS": 10000,
-        "KeepAliveTimeoutMS": 5000
-     }</string>
-    <string name="platform_activating_config_default">{}</string>
-    <string name="platform_organization_default">{
-        "province": {
-            "id": "P110000",
-            "province": "北京市"
-        },
-        "city": {
-            "id": "C110000",
-            "province": "北京市",
-            "city": "北京市"
-        },
-        "district": {
-            "id": "D110108",
-            "province": "北京市",
-            "city": "北京市",
-            "district": "海淀区"
-        },
-        "school": {
-            "id": 1,
-            "name": "中国人民大学附属中学（初中部）",
-            "type": "初中",
-            "role": "主讲学校"
-        },
-        "schoolClass": {
-            "id": 1,
-            "name": "初一（1）班",
-            "type": "精品录播"
-        }
-    }</string>
-
+    <string name="platform_rtmp_prefix">platform_rtmp_prefix</string>
 
     <!--preferences for local video-->
     <string name="my_local_video_preferences">sanp.mp100.my_local_video_preferences</string>
@@ -74,4 +34,205 @@
     <string name="video_output_formats">video_output_formats</string>
     <string name="video_output_default_quality">video_output_default_quality</string>
     <string name="video_output_default_quality_default">High</string>
+
+
+    <!--设备测试Start-->
+    <string-array name="device_test_array">
+        <!--<item >遥控器测试</item>-->
+        <!--<item>本地存储</item>-->
+        <!--<item>U盘存储</item>-->
+        <!--<item>电池</item>-->
+        <!--<item>有线测试</item>-->
+        <!--<item>无线测试</item>-->
+        <item>视频输入-采集源0</item>
+        <item>视频输入-采集源1</item>
+        <!--<item>视频输入-USB摄像头</item>-->
+        <!--<item>视频输出-HDMI&#160;1080</item>-->
+        <!--<item>视频输出-HDMI&#160;720</item>-->
+        <!--<item>视频输出-VGA&#160;1080</item>-->
+        <!--<item>视频输出-VGA&#160;720</item>-->
+        <!--<item>音频输入-HDMI</item>-->
+        <!--<item>音频输入-内置MIC</item>-->
+        <!--<item>音频输入-3.5</item>-->
+        <!--<item>音频输出-HDMI</item>-->
+        <!--<item>音频输出-3.5</item>-->
+        <item>编码效果</item>
+        <item>编解码选项</item>
+        <!--<item>1解1080P+1编1080P</item>-->
+        <!--<item>2解1080P+1编1080P</item>-->
+        <!--<item>3解1080P+1编1080P</item>-->
+        <!--<item>4解1080P+1编1080P</item>-->
+        <!--<item>1解1080P+2编1080P</item>-->
+        <!--<item>2解1080P+2编1080P</item>-->
+        <!--<item>3解1080P+2编1080P</item>-->
+        <!--<item>4解1080P+2编1080P</item>-->
+        <!--<item>1解1080P+1编720P</item>-->
+        <!--<item>2解1080P+1编720P</item>-->
+        <!--<item>3解1080P+1编720P</item>-->
+        <!--<item>4解1080P+1编720P</item>-->
+        <!--<item>1解1080P+2编720P</item>-->
+        <!--<item>2解1080P+2编720P</item>-->
+        <!--<item>3解1080P+2编720P</item>-->
+        <!--<item>4解1080P+2编720P</item>-->
+
+        <!--<item>1解720P+1编1080P</item>-->
+        <!--<item>2解720P+1编1080P</item>-->
+        <!--<item>3解720P+1编1080P</item>-->
+        <!--<item>4解720P+1编1080P</item>-->
+        <!--<item>1解720P+2编1080P</item>-->
+        <!--<item>2解720P+2编1080P</item>-->
+        <!--<item>3解720P+2编1080P</item>-->
+        <!--<item>4解720P+2编1080P</item>-->
+        <!--<item>1解720P+1编720P</item>-->
+        <!--<item>2解720P+1编720P</item>-->
+        <!--<item>3解720P+1编720P</item>-->
+        <!--<item>4解720P+1编720P</item>-->
+        <!--<item>1解720P+2编720P</item>-->
+        <!--<item>2解720P+2编720P</item>-->
+        <!--<item>3解720P+2编720P</item>-->
+        <!--<item>4解720P+2编720P</item>-->
+        <!--<item>2采集+1解+1编</item>-->
+
+        <!--<item>4解1080P+3编1080P</item>-->
+        <!--<item>4解1080P+3编720P</item>-->
+        <!--<item>4解720P+3编1080P</item>-->
+        <!--<item>4解720P+3编720P</item>-->
+        <!--<item>5解1080P+2编1080P</item>-->
+        <!--<item>5解1080P+2编720P</item>-->
+        <!--<item>5解720P+2编1080P</item>-->
+        <!--<item>5解720P+2编720P</item>-->
+        <!--<item>1解1080P</item>-->
+        <!--<item>2解1080P</item>-->
+        <!--<item>3解1080P</item>-->
+        <!--<item>4解1080P</item>-->
+
+    </string-array>
+    <string name="decoding_px">解码  分辨率：</string>
+    <string name="decoding_bit_rate">码率：</string>
+    <string name="decoding_frame_rate">帧率：</string>
+    <string name="output_frame_rate">合成帧率：</string>
+    <string name="encoding_px">编码  分辨率：</string>
+    <string name="encoding_bit_rate">码率：</string>
+    <string name="encoding_frame_rate">帧率：</string>
+    <string name="encoding_now">编码中...</string>
+    <string name="cpu_use_rate">CPU使用率：</string>
+    <string name="cpu_use_temp">CPU温度：</string>
+    <string name="mem_use_rate">内存使用率：</string>
+
+    <string name="media_input_type">输入类型：</string>
+    <string name="use_type">可用状态：</string>
+    <string name="frame_bps">帧率：</string>
+    <string name="max_fbps">最大分辨率：</string>
+    <string name="current_fbps">当前分辨率：</string>
+
+
+    <string name="sd_name">SD卡名称：</string>
+    <string name="sd_available_size">SD卡剩余容量：</string>
+    <string name="sd_available_total_size">SD卡总容量：</string>
+    <string name="rom_name">内存名称：</string>
+    <string name="rom_available_size">内存剩余容量：</string>
+    <string name="rom_total_size">内存卡总容量：</string>
+
+    <string name="u_disk_name">U盘名称：</string>
+    <string name="u_disk_remain_size">剩余容量：</string>
+    <string name="u_disk_total_size">剩余大小：</string>
+
+    <string name="check_battery">请查看板载电池</string>
+
+    <string name="network_config_mode">配置模式：</string>
+    <string name="network_speed">协商速率：</string>
+    <string name="network_ip">IP地址：</string>
+    <string name="network_mask">子网掩码地址：</string>
+    <string name="network_gateway">网关：</string>
+    <string name="network_dns">DNS：</string>
+
+    <string name="net_static">静态</string>
+    <string name="ether_test_toast">请在有线网络环境下测试</string>
+    <string name="wifi_test_toast">请在无线网络环境的情况下测试</string>
+    <string name="connect_eth_success">连接有线网络成功</string>
+    <string name="connect_eth_failure">连接有线网络失败</string>
+    <string name="connect_wlan_success">连接无线网络成功</string>
+
+    <!--编解码选项-->
+    <string name="collection">采集：</string>
+    <string name="decoding">解码：</string>
+    <string name="decoding_ppxx">解码分辨率:</string>
+    <string name="encoding_first">编码1：</string>
+    <string name="encoding_second">编码2：</string>
+    <string name="encoding_third">编码3：</string>
+    <string name="encoding_fourth">编码4：</string>
+    <string name="high_px">1080P</string>
+    <string name="middle_px">720P</string>
+
+    <string name="zero">0</string>
+    <string name="one">1</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+
+    <string-array name="docoing_num">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+    <string-array name="decoding_px">
+        <item>1080P</item>
+        <item>720P</item>
+    </string-array>
+
+    <string-array name="encoding_px">
+        <item>无</item>
+        <item>1080P</item>
+        <item>720P</item>
+        <item>480P</item>
+        <item>1080P@10</item>
+        <item>720P@10</item>
+    </string-array>
+    <!--设备测试End-->
+
+    <!--<string name="platform_connection_default">{-->
+        <!--"WebSocketURL": "ws://lbblscy.3322.org:8085/device-hub",-->
+        <!--"Realm": "ebp.daemon",-->
+        <!--"RetryConnectEnable": true,-->
+        <!--"RetryConnectTimes": -1,-->
+        <!--"RetryConnectIntervalMS": 7000,-->
+        <!--"KeepAliveEnable": true,-->
+        <!--"KeepAliveRetryTimes": 3,-->
+        <!--"KeepAliveIntervalMS": 10000,-->
+        <!--"KeepAliveTimeoutMS": 5000-->
+     <!--}</string>-->
+    <!--<string name="platform_activating_config_default">{}</string>-->
+    <!--<string name="platform_organization_default">{-->
+        <!--"province": {-->
+            <!--"id": "P110000",-->
+            <!--"province": "北京市"-->
+        <!--},-->
+        <!--"city": {-->
+            <!--"id": "C110000",-->
+            <!--"province": "北京市",-->
+            <!--"city": "北京市"-->
+        <!--},-->
+        <!--"district": {-->
+            <!--"id": "D110108",-->
+            <!--"province": "北京市",-->
+            <!--"city": "北京市",-->
+            <!--"district": "海淀区"-->
+        <!--},-->
+        <!--"school": {-->
+            <!--"id": 1,-->
+            <!--"name": "中国人民大学附属中学（初中部）",-->
+            <!--"type": "初中",-->
+            <!--"role": "主讲学校"-->
+        <!--},-->
+        <!--"schoolClass": {-->
+            <!--"id": 1,-->
+            <!--"name": "初一（1）班",-->
+            <!--"type": "精品录播"-->
+        <!--}-->
+    <!--}</string>-->
 </resources>

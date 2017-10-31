@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+    //分辨率
+    <TextView
+        android:id="@+id/px_type"
+        style="@style/device_text_type_style" />
+    <TextView
+        android:id="@+id/px_rate"
+        android:gravity="left|center"
+        style="@style/device_text_type_style" />
+
+   //码率
+    <TextView
+        android:id="@+id/bit_type"
+        style="@style/device_text_type_style" />
+    <TextView
+        android:id="@+id/bit_rate"
+        android:gravity="left|center"
+        style="@style/device_text_type_style" />
+
+    //帧率
+    <TextView
+        android:id="@+id/fbps_type"
+        style="@style/device_text_type_style" />
+    <TextView
+        android:id="@+id/fbps_rate"
+        android:gravity="left|center"
+        style="@style/device_text_type_style" />
+
+</LinearLayout>

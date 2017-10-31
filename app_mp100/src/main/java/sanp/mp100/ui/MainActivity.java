@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import sanp.mp100.R;
-import sanp.mp100.ui.test.BusinessPlatformPostmanTestActivity;
-import sanp.mp100.ui.test.BusinessPlatformTestActivity;
+import sanp.mp100.test.ui.BusinessPlatformPostmanTestActivity;
+import sanp.mp100.test.ui.BusinessPlatformTestActivity;
 
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {

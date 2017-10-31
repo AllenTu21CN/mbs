@@ -28,8 +28,8 @@
         </activity>
 
         <activity android:name=".ui.CourseTable"/>
-        <activity android:name=".ui.test.BusinessPlatformTestActivity"/>
-        <activity android:name=".ui.test.BusinessPlatformPostmanTestActivity"/>
+        <activity android:name=".test.ui.BusinessPlatformTestActivity"/>
+        <activity android:name=".test.ui.BusinessPlatformPostmanTestActivity"/>
     </application>
 
 </manifest>

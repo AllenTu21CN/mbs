@@ -14,7 +14,6 @@ import java.util.Map;
 
 import sanp.avalon.libs.base.utils.FileSaveUtils;
 import sanp.avalon.libs.base.utils.LogManager;
-import sanp.mp100.integration.BusinessPlatform;
 
 
 /**
@@ -25,7 +24,9 @@ public class MP100Application extends Application {
 
     public static final String TMP_FILE_PREFIX = "MP100/tmp";
     public static final String EXTERNAL_STORAGE_DIRECTORY = Environment.getExternalStorageDirectory() + "/";
+    public static final String HOME_EXTERNAL_PATH = EXTERNAL_STORAGE_DIRECTORY  + "MP100";
     public static final String TMP_FILE_PATH = EXTERNAL_STORAGE_DIRECTORY  + TMP_FILE_PREFIX;
+
 
     private static final Map<String, Integer> TMP_SETTINGS_FILES = new HashMap<String, Integer>() {{
         put("connection.json", R.raw.connection);
@@ -33,6 +34,7 @@ public class MP100Application extends Application {
         put("sources.json", R.raw.sources);
         put("scenes.json", R.raw.scenes);
         put("output_formats.json", R.raw.output_formats);
+        put("rtmp_config.json", R.raw.rtmp_config);
     }};
 
     private static final Map<String, Integer> VIDEO_TEST_FILES = new HashMap<String, Integer>() {{
@@ -46,8 +48,6 @@ public class MP100Application extends Application {
 
         saveTmpSettingsFilesToStorage();
         saveMp4ToStorage();
-
-        BusinessPlatform.getInstance().init(this);
     }
 
     public static <T> T loadSettingsFromTmpFile(String filename, Class<T> classOf) {

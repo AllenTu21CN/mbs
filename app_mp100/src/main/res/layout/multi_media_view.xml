@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/main_coding"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/device_text_type_style"
+                    android:text="@string/cpu_use_rate" />
+
+                <TextView
+                    android:id="@+id/cpu_use_rate"
+                    style="@style/device_text_type_style"
+                    android:layout_marginLeft="50dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/device_text_type_style"
+                    android:text="@string/cpu_use_temp" />
+
+                <TextView
+                    android:id="@+id/cpu_temp"
+                    style="@style/device_text_type_style"
+                    android:layout_marginLeft="50dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/device_text_type_style"
+                    android:text="@string/mem_use_rate" />
+
+                <TextView
+                    android:id="@+id/mem_use_rate"
+                    style="@style/device_text_type_style"
+                    android:layout_marginLeft="50dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/device_text_type_style"
+                    android:text="@string/output_frame_rate" />
+
+                <TextView
+                    android:id="@+id/output_frame_rate"
+                    style="@style/device_text_type_style"
+                    android:layout_marginLeft="50dp" />
+            </LinearLayout>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/divider_color"/>
+    <TextView
+        android:id="@+id/encoding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:text="@string/encoding_now"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:visibility="gone" />
+</RelativeLayout>
