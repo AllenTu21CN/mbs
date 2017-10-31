@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.media.audio.AudioEncoder;
 import sanp.avalon.libs.media.base.AVDefines;
 import sanp.mp100.MP100Application;
 import sanp.mp100.R;
@@ -238,6 +237,7 @@ public class RBUtil implements MediaController.Observer {
     private Content mCurrentContent = null;
     private Map<Integer, Role> mCurrentContentRoles = new HashMap<>();
 
+    private Quality mDefaultQuality = Quality.Middle;
     private Map<Quality, OutputFormat> mSupportingOutputFormats = null;
 
     private RBUtil(Context context) {
@@ -447,7 +447,7 @@ public class RBUtil implements MediaController.Observer {
     }
 
     public int addOutput(String url) {
-        return addOutput(url, Quality.Middle);
+        return addOutput(url, mDefaultQuality);
     }
 
     public int addOutput(String url, Quality quality) {
@@ -460,11 +460,45 @@ public class RBUtil implements MediaController.Observer {
     }
 
     public int addOutput(String url, OutputFormat format) {
-        int ret = mMediaController.addOutput(url, format.video, format.audio, MediaController.RECOMMENDED_REOPEN_CNT);
-        if(ret >= 0) {
-            mOutputs.put(ret, url);
+        synchronized (mLock) {
+            int ret = mMediaController.addOutput(url, format.video, format.audio, MediaController.RECOMMENDED_REOPEN_CNT);
+            if (ret >= 0) {
+                mOutputs.put(ret, url);
+            }
+            return ret;
         }
-        return ret;
+    }
+
+    public int removeOutput(int id) {
+        synchronized (mLock) {
+            String url = mOutputs.remove(id);
+            if(url == null) {
+                LogManager.w("can't find the output-" + id);
+                return -1;
+            }
+
+            LogManager.i(String.format("RBUtil remove output: id-%d url-%s", id, url));
+            mMediaController.removeOutput(id);
+            return 0;
+        }
+    }
+
+    public int removeOutput(String url) {
+        // just find the first one which has the same url
+        int id = -1;
+        synchronized (mLock) {
+            for(Map.Entry<Integer, String> entry: mOutputs.entrySet()) {
+                if(entry.getValue().equals(url)) {
+                    id = entry.getKey();
+                    break;
+                }
+            }
+            if(id == -1) {
+                LogManager.w("can't find the output-" + id);
+                return -1;
+            }
+        }
+        return removeOutput(id);
     }
 
     private void setContent(Content content) {
@@ -573,6 +607,11 @@ public class RBUtil implements MediaController.Observer {
         } else {
             mSupportingOutputFormats = null;
         }
+
+        String defaultQ = mSharedPref.getString(
+                mContext.getString(R.string.video_output_default_quality),
+                mContext.getString(R.string.video_output_default_quality_default));
+        mDefaultQuality = new Gson().fromJson(defaultQ, Quality.class);
     }
 
     private void saveOutputFormats() {

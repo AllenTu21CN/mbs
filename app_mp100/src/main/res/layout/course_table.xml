@@ -390,7 +390,7 @@
                         android:listSelector="@android:color/transparent"
 
                         android:numColumns="7"
-                        android:padding="@dimen/course_table_divider_width"
+                        android:background="@drawable/course_table_gridview_border"
 
                         android:stretchMode="columnWidth" />
 
