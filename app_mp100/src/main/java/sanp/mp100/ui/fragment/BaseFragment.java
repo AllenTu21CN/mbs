@@ -20,6 +20,8 @@ import sanp.mp100.R;
 
 /**
  * Created by Tom on 2017/3/1.
+ *
+ * Modified by will@1dao2.com, 2017/10/31
  */
 
 public abstract class BaseFragment extends Fragment {
@@ -95,7 +97,7 @@ public abstract class BaseFragment extends Fragment {
      */
     public void showFragment(String oldTag, int layout, BaseFragment fragment, String newTag) {
         FragmentTransaction ft = mFragmentManager.beginTransaction();
-        if (newTag.equals("LessonTableFragment")) {
+        if (newTag.equals("CourseTableFragment TODO")) { //TODO
             ft.setCustomAnimations(R.anim.actionsheet_dialog_in, R.anim.actionsheet_dialog_out);
         } else {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);

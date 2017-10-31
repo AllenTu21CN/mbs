@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import sanp.mp100.R;
+import sanp.mp100.integration.BusinessPlatform;
 
 /**
  * @brief Created by will@1dao2.com on 2017/10/30.
@@ -41,14 +42,13 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
     private TextView mClassTimeView;
     private TextView mClassContentView;
 
-    private String   mClassName;
-    private String   mClassTeacher;
-    private String   mClassTime;
-    private String   mClassContent;
-
     // taking class button
     private Button mTakingClassCtrlBtn;
     private Button mHiddenThisView;
+
+    private BusinessPlatform.TimeTable mCourse;
+
+    private Boolean mIsTakingClass;
 
     // @brief Implements Fragment
     @Override
@@ -59,6 +59,8 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        mIsTakingClass = true;
 
         initView();
 
@@ -78,6 +80,18 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
 
         mTakingClassCtrlBtn.setOnClickListener(this);
         mHiddenThisView.setOnClickListener(this);
+
+        // set class status and ctrl btn view according to @mIsTakingClass
+        if (mIsTakingClass) {
+            mClassStatusView.setText("正在上课");
+            mTakingClassCtrlBtn.setText("结束上课");
+        } else {
+            mClassStatusView.setText("课程结束");
+            mTakingClassCtrlBtn.setText("开始上课");
+        }
+
+        // show class info
+        updateClassCourseInfo();
     }
 
     // @brief Implements View.onClickListener
@@ -95,4 +109,33 @@ public class TakingClassFragment extends BaseFragment implements View.OnClickLis
                 break;
         }
     }
+
+    // @brief Sets current class' course
+    public void setClassCourse(BusinessPlatform.TimeTable course) {
+        mCourse = course;
+    }
+
+    // @brief Starts taking class
+    public int startTakingClass() {
+        //todo
+        return 0;
+    }
+
+    // @brief Stops taking class
+    public int StopTakingClass() {
+        //todo
+        return 0;
+    }
+
+
+    // @brief Updates class' course info
+    private void updateClassCourseInfo() {
+        if (mCourse == null) return;
+
+        mClassNameView.setText(mCourse.subject_name);
+        mClassTeacherView.setText(mCourse.teacher_name);
+        mClassTimeView.setText(mCourse.date + " 第" + mCourse.section + "节");
+        mClassContentView.setText(mCourse.title);
+    }
+
 }

@@ -39,8 +39,6 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
     public static final String TAG = "CourseTableFragment";
 
-    private Context  mContext;
-
     // course table layout view: see course_table.xml
     private View     mCourseTableViewGroup;
 
@@ -133,8 +131,6 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
         // course layout view
         mCourseTableViewGroup = View.inflate(getActivity(), R.layout.course_table, null);
-
-        mContext = getActivity();
 
         return;
     }

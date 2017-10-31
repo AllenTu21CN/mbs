@@ -10,7 +10,11 @@ import android.view.ViewGroup;
 import sanp.mp100.R;
 
 /**
- * Created by Tom on 2017/4/20.
+ * Created by Tuyj on 2017/10/30.
+ *
+ * Modified by will@1dao2.com on 2017/10/31
+ * 1) implements init view
+ * 2) add show course table view
  */
 
 public class HomeFragment extends BaseFragment {
@@ -30,7 +34,7 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = View.inflate(getActivity(), R.layout.video_test_view, null);
+        view = View.inflate(getActivity(), R.layout.home_fragment, null);
     }
 
     @Nullable
@@ -41,7 +45,7 @@ public class HomeFragment extends BaseFragment {
     }
 
     public void initView(View view) {
-        // showLessonTable();
+        showCourseTable();
     }
 
     @Override
@@ -53,5 +57,11 @@ public class HomeFragment extends BaseFragment {
     public boolean onBackDown(int keyCode, KeyEvent event) {
         getActivity().onBackPressed();
         return super.onBackDown(keyCode, event);
+    }
+
+    // @brief Changes fragment to show course table
+    public void showCourseTable() {
+        CourseTableFragment fragment = CourseTableFragment.getInstance();
+        showFragment(TAG, R.id.fragmentLayout, fragment, CourseTableFragment.TAG);
     }
 }
