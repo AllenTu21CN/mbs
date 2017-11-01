@@ -26,7 +26,7 @@ import sanp.mp100.ui.adapter.CourseThread;
 public class ClassFragment extends BaseFragment implements View.OnClickListener, CourseThread.ClassNotify {
 
     public static final String TAG = "ClassFragment";
-    public static ClassFragment mClassFragment;
+    public static ClassFragment mClassFragment = null;
 
     // class fragment view: a single instance.
     public static ClassFragment getInstance() {
@@ -48,8 +48,8 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     private TextView mClassContentView;
 
     // taking class button
-    private Button mTakingClassCtrlBtn;
-    private Button mHiddenThisView;
+    private Button mClassCtrlBtn;
+    private Button mHiddenThisBtn;
 
     private BusinessPlatform.TimeTable mCourse;
 
@@ -63,14 +63,14 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     // class fragment message handler
     private Handler mHandler;
 
-    private final int BUTTON_ENABLE_TEXT_COLOR  = 0xffffffff;
-    private final int BUTTON_DISABLE_TEXT_COLOR = 0x646a6a6b;
+    private static final int BUTTON_ENABLE_TEXT_COLOR  = 0xffffffff;
+    private static final int BUTTON_DISABLE_TEXT_COLOR = 0x646a6a6b;
 
-    private final String CLASS_STATE_FINISHED   = "finished";
-    private final String CLASS_STATE_IN_CLASS   = "in_class";
-    private final String CLASS_STATE_PLANNED    = "planned";
-    private final String CLASS_STATE_STARTING   = "starting";
-    private final String CLASS_STATE_STOPING    = "stopping";
+    private static final String CLASS_STATE_FINISHED   = "finished";
+    private static final String CLASS_STATE_IN_CLASS   = "in_class";
+    private static final String CLASS_STATE_PLANNED    = "planned";
+    private static final String CLASS_STATE_STARTING   = "starting";
+    private static final String CLASS_STATE_STOPING    = "stopping";
 
     // @brief Implements Fragment
     @Override
@@ -102,11 +102,11 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         mClassTimeView    = (TextView) mClassViewGroup.findViewById(R.id.class_time);
         mClassContentView = (TextView) mClassViewGroup.findViewById(R.id.class_content);
 
-        mTakingClassCtrlBtn = (Button) mClassViewGroup.findViewById(R.id.taking_class_ctrl);
-        mHiddenThisView     = (Button) mClassViewGroup.findViewById(R.id.hidden_this_view);
+        mClassCtrlBtn  = (Button) mClassViewGroup.findViewById(R.id.taking_class_ctrl);
+        mHiddenThisBtn = (Button) mClassViewGroup.findViewById(R.id.hidden_this_view);
 
-        mTakingClassCtrlBtn.setOnClickListener(this);
-        mHiddenThisView.setOnClickListener(this);
+        mClassCtrlBtn.setOnClickListener(this);
+        mHiddenThisBtn.setOnClickListener(this);
 
         // update fragment view
         updateClassFragmentView();
@@ -282,33 +282,33 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
             mClassStatusView.setText("课程信息");
 
-            mTakingClassCtrlBtn.setText("开始上课");
-            mTakingClassCtrlBtn.setTextColor(BUTTON_ENABLE_TEXT_COLOR);
+            mClassCtrlBtn.setText("开始上课");
+            mClassCtrlBtn.setTextColor(BUTTON_ENABLE_TEXT_COLOR);
 
-            mTakingClassCtrlBtn.setEnabled(true);
-            mTakingClassCtrlBtn.setFocusable(true);
+            mClassCtrlBtn.setEnabled(true);
+            mClassCtrlBtn.setFocusable(true);
 
         } else if (mCourse.status.equals(CLASS_STATE_IN_CLASS)) {
             mIsTakingClass = true;
 
             mClassStatusView.setText("正在上课");
 
-            mTakingClassCtrlBtn.setText("结束课程");
-            mTakingClassCtrlBtn.setTextColor(BUTTON_ENABLE_TEXT_COLOR);
+            mClassCtrlBtn.setText("结束课程");
+            mClassCtrlBtn.setTextColor(BUTTON_ENABLE_TEXT_COLOR);
 
-            mTakingClassCtrlBtn.setEnabled(true);
-            mTakingClassCtrlBtn.setFocusable(true);
+            mClassCtrlBtn.setEnabled(true);
+            mClassCtrlBtn.setFocusable(true);
 
         } else if (mCourse.status.equals(CLASS_STATE_FINISHED)) {
             mIsTakingClass = false;
 
             mClassStatusView.setText("课程已结束");
 
-            mTakingClassCtrlBtn.setText("开始上课");
-            mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
+            mClassCtrlBtn.setText("开始上课");
+            mClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
 
-            mTakingClassCtrlBtn.setEnabled(false);
-            mTakingClassCtrlBtn.setFocusable(false);
+            mClassCtrlBtn.setEnabled(false);
+            mClassCtrlBtn.setFocusable(false);
 
         } else if (mCourse.status.equals(CLASS_STATE_STARTING)) {
 
@@ -316,11 +316,11 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mClassStatusView.setText("正在开始上课");
 
             // set class ctrl button disable
-            mTakingClassCtrlBtn.setText("开始上课");
-            mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
+            mClassCtrlBtn.setText("开始上课");
+            mClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
 
-            mTakingClassCtrlBtn.setEnabled(false);
-            mTakingClassCtrlBtn.setFocusable(false);
+            mClassCtrlBtn.setEnabled(false);
+            mClassCtrlBtn.setFocusable(false);
 
         } else if (mCourse.status.equals(CLASS_STATE_STOPING)) {
 
@@ -328,11 +328,11 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mClassStatusView.setText("正在结束课程");
 
             // set class ctrl button disable
-            mTakingClassCtrlBtn.setText("结束课程");
-            mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
+            mClassCtrlBtn.setText("结束课程");
+            mClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
 
-            mTakingClassCtrlBtn.setEnabled(false);
-            mTakingClassCtrlBtn.setFocusable(false);
+            mClassCtrlBtn.setEnabled(false);
+            mClassCtrlBtn.setFocusable(false);
         }
     }
 }
