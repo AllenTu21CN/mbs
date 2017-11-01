@@ -28,9 +28,9 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     public static final String TAG = "ClassFragment";
     public static ClassFragment mClassFragment;
 
+    // class fragment view: a single instance.
     public static ClassFragment getInstance() {
-        if (mClassFragment == null)
-            mClassFragment = new ClassFragment();
+        if (mClassFragment == null) mClassFragment = new ClassFragment();
 
         return mClassFragment;
     }
@@ -68,6 +68,8 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     private final String CLASS_STATE_FINISHED   = "finished";
     private final String CLASS_STATE_IN_CLASS   = "in_class";
     private final String CLASS_STATE_PLANNED    = "planned";
+    private final String CLASS_STATE_STARTING   = "starting";
+    private final String CLASS_STATE_STOPING    = "stopping";
 
     // @brief Implements Fragment
     @Override
@@ -138,7 +140,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
                 break;
             case R.id.hidden_this_view:
-                //todo
+                //TODO
                 break;
             default:
                 break;
@@ -185,6 +187,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mCourse.status = CLASS_STATE_IN_CLASS;
         } else {
             LogManager.w("ClassFragment start class failed");
+            mCourse.status = CLASS_STATE_PLANNED;
             //TODO: show a warning dialog
         }
 
@@ -201,6 +204,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mCourse.status = CLASS_STATE_FINISHED;
         } else {
             LogManager.w("ClassFragment stop class failed");
+            mCourse.status = CLASS_STATE_IN_CLASS;
             //TODO: show a waning dialog
         }
 
@@ -231,13 +235,11 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         // start
         mCourseThread.startClass(mCourse);
 
-        // update class card view status
-        mClassStatusView.setText("正在开始上课");
+        // change course state
+        mCourse.status = CLASS_STATE_STARTING;
 
-        // set class ctrl button disable
-        mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
-        mTakingClassCtrlBtn.setEnabled(false);
-        mTakingClassCtrlBtn.setFocusable(false);
+        // update view
+        updateClassFragmentView();
 
         return 0;
     }
@@ -253,13 +255,11 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         // stop
         mCourseThread.stopClass(mCourse);
 
-        // update class card view
-        mClassStatusView.setText("正在结束课程");
+        // change course state
+        mCourse.status = CLASS_STATE_STOPING;
 
-        // set class ctrl button disable
-        mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
-        mTakingClassCtrlBtn.setEnabled(false);
-        mTakingClassCtrlBtn.setFocusable(false);
+        // update class card(fragment) view
+        updateClassFragmentView();
 
         return 0;
     }
@@ -302,6 +302,30 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mClassStatusView.setText("课程已结束");
 
             mTakingClassCtrlBtn.setText("开始上课");
+            mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
+
+            mTakingClassCtrlBtn.setEnabled(false);
+            mTakingClassCtrlBtn.setFocusable(false);
+
+        } else if (mCourse.status.equals(CLASS_STATE_STARTING)) {
+
+            // update class card view status
+            mClassStatusView.setText("正在开始上课");
+
+            // set class ctrl button disable
+            mTakingClassCtrlBtn.setText("开始上课");
+            mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
+
+            mTakingClassCtrlBtn.setEnabled(false);
+            mTakingClassCtrlBtn.setFocusable(false);
+
+        } else if (mCourse.status.equals(CLASS_STATE_STOPING)) {
+
+            // update class card view
+            mClassStatusView.setText("正在结束课程");
+
+            // set class ctrl button disable
+            mTakingClassCtrlBtn.setText("结束课程");
             mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
 
             mTakingClassCtrlBtn.setEnabled(false);
