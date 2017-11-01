@@ -44,6 +44,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     private TextView mClassNameView;
     private TextView mClassTeacherView;
     private TextView mClassTimeView;
+    private String   mClassTime;
     private TextView mClassContentView;
 
     // taking class button
@@ -217,6 +218,8 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     // @brief Sets current class' course
     public void setClassCourse(BusinessPlatform.TimeTable course) {
         mCourse = course;
+        // calc class time: date + week-day
+        mClassTime = CourseTableFragment.dateWithWeekDay(course.date) + " 第" + course.section + "节";
     }
 
     // @brief Sets course thread handler
@@ -270,7 +273,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
         mClassNameView.setText(mCourse.subject_name);
         mClassTeacherView.setText(mCourse.teacher_name);
-        mClassTimeView.setText(mCourse.date + " 第" + mCourse.section + "节");
+        mClassTimeView.setText(mClassTime);
         mClassContentView.setText(mCourse.title);
 
         // set class status and ctrl btn view

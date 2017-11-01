@@ -376,6 +376,31 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         return days;
     }
 
+    public static String dateWithWeekDay(String date) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+
+        Date time;
+        try { time = format.parse(date); } catch(Exception e) {
+            return date;
+        }
+
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTime(time);
+        String day = "";
+
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.MONDAY:    day = "星期一"; break;
+            case Calendar.TUESDAY:   day = "星期二"; break;
+            case Calendar.WEDNESDAY: day = "星期三"; break;
+            case Calendar.THURSDAY:  day = "星期四"; break;
+            case Calendar.FRIDAY:    day = "星期五"; break;
+            case Calendar.SATURDAY:  day = "星期六"; break;
+            case Calendar.SUNDAY:    day = "星期日"; break;
+        }
+
+        return day;
+    }
+
     // @brief Handles button click
     public void onClick(View view) {
         switch (view.getId()) {
