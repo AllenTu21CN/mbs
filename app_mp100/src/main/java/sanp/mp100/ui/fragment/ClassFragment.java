@@ -62,6 +62,13 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     // class fragment message handler
     private Handler mHandler;
 
+    private final int BUTTON_ENABLE_TEXT_COLOR  = 0xffffffff;
+    private final int BUTTON_DISABLE_TEXT_COLOR = 0x646a6a6b;
+
+    private final String CLASS_STATE_FINISHED   = "finished";
+    private final String CLASS_STATE_IN_CLASS   = "in_class";
+    private final String CLASS_STATE_PLANNED    = "planned";
+
     // @brief Implements Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,7 +86,6 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
         initMessageHandler();
 
-        mIsTakingClass = false;
         initView();
 
         return mClassViewGroup;
@@ -99,8 +105,8 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         mTakingClassCtrlBtn.setOnClickListener(this);
         mHiddenThisView.setOnClickListener(this);
 
-        // show class info
-        updateClassCourseInfo();
+        // update fragment view
+        updateClassFragmentView();
     }
 
     // @brief Init class fragment message handler
@@ -175,25 +181,15 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     private void onStartClassMsg(int result) {
         LogManager.i("ClassFragment, onStartClass result: " + result);
 
-        mIsTakingClass = true;
-
-        String status_text = "正在上课";
-        String ctrl_text   = "结束上课";
-
-        if (result != 0) {
+        if (result == 0) {
+            mCourse.status = CLASS_STATE_IN_CLASS;
+        } else {
             LogManager.w("ClassFragment start class failed");
-
-            mIsTakingClass = false;
-
-            status_text = "课程信息";
-            ctrl_text   = "开始上课";
+            //TODO: show a warning dialog
         }
 
-        mClassStatusView.setText(status_text);
-
-        mTakingClassCtrlBtn.setText(ctrl_text);
-        mTakingClassCtrlBtn.setEnabled(true);
-        mTakingClassCtrlBtn.setFocusable(true);
+        // update class fragment view
+        updateClassFragmentView();
 
         return;
     }
@@ -201,27 +197,15 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     private void onStopClassMsg(int result) {
         LogManager.i("ClassFragment, onStopClass result: " + result);
 
-        mIsTakingClass = false;
-
-        String  status_text = "课程已结束";
-        String  ctrl_text   = "开始上课";
-        boolean able        = false;
-
-        if (result != 0) {
+        if (result == 0) {
+            mCourse.status = CLASS_STATE_FINISHED;
+        } else {
             LogManager.w("ClassFragment stop class failed");
-
-            mIsTakingClass = true;
-
-            status_text = "正在上课";
-            ctrl_text   = "结束上课";
-            able        = true;
+            //TODO: show a waning dialog
         }
 
-        mClassStatusView.setText(status_text);
-
-        mTakingClassCtrlBtn.setText(ctrl_text);
-        mTakingClassCtrlBtn.setEnabled(able);
-        mTakingClassCtrlBtn.setFocusable(able);
+        // update class fragment view
+        updateClassFragmentView();
 
         return;
     }
@@ -248,9 +232,10 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         mCourseThread.startClass(mCourse);
 
         // update class card view status
-        mClassStatusView.setText("请稍等 正准备开始上课");
+        mClassStatusView.setText("正在开始上课");
 
         // set class ctrl button disable
+        mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
         mTakingClassCtrlBtn.setEnabled(false);
         mTakingClassCtrlBtn.setFocusable(false);
 
@@ -269,17 +254,18 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         mCourseThread.stopClass(mCourse);
 
         // update class card view
-        mClassStatusView.setText("请稍等 正准备结束课程");
+        mClassStatusView.setText("正在结束课程");
 
         // set class ctrl button disable
+        mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
         mTakingClassCtrlBtn.setEnabled(false);
         mTakingClassCtrlBtn.setFocusable(false);
 
         return 0;
     }
 
-    // @brief Updates class' course info
-    private void updateClassCourseInfo() {
+    // @brief Updates class fragment from class' course info
+    private void updateClassFragmentView() {
         if (mCourse == null) return;
 
         mClassNameView.setText(mCourse.subject_name);
@@ -288,26 +274,35 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         mClassContentView.setText(mCourse.title);
 
         // set class status and ctrl btn view
-        if (mCourse.status.equals("planned")) {
+        if (mCourse.status.equals(CLASS_STATE_PLANNED)) {
             mIsTakingClass = false;
 
             mClassStatusView.setText("课程信息");
 
             mTakingClassCtrlBtn.setText("开始上课");
+            mTakingClassCtrlBtn.setTextColor(BUTTON_ENABLE_TEXT_COLOR);
+
             mTakingClassCtrlBtn.setEnabled(true);
             mTakingClassCtrlBtn.setFocusable(true);
 
-        } else if (mCourse.status.equals("in_class")) {
+        } else if (mCourse.status.equals(CLASS_STATE_IN_CLASS)) {
             mIsTakingClass = true;
 
             mClassStatusView.setText("正在上课");
 
             mTakingClassCtrlBtn.setText("结束课程");
+            mTakingClassCtrlBtn.setTextColor(BUTTON_ENABLE_TEXT_COLOR);
+
             mTakingClassCtrlBtn.setEnabled(true);
             mTakingClassCtrlBtn.setFocusable(true);
 
-        } else if (mCourse.status.equals("finished")) {
+        } else if (mCourse.status.equals(CLASS_STATE_FINISHED)) {
+            mIsTakingClass = false;
+
             mClassStatusView.setText("课程已结束");
+
+            mTakingClassCtrlBtn.setText("开始上课");
+            mTakingClassCtrlBtn.setTextColor(BUTTON_DISABLE_TEXT_COLOR);
 
             mTakingClassCtrlBtn.setEnabled(false);
             mTakingClassCtrlBtn.setFocusable(false);
