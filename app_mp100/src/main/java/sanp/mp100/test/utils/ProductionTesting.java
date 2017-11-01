@@ -16,6 +16,7 @@ import sanp.avalon.libs.base.utils.HardwareStatisHelper;
 import sanp.avalon.libs.base.utils.LogManager;
 import sanp.avalon.libs.media.base.AVDefines;
 import sanp.mp100.MP100Application;
+import sanp.mp100.integration.RBUtil;
 import sanp.mpx.mc.MediaController;
 import sanp.mpx.mc.MediaEngine;
 import sanp.mpx.mc.ScreenLayout;
@@ -34,8 +35,6 @@ public class ProductionTesting implements MediaController.Observer {
         PRODUCTION_TESTING_MEDIACOMPOSITIVE,
         PRODUCTION_TESTING_ENCODED,
     }
-
-    ;
 
     // 编解码统计信息
     public static class CodingStatis {
@@ -67,8 +66,6 @@ public class ProductionTesting implements MediaController.Observer {
             mixFps = 0;
         }
     }
-
-    ;
 
     // 硬件统计信息
     public static class HardwareStatis {
@@ -112,7 +109,7 @@ public class ProductionTesting implements MediaController.Observer {
     public static final VideoFormat DEFAULT_720P_FORMAT = VideoFormat.FORMAT_720P_1M_25FPS;
     public static final VideoFormat DEFAULT_480P_FORMAT = VideoFormat.FORMAT_480P_512K_25FPS;
 
-    private static final String MP4_PATH =  MP100Application.HOME_EXTERNAL_PATH;
+    private static final String MP4_PATH =  MP100Application.TMP_FILE_PATH;
 
     private static Map<VideoFormat, String> gDecodingFiles = new HashMap<VideoFormat, String>() {{
         // put(VideoFormat.FORMAT_1080P_2M_25FPS, "rtsp://10.1.83.200:5000/main.h264");
@@ -120,8 +117,8 @@ public class ProductionTesting implements MediaController.Observer {
         put(VideoFormat.FORMAT_720P_1M_25FPS, MP4_PATH + "/test_720p_24fps_1mbps_17secs.mp4?loop=true");
     }};
     private static Map<Integer, String> gCaptureUrls = new HashMap<Integer, String>() {{
-        put(CAPTURE_DEVICE_CAMERA0, "capture://none?type=integrated_camera&id=0&description=none");
-        put(CAPTURE_DEVICE_CAMERA1, "capture://none?type=integrated_camera&id=1&description=none");
+        put(CAPTURE_DEVICE_CAMERA0, "capture://none?type=video&id=0");
+        put(CAPTURE_DEVICE_CAMERA1, "capture://none?type=video&id=1");
     }};
     private static Map<VideoFormat, MediaEngine.VideoSinkConfig> gFormatConfigs = new HashMap<VideoFormat, MediaEngine.VideoSinkConfig>() {{
         put(VideoFormat.FORMAT_1080P_4M_30FPS, new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1920, 1088, 30, 4 * 1024 * 1024, 10));
@@ -135,7 +132,7 @@ public class ProductionTesting implements MediaController.Observer {
         put(VideoFormat.FORMAT_480P_1M_30FPS, new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 856, 480, 30, 1 * 1024 * 1024, 10));
         put(VideoFormat.FORMAT_480P_512K_25FPS, new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 856, 480, 25, 512 * 1024, 10));
     }};
-    private static String gEncodingFilePath = Environment.getExternalStorageDirectory() + "/pt";
+    private static String gEncodingFilePath = MP100Application.HOME_EXTERNAL_PATH + "/pt";
 
     private static final String ENCODING_MEDIA_TEST = gEncodingFilePath + "/test-0.mp4" + "?loop=true";
 
@@ -168,6 +165,7 @@ public class ProductionTesting implements MediaController.Observer {
     public void entryTesting() {
         new File(gEncodingFilePath).mkdir();
         mMediaController = MediaController.getInstance();
+        mMediaController.removeObserver(RBUtil.getInstance());
         mMediaController.clean();
         mOutputs.clear();
         mMediaController.enableDisplayTestingItems(true);
