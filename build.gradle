@@ -12,6 +12,7 @@ project.ext {
 buildscript {
     repositories {
         jcenter()
+        google()
     }
     dependencies {
         // because of wamp-autobahn
@@ -28,6 +29,7 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        google()
     }
 }
 

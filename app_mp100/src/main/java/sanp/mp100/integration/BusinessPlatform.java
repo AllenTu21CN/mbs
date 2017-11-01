@@ -402,7 +402,7 @@ public class BusinessPlatform {
     public List<Province> getAreaProvinces()
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         List<Province> provinces = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(provinces, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
         return provinces;
@@ -417,7 +417,7 @@ public class BusinessPlatform {
      * */
     public int getAreaProvinces(Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         return mPlatformPostman.asyncInvokeResultAsList(resultCallback, Province.class, PROCEDURE_NAME_AREA_GET_PROVINCES);
     }
 
@@ -426,7 +426,7 @@ public class BusinessPlatform {
     public List<City> getAreaCitiesByProvince(String province)
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         List<City> cities = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(cities, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
         return cities;
@@ -441,7 +441,7 @@ public class BusinessPlatform {
      * */
     public int getAreaCitiesByProvince(String province, Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         return mPlatformPostman.asyncInvokeResultAsList(resultCallback, City.class, PROCEDURE_NAME_AREA_GET_CITIES, province);
     }
 
@@ -450,7 +450,7 @@ public class BusinessPlatform {
     public List<District> getAreaDistrictsByCity(String province, String city)
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         List<District> districts = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(districts, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
         return districts;
@@ -465,7 +465,7 @@ public class BusinessPlatform {
      * */
     public int getAreaDistrictsByCity(String province, String city, Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         return mPlatformPostman.asyncInvokeResultAsList(resultCallback, District.class, PROCEDURE_NAME_AREA_GET_DISTRICTS, province, city);
     }
 
@@ -479,7 +479,7 @@ public class BusinessPlatform {
     public List<School> getOrgSchoolsByArea(String province, String city, String district)
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         List<School> schools = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(schools, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
         return schools;
@@ -497,7 +497,7 @@ public class BusinessPlatform {
      * */
     public int getOrgSchoolsByArea(String province, String city, String district, Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         return mPlatformPostman.asyncInvokeResultAsList(resultCallback, School.class, PROCEDURE_NAME_ORG_GET_SCHOOLS, province, city, district);
     }
 
@@ -506,7 +506,7 @@ public class BusinessPlatform {
     public List<SchoolClass> getOrgClassesBySchoolId(long school_id)
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         List<SchoolClass> classes = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(classes, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
         return classes;
@@ -521,7 +521,7 @@ public class BusinessPlatform {
      * */
     public int getOrgClassesBySchoolId(long school_id, Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         return mPlatformPostman.asyncInvokeResultAsList(resultCallback, SchoolClass.class, PROCEDURE_NAME_ORG_GET_CLASSES, school_id);
     }
 
@@ -534,7 +534,7 @@ public class BusinessPlatform {
     public List<TimeTable> getLessonTimetable(long class_id, String start_date, String end_date)
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         List<TimeTable> tables = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(tables, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
         return tables;
@@ -551,7 +551,7 @@ public class BusinessPlatform {
      * */
     public int getLessonTimetable(long class_id, String start_date, String end_date, Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
         return mPlatformPostman.asyncInvokeResultAsList(resultCallback, TimeTable.class, PROCEDURE_NAME_LESSON_GET_TIMETABLE, class_id, start_date, end_date);
     }
 
@@ -560,7 +560,7 @@ public class BusinessPlatform {
     public void startPlanned(long timetable_id)
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
 
         List<LessonInfo> infos = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(infos, LessonInfo.class, PROCEDURE_NAME_LESSON_START_PLANNED, timetable_id);
@@ -575,7 +575,7 @@ public class BusinessPlatform {
      * */
     public int startPlanned(long timetable_id, Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
 
         return mPlatformPostman.asyncInvokeResultAsList(
                 ((value, args, kwargs) -> {
@@ -600,7 +600,7 @@ public class BusinessPlatform {
     public void stopPlanned(long timetable_id)
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
 
         stopRtmpOutput(timetable_id);
         mPlatformPostman.syncInvoke(PROCEDURE_NAME_LESSON_STOP_PLANNED, Arrays.asList(timetable_id), null);
@@ -614,7 +614,7 @@ public class BusinessPlatform {
      * */
     public int stopPlanned(long timetable_id, Callback resultCallback) {
         if (!mInited)
-            throw new RuntimeException("init first");
+            throw new RuntimeException("BusinessPlatform init first");
 
         stopRtmpOutput(timetable_id);
         return mPlatformPostman.asyncInvoke(PROCEDURE_NAME_LESSON_STOP_PLANNED, Arrays.asList(timetable_id), null, resultCallback);

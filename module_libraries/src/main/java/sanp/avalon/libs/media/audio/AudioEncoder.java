@@ -117,11 +117,11 @@ public class AudioEncoder implements AudioCapturer.Callback {
 
         mMediaFormat = new MediaFormat();
         mMediaFormat.setString(MediaFormat.KEY_MIME, codeName);
-        if(codeName == MediaFormat.MIMETYPE_AUDIO_G711_ALAW || codeName == MediaFormat.MIMETYPE_AUDIO_G711_MLAW) {
+        if(codeName.equals(MediaFormat.MIMETYPE_AUDIO_G711_ALAW) || codeName.equals(MediaFormat.MIMETYPE_AUDIO_G711_MLAW)) {
             mMediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, G711Encoder.DEFAULT_RAW_FRAME_SIZE_IN_BYTES);
             mEncoder = new G711Encoder();
         } else {
-            if(codeName == Supporting.ENC_NAME_AAC) {
+            if(codeName.equals(Supporting.ENC_NAME_AAC)) {
                 mMediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
                 mMediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, profile);
                 mMediaFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, sampleRate);
@@ -296,7 +296,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
     }
 
     static public boolean isValid(String codeName, AudioCapturer.Format format) {
-        if(codeName == Supporting.ENC_NAME_AAC) {
+        if(codeName.equals(Supporting.ENC_NAME_AAC)) {
             if(format.SampleRate > Supporting.ENC_AAC_SAMPLERATE_MAX || format.SampleRate < Supporting.ENC_AAC_SAMPLERATE_MIN) {
                 LogManager.e(String.format("Invalid sampleRate: %d", format.SampleRate));
                 return false;
@@ -305,7 +305,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
                 LogManager.e(String.format("Invalid channelsCnt: %d", format.ChannelsCnt));
                 return false;
             }
-        } else if(codeName == Supporting.ENC_NAME_G711A || codeName == Supporting.ENC_NAME_G711U) {
+        } else if(codeName.equals(Supporting.ENC_NAME_G711A) || codeName.equals(Supporting.ENC_NAME_G711U)) {
             if(format.SampleRate >= 0 && format.SampleRate != Supporting.ENC_G711_SAMPLERATE) {
                 LogManager.e(String.format("Invalid samplerate: %d(MUST be %d)", format.SampleRate, Supporting.ENC_G711_SAMPLERATE));
                 return false;
