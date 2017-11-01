@@ -71,8 +71,10 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         LogManager.i("ClassFragment onCreate: init view group(layout/course_class.xml)");
     }
 
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+            @Nullable Bundle savedInstanceState) {
         LogManager.i("ClassFragment: onCreateView: init all views(Text, Btn, ..)");
 
         initMessageHandler();
@@ -96,15 +98,6 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
         mTakingClassCtrlBtn.setOnClickListener(this);
         mHiddenThisView.setOnClickListener(this);
-
-        // set class status and ctrl btn view according to @mIsTakingClass
-        if (mIsTakingClass) {
-            mClassStatusView.setText("正在上课");
-            mTakingClassCtrlBtn.setText("结束上课");
-        } else {
-            mClassStatusView.setText("课程信息");
-            mTakingClassCtrlBtn.setText("开始上课");
-        }
 
         // show class info
         updateClassCourseInfo();
@@ -294,6 +287,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         mClassTimeView.setText(mCourse.date + " 第" + mCourse.section + "节");
         mClassContentView.setText(mCourse.title);
 
+        // set class status and ctrl btn view
         if (mCourse.status.equals("planned")) {
             mIsTakingClass = false;
 
