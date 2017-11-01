@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="100dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/network_config_mode"
+            style="@style/device_storage_text_style" />
+        <TextView
+            android:id="@+id/net_config"
+            android:layout_marginLeft="50dp"
+            style="@style/device_storage_text_style" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="100dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/network_ip"
+            style="@style/device_storage_text_style" />
+        <TextView
+            android:id="@+id/net_ip"
+            android:layout_marginLeft="50dp"
+            style="@style/device_storage_text_style" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="100dp"
+        android:orientation="horizontal">
+        <TextView
+           android:text="@string/network_mask"
+            style="@style/device_storage_text_style" />
+        <TextView
+            android:id="@+id/net_mask"
+            android:layout_marginLeft="50dp"
+            style="@style/device_storage_text_style" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="100dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/network_gateway"
+            style="@style/device_storage_text_style" />
+        <TextView
+            android:id="@+id/net_gateway"
+            android:layout_marginLeft="50dp"
+            style="@style/device_storage_text_style" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="100dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/network_dns"
+            style="@style/device_storage_text_style" />
+        <TextView
+            android:id="@+id/net_dns"
+            android:layout_marginLeft="50dp"
+            style="@style/device_storage_text_style" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="100dp"
+        android:orientation="horizontal">
+        <TextView
+            android:text="@string/network_speed"
+            style="@style/device_storage_text_style" />
+        <TextView
+            android:id="@+id/net_speed"
+            android:layout_marginLeft="50dp"
+            style="@style/device_storage_text_style" />
+    </LinearLayout>
+
+</LinearLayout>

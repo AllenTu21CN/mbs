@@ -1,4 +1,4 @@
-package sanp.mp100.ui.test;
+package sanp.mp100.test.ui;
 
 import android.content.Intent;
 import android.os.Bundle;

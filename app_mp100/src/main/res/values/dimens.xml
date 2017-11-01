@@ -56,4 +56,7 @@
     <dimen name="week_text_font_size">22sp</dimen>
     <dimen name="table_time_text_font_size">22sp</dimen>
 
+    <dimen name="device_storage_item_magrintop">50dp</dimen>
+    <dimen name="device_test_item_height">120dp</dimen>
+
 </resources>

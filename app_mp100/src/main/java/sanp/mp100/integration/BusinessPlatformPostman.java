@@ -475,6 +475,6 @@ public class BusinessPlatformPostman implements Runnable {
     }
 
     private void onDisconnecting(Session session, CloseDetails closeDetails) {
-        LogManager.i(String.format("BusinessPlatformPostman(%lld) onDisconnecting with [reason=%s] [message=%s]", session.getID(), closeDetails.reason, closeDetails.message));
+        LogManager.i(String.format("BusinessPlatformPostman(%d) onDisconnecting with [reason=%s] [message=%s]", session.getID(), closeDetails.reason, closeDetails.message));
     }
 }

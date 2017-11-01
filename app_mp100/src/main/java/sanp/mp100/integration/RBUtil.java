@@ -33,7 +33,7 @@ public class RBUtil implements MediaController.Observer {
     public interface StateObserver {
         void onSourceAdding(int id, String url, List<Role> roles, int result);
         void onSourceLost(int id, String url, List<Role> roles, int result);
-        void onOutputAdding(int id, String ur, int result);
+        void onOutputAdding(int id, String url, int result);
         void onOutputLost(int id, String url, int result);
     }
 
@@ -196,7 +196,7 @@ public class RBUtil implements MediaController.Observer {
         }
     }
 
-    public class OutputFormat {
+    public static class OutputFormat {
         public MediaEngine.VideoSinkConfig video;
         public MediaEngine.AudioSinkConfig audio;
 
@@ -261,7 +261,6 @@ public class RBUtil implements MediaController.Observer {
 
     public void init(SurfaceHolder holder) {
         mMediaController.init(holder);
-        addSources();
     }
 
     public void changeSurface(SurfaceHolder holder, int format, int width, int height) {
@@ -293,6 +292,19 @@ public class RBUtil implements MediaController.Observer {
         synchronized (mLock) {
             if (mStatisObservers.contains(ob))
                 mStatisObservers.remove(ob);
+        }
+    }
+
+    public void addSources() {
+        synchronized (mLock) {
+            for (Source source : mSources) {
+                LogManager.i(String.format("RBUtil initialize source: url-%s", source.url));
+                int id = mMediaController.addSource(source.url, Arrays.asList(AVDefines.DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
+                if (id >= 0) {
+                    source.id = id;
+                    source.state = State.Doing;
+                }
+            }
         }
     }
 
@@ -534,19 +546,6 @@ public class RBUtil implements MediaController.Observer {
         }
     }
 
-    private void addSources() {
-        synchronized (mLock) {
-            for (Source source : mSources) {
-                LogManager.i(String.format("RBUtil initialize source: url-%s", source.url));
-                int id = mMediaController.addSource(source.url, Arrays.asList(AVDefines.DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
-                if (id >= 0) {
-                    source.id = id;
-                    source.state = State.Doing;
-                }
-            }
-        }
-    }
-
     private void loadPreferences() {
         loadSources();
         loadScenes();
@@ -676,6 +675,8 @@ public class RBUtil implements MediaController.Observer {
         return null;
     }
 
+    class BreakOut extends Exception {}
+
     ///////////////////////// implementation of MediaController.Observer
     @Override
     public void onSourceAdded(int sourceId, String url, int result) {
@@ -689,43 +690,47 @@ public class RBUtil implements MediaController.Observer {
             }
 
             source.state = (result == 0 ? State.Done : State.None);
-            for(StateObserver ob: mStateObservers)
-                ob.onSourceAdding(sourceId, url, source.roles, result);
-
             if (result == 0) {
-                // TODO: audio source
-                mMediaController.addSource2Scene(sourceId);
+                try {
+                    // TODO: audio source
+                    mMediaController.addSource2Scene(sourceId);
 
-                // show this source if necessarily
-                if(source.roles.size() == 0) // has not been bound any role
-                    return;
-                if(mCurrentContent == null) // has no content in current scene
-                    return;
-                for(Map.Entry<Integer, List<Role>> entry: mCurrentContent.roleCandidates.entrySet()) {
-                    int subScreenIndex = entry.getKey();
-                    List<Role> roleCandidates = entry.getValue();
-                    Role curRoleInThisSubScreen = mCurrentContentRoles.get(subScreenIndex);
-                    for(Role role: roleCandidates) {
-                        if(source.roles.contains(role)) { // the role bound with this source is in the sub-screen
-                            if(curRoleInThisSubScreen != null) { // the sub-screen has been filled with curRoleInThisSubScreen
-                                int this_priority = roleCandidates.indexOf(role);
-                                int cur_priority = roleCandidates.indexOf(curRoleInThisSubScreen);
-                                if(this_priority == cur_priority) {
-                                    throw new RuntimeException("logical error: this source had been add to this sub-screen or more than one source has the same role-" + role.toString());
-                                } else if(this_priority > cur_priority) { // this source's role priority is lower than the current one
-                                    return;
+                    // show this source if necessarily
+                    if(source.roles.size() == 0) // has not been bound any role
+                        throw new BreakOut();
+                    if(mCurrentContent == null) // has no content in current scene
+                        throw new BreakOut();
+                    for(Map.Entry<Integer, List<Role>> entry: mCurrentContent.roleCandidates.entrySet()) {
+                        int subScreenIndex = entry.getKey();
+                        List<Role> roleCandidates = entry.getValue();
+                        Role curRoleInThisSubScreen = mCurrentContentRoles.get(subScreenIndex);
+                        for(Role role: roleCandidates) {
+                            if(source.roles.contains(role)) { // the role bound with this source is in the sub-screen
+                                if(curRoleInThisSubScreen != null) { // the sub-screen has been filled with curRoleInThisSubScreen
+                                    int this_priority = roleCandidates.indexOf(role);
+                                    int cur_priority = roleCandidates.indexOf(curRoleInThisSubScreen);
+                                    if(this_priority == cur_priority) {
+                                        throw new RuntimeException("logical error: this source had been add to this sub-screen or more than one source has the same role-" + role.toString());
+                                    } else if(this_priority > cur_priority) { // this source's role priority is lower than the current one
+                                        throw new BreakOut();
+                                    }
                                 }
-                            }
 
-                            // fill the sub-screen with this source
-                            String pos = ScreenLayout.getSubScreenPosition(mCurrentContent.layout, mCurrentContent.subScreenCnt, subScreenIndex);
-                            mMediaController.setSourcePosition(sourceId, source.pattern, pos);
-                            mCurrentContentRoles.put(subScreenIndex, role);
-                            return;
+                                // fill the sub-screen with this source
+                                String pos = ScreenLayout.getSubScreenPosition(mCurrentContent.layout, mCurrentContent.subScreenCnt, subScreenIndex);
+                                mMediaController.setSourcePosition(sourceId, source.pattern, pos);
+                                mCurrentContentRoles.put(subScreenIndex, role);
+                                throw new BreakOut();
+                            }
                         }
                     }
+                } catch (BreakOut e) {
+                    // nothing
                 }
             }
+
+            for(StateObserver ob: mStateObservers)
+                ob.onSourceAdding(sourceId, url, source.roles, result);
         }
     }
 
@@ -742,47 +747,51 @@ public class RBUtil implements MediaController.Observer {
 
             source.state = State.None;
             mMediaController.cleanSceneSource(sourceId);
+            try {
+                // replace this source with others if necessarily
+                if(source.roles.size() == 0) // has not been bound any role
+                    throw new BreakOut();
+                if(mCurrentContent == null) // has no content in current scene
+                    throw new BreakOut();
+
+                List<Integer> subScreenIndexs = new ArrayList<>();
+                subScreenIndexs.addAll(mCurrentContentRoles.keySet());
+                for(int subScreenIndex: subScreenIndexs) { // search the roles which are shown on the screen
+                    Role role = mCurrentContentRoles.get(subScreenIndex);
+                    if(!source.roles.contains(role)) // the shown role is not bound with this source
+                        continue;
+
+                    // find the candidate to replace this source
+                    boolean found = false;
+                    List<Role> roleCandidates = mCurrentContent.roleCandidates.get(subScreenIndex);
+                    for(Role candidate: roleCandidates) {
+                        if(source.roles.contains(candidate))  // skip self
+                            continue;
+                        Source backupSource = getSourceByRole(candidate);
+                        if(backupSource == null) // the candidate role is none
+                            continue;
+                        if(backupSource.state != State.Done) // the candidate source has not been added or done with failure
+                            continue;
+
+                        // TODO: to check whether this source had been shown in other sub-screen(there is a hidden rule: a source just can be shown once)
+
+                        // fill the sub-screen with this backupSource
+                        String pos = ScreenLayout.getSubScreenPosition(mCurrentContent.layout, mCurrentContent.subScreenCnt, subScreenIndex);
+                        mMediaController.setSourcePosition(backupSource.id, backupSource.pattern, pos);
+                        mCurrentContentRoles.put(subScreenIndex, candidate);
+                        found = true;
+                        break;
+                    }
+                    if(!found) {
+                        mCurrentContentRoles.remove(subScreenIndex);
+                    }
+                }
+            } catch (BreakOut e) {
+                // nothing
+            }
+
             for(StateObserver ob: mStateObservers)
                 ob.onSourceLost(sourceId, url, source.roles, result);
-
-            // replace this source with others if necessarily
-            if(source.roles.size() == 0) // has not been bound any role
-                return;
-            if(mCurrentContent == null) // has no content in current scene
-                return;
-
-            List<Integer> subScreenIndexs = new ArrayList<>();
-            subScreenIndexs.addAll(mCurrentContentRoles.keySet());
-            for(int subScreenIndex: subScreenIndexs) { // search the roles which are shown on the screen
-                Role role = mCurrentContentRoles.get(subScreenIndex);
-                if(!source.roles.contains(role)) // the shown role is not bound with this source
-                    continue;
-
-                // find the candidate to replace this source
-                boolean found = false;
-                List<Role> roleCandidates = mCurrentContent.roleCandidates.get(subScreenIndex);
-                for(Role candidate: roleCandidates) {
-                    if(source.roles.contains(candidate))  // skip self
-                        continue;
-                    Source backupSource = getSourceByRole(candidate);
-                    if(backupSource == null) // the candidate role is none
-                        continue;
-                    if(backupSource.state != State.Done) // the candidate source has not been added or done with failure
-                        continue;
-
-                    // TODO: to check whether this source had been shown in other sub-screen(there is a hidden rule: a source just can be shown once)
-
-                    // fill the sub-screen with this backupSource
-                    String pos = ScreenLayout.getSubScreenPosition(mCurrentContent.layout, mCurrentContent.subScreenCnt, subScreenIndex);
-                    mMediaController.setSourcePosition(backupSource.id, backupSource.pattern, pos);
-                    mCurrentContentRoles.put(subScreenIndex, candidate);
-                    found = true;
-                    break;
-                }
-                if(!found) {
-                    mCurrentContentRoles.remove(subScreenIndex);
-                }
-            }
         }
     }
 

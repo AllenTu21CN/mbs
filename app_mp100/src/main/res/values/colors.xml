@@ -69,4 +69,6 @@
     <color name="lesson_txt_1">#ffffff</color>
     <color name="lesson_txt_2">#ffeeee</color>
     <color name="lessoning">#5adb9c</color>
+
+    <color name="divider_color">#6e6e6a</color>
 </resources>

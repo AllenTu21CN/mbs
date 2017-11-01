@@ -24,12 +24,13 @@
         <activity
             android:name=".ui.HomeActivity"
             android:launchMode="singleInstance"
-            android:theme="@style/StartTheme">
+            android:theme="@style/StartTheme"
+            android:screenOrientation="landscape">
         </activity>
 
         <activity android:name=".ui.CourseTable"/>
-        <activity android:name=".ui.test.BusinessPlatformTestActivity"/>
-        <activity android:name=".ui.test.BusinessPlatformPostmanTestActivity"/>
+        <activity android:name=".test.ui.BusinessPlatformTestActivity"/>
+        <activity android:name=".test.ui.BusinessPlatformPostmanTestActivity"/>
     </application>
 
 </manifest>

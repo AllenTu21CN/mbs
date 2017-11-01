@@ -127,7 +127,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        // getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         // course layout view
         mCourseTableViewGroup = View.inflate(getActivity(), R.layout.course_table, null);
