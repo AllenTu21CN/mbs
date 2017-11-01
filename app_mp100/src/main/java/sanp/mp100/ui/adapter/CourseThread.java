@@ -260,6 +260,7 @@ public class CourseThread implements Runnable {
         try {
             BusinessPlatform.getInstance().startPlanned(course.id);
         } catch (InternalError|Exception e) {
+            e.printStackTrace();
             LogManager.w("onStartClass start class failed: " + e);
             result = -1;
         }
@@ -279,6 +280,7 @@ public class CourseThread implements Runnable {
         try {
             BusinessPlatform.getInstance().stopPlanned(course.id);
         } catch (InternalError|Exception e) {
+            e.printStackTrace();
             LogManager.w("onStopClass stop class failed: " + e);
             result = -1;
         }

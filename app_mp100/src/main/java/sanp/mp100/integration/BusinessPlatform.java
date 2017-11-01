@@ -563,10 +563,10 @@ public class BusinessPlatform {
             throw new RuntimeException("init first");
         if(inClassLesson != null) {
             if(inClassLesson.first == timetable_id) {
-                LogManager.w(String.format("the class[%lld] had been started", timetable_id));
+                LogManager.w(String.format("the class[%d] had been started", timetable_id));
                 return;
             } else {
-                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%lld)",
+                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%d)",
                         inClassLesson.first, inClassLesson.second, inClassLesson.third, timetable_id));
             }
         }
@@ -587,10 +587,10 @@ public class BusinessPlatform {
             throw new RuntimeException("init first");
         if(inClassLesson != null) {
             if(inClassLesson.first == timetable_id) {
-                LogManager.w(String.format("the class[%lld] had been started", timetable_id));
+                LogManager.w(String.format("the class[%d] had been started", timetable_id));
                 return BPError.ERROR_IMPORTANT_ACTION_SKIP;
             } else {
-                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%lld)",
+                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%d)",
                         inClassLesson.first, inClassLesson.second, inClassLesson.third, timetable_id));
             }
         }
@@ -620,9 +620,9 @@ public class BusinessPlatform {
         if (!mInited)
             throw new RuntimeException("init first");
         if(inClassLesson == null)
-            throw new RuntimeException(String.format("logical error: the class[%lld] has not been started", timetable_id));
+            throw new RuntimeException(String.format("logical error: the class[%d] has not been started", timetable_id));
         if(inClassLesson.first != timetable_id)
-            throw new RuntimeException(String.format("logical error: the timetable_id[%lld] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
+            throw new RuntimeException(String.format("logical error: the timetable_id[%d] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
                     timetable_id, inClassLesson.first, inClassLesson.second, inClassLesson.third));
 
         RBUtil.getInstance().removeOutput(inClassLesson.second);
@@ -640,9 +640,9 @@ public class BusinessPlatform {
         if (!mInited)
             throw new RuntimeException("init first");
         if(inClassLesson == null)
-            throw new RuntimeException(String.format("logical error: the class[%lld] has not been started", timetable_id));
+            throw new RuntimeException(String.format("logical error: the class[%d] has not been started", timetable_id));
         if(inClassLesson.first != timetable_id)
-            throw new RuntimeException(String.format("logical error: the timetable_id[%lld] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
+            throw new RuntimeException(String.format("logical error: the timetable_id[%d] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
                     timetable_id, inClassLesson.first, inClassLesson.second, inClassLesson.third));
 
         RBUtil.getInstance().removeOutput(inClassLesson.second);
