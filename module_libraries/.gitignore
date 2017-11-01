@@ -1,5 +1,5 @@
 /build
-jniLibs/
+#jniLibs/
 .cproject
 /src/main/cpp/avalon/
 sanp_mpx_mc_protocol_*.h

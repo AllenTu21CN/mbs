@@ -41,10 +41,10 @@ public class AudioDecoder {
         }
 
         String mime = format.getString(MediaFormat.KEY_MIME);
-        if(mime == MediaFormat.MIMETYPE_AUDIO_AAC) {
+        if(mime.equals(MediaFormat.MIMETYPE_AUDIO_AAC)) {
             LogManager.e("TODO: not implement aac deocoder");
             return -1;
-        } else if(mime == MediaFormat.MIMETYPE_AUDIO_G711_MLAW || mime == MediaFormat.MIMETYPE_AUDIO_G711_ALAW) {
+        } else if(mime.equals(MediaFormat.MIMETYPE_AUDIO_G711_MLAW) || mime.equals(MediaFormat.MIMETYPE_AUDIO_G711_ALAW)) {
             mDecoder = new G711Decoder();
         } else {
             LogManager.e("non-support audio decoder mime " + mime);
@@ -69,7 +69,7 @@ public class AudioDecoder {
 
     public int start() {
         if(mDecoder == null) {
-            LogManager.e("init first");
+            LogManager.e("audio decoder init first");
             return -1;
         }
         if(mRunning && mOutputThread != null)
@@ -184,9 +184,9 @@ public class AudioDecoder {
         @Override
         public int init(MediaFormat format) {
             String mime = format.getString(MediaFormat.KEY_MIME);
-            if(mime == MediaFormat.MIMETYPE_AUDIO_G711_ALAW) {
+            if(mime.equals(MediaFormat.MIMETYPE_AUDIO_G711_ALAW)) {
                 mType = G711_TYPE_PCMA;
-            } else if(mime == MediaFormat.MIMETYPE_AUDIO_G711_MLAW) {
+            } else if(mime.equals(MediaFormat.MIMETYPE_AUDIO_G711_MLAW)) {
                 mType = G711_TYPE_PCMU;
             } else {
                 LogManager.e("invalid G711Decoder mine: " + mime);

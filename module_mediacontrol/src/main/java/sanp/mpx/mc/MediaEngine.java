@@ -190,7 +190,7 @@ public final class MediaEngine implements Choreographer.FrameCallback {
             return (width == other.width && 
                     height == other.height &&
                     frameRate == other.frameRate &&
-                    mimeType == other.mimeType &&
+                    mimeType.equals(other.mimeType) &&
                     bitrate == other.bitrate);
         }
     }
@@ -3592,9 +3592,9 @@ public final class MediaEngine implements Choreographer.FrameCallback {
         }
 
         private Tuple<Integer, Integer> sinkBasicFormat(String mime) {
-            if(mime == AudioEncoder.Supporting.ENC_NAME_AAC) {
+            if(mime.equals(AudioEncoder.Supporting.ENC_NAME_AAC)) {
                 return new Tuple<>(AudioCapturer.Supporting.HZ_RECOMMENDED, AudioCapturer.Supporting.CHANNEL_RECOMMENDED);
-            } else if(mime == AudioEncoder.Supporting.ENC_NAME_G711A || mime == AudioEncoder.Supporting.ENC_NAME_G711U) {
+            } else if(mime.equals(AudioEncoder.Supporting.ENC_NAME_G711A) || mime.equals(AudioEncoder.Supporting.ENC_NAME_G711U)) {
                 return new Tuple<>(AudioEncoder.Supporting.ENC_G711_SAMPLERATE, AudioEncoder.Supporting.ENC_G711_CHANNEL_CNT);
             } else if (AudioEncoder.Supporting.ENC_NAMEs.contains(mime)){
                 throw new RuntimeException("logical error: not implement");

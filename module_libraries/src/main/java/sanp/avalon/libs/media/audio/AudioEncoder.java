@@ -70,7 +70,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
             Profile = other.Profile;
         }
         public boolean isEqual(Format other) {
-            return (CodecName == other.CodecName &&
+            return (CodecName.equals(other.CodecName) &&
                     Bitrate == other.Bitrate &&
                     Profile == other.Profile);
         }
@@ -150,7 +150,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
 
     public int start() {
         if(mEncoder == null) {
-            LogManager.e("init first");
+            LogManager.e("audio encoder init first");
             return -1;
         }
         if(mRunning && mOutputThread != null)
@@ -234,7 +234,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
 
     public void enableTesting(boolean on) {
         if(mEncoder == null) {
-            LogManager.e("init first");
+            LogManager.e("audio encoder init first");
             return;
         }
         if(on) {
@@ -244,13 +244,13 @@ public class AudioEncoder implements AudioCapturer.Callback {
                 mTesting = null;
             }
 
-            if(mOutFormat.CodecName == Supporting.ENC_NAME_AAC) {
+            if(mOutFormat.CodecName.equals(Supporting.ENC_NAME_AAC)) {
                 String filePath = String.format(DefaultFileTestingPath, "aac");
                 mTesting = new Debug2FileTesting(filePath, mInFormat.SampleRate, mInFormat.ChannelsCnt, mOutFormat.Profile);
-            } else if(mOutFormat.CodecName == Supporting.ENC_NAME_G711A) {
+            } else if(mOutFormat.CodecName.equals(Supporting.ENC_NAME_G711A)) {
                 String filePath = String.format(DefaultFileTestingPath, "g711a");
                 mTesting = new Debug2FileTesting(filePath);
-            } else if(mOutFormat.CodecName == Supporting.ENC_NAME_G711U) {
+            } else if(mOutFormat.CodecName.equals(Supporting.ENC_NAME_G711U)) {
                 String filePath = String.format(DefaultFileTestingPath, "g711u");
                 mTesting = new Debug2FileTesting(filePath);
             }
@@ -274,7 +274,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
     }
 
     static public boolean isValid(Format format) {
-        if(format.CodecName == Supporting.ENC_NAME_AAC) {
+        if(format.CodecName.equals(Supporting.ENC_NAME_AAC)) {
             if(!Supporting.ENC_AAC_PROFILEs.contains(format.Profile)) {
                 LogManager.e(String.format("Invalid profile: %d", format.Profile));
                 return false;
@@ -283,7 +283,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
                 LogManager.e(String.format("Invalid bitrate: %d", format.Bitrate));
                 return false;
             }
-        } else if(format.CodecName == Supporting.ENC_NAME_G711A || format.CodecName == Supporting.ENC_NAME_G711U) {
+        } else if(format.CodecName.equals(Supporting.ENC_NAME_G711A) || format.CodecName.equals(Supporting.ENC_NAME_G711U)) {
             if(format.Bitrate >= 0 && format.Bitrate != Supporting.ENC_G711_BITRATE) {
                 LogManager.e(String.format("Invalid bitrate: %d(MUST be %d)", format.Bitrate, Supporting.ENC_G711_BITRATE));
                 return false;
@@ -472,9 +472,9 @@ public class AudioEncoder implements AudioCapturer.Callback {
                 return 0;
             }
             String mime = format.getString(MediaFormat.KEY_MIME);
-            if(mime == MediaFormat.MIMETYPE_AUDIO_G711_ALAW) {
+            if(mime.equals(MediaFormat.MIMETYPE_AUDIO_G711_ALAW)) {
                 mType = G711_TYPE_PCMA;
-            } else if(mime == MediaFormat.MIMETYPE_AUDIO_G711_MLAW) {
+            } else if(mime.equals(MediaFormat.MIMETYPE_AUDIO_G711_MLAW)) {
                 mType = G711_TYPE_PCMU;
             } else {
                 LogManager.e("invalid G711Encoder mine: " + mime);

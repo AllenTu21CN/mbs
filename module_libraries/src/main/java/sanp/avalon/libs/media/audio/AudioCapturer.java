@@ -214,7 +214,7 @@ public class AudioCapturer {
             return false;
         }
         if(mAudioRecord == null) {
-            LogManager.w("init first");
+            LogManager.w("audio capturer init first");
             return false;
         }
         if(mNoiseSuppressor == null) {
@@ -235,7 +235,7 @@ public class AudioCapturer {
             return false;
         }
         if(mAudioRecord == null) {
-            LogManager.w("init first");
+            LogManager.w("audio capturer init first");
             return false;
         }
         if(mAutomaticGainControl == null) {
@@ -287,7 +287,7 @@ public class AudioCapturer {
 
     public void enableTesting(boolean on, int method, int playbackMode) {
         if(mAudioRecord == null) {
-            LogManager.e("init first");
+            LogManager.e("audio capturer init first");
             return;
         }
         if(on) {

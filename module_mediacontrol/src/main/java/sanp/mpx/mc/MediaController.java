@@ -277,10 +277,10 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 
         public boolean isEqual(DisplayName other) {
             return (
-                    Content == other.Content &&
+                    Content.equals(other.Content) &&
                             Align.Horizontal == other.Align.Horizontal &&
                             Align.Vertical == other.Align.Vertical &&
-                            Style == other.Style
+                            Style.equals(other.Style)
             );
         }
     };
@@ -951,7 +951,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         public void setBackgroundColor(String rgbCode, boolean immediate) {
             if (!rgbCode.startsWith(colorPrefix))
                 throw new RuntimeException(String.format("Invalid RGB color code(%s) format. Must startwith '%s'", rgbCode, colorPrefix));
-            if (mBackgroundColor == rgbCode)
+            if (mBackgroundColor.equals(rgbCode))
                 return;
 
             mBackgroundColor = rgbCode;
@@ -967,7 +967,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         public void setBackgroundImage(String url, boolean immediate) {
             if (!url.startsWith(filePrefix) && url != BACKGROUND_DEFAULT_IMAGE)
                 throw new RuntimeException(String.format("Invalid file url(%s) format. Must startwith '%s'", url, filePrefix));
-            if (mBackgroundImage == url)
+            if (mBackgroundImage.equals(url))
                 return;
 
             mBackgroundImage = url;
@@ -2472,7 +2472,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         if(audioSinkConf == null)
             return;
         MediaFormat outFormat = mMediaEngine.getAudioSinkBasicFormat(audioSinkConf.encFormat.CodecName);
-        if (audioSinkConf.encFormat.CodecName == AudioEncoder.Supporting.ENC_NAME_AAC) {
+        if (audioSinkConf.encFormat.CodecName.equals(AudioEncoder.Supporting.ENC_NAME_AAC)) {
             outFormat.setInteger(MediaFormat.KEY_BIT_RATE, audioSinkConf.encFormat.Bitrate);
             outFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, audioSinkConf.encFormat.Profile);
         }
