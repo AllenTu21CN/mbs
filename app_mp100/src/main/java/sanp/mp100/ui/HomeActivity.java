@@ -12,7 +12,10 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
+import sanp.avalon.libs.base.utils.LogManager;
+import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.RBUtil;
+import sanp.mp100.test.ui.fragment.DeviceTestFragment;
 import sanp.mp100.ui.fragment.BaseFragment;
 import sanp.mp100.ui.fragment.HomeFragment;
 
@@ -42,6 +45,7 @@ public class HomeActivity extends FragmentActivity {
 
     private void initData() {
         mRBUtil = mRBUtil.allocateInstance(this);
+        BusinessPlatform.getInstance().init(this);
     }
 
     public void initView() {
@@ -55,13 +59,11 @@ public class HomeActivity extends FragmentActivity {
         mHomeFragment = HomeFragment.getInstance();
         mFragmentManager = getSupportFragmentManager();
         mFragmentTransaction = mFragmentManager.beginTransaction();
-        mFragmentTransaction.add(R.id.fragmentLayout, mHomeFragment, HomeFragment.TAG);
-        mFragmentTransaction.addToBackStack(null);
-        mFragmentTransaction.commit();
     }
 
     @Override
     protected void onDestroy() {
+        LogManager.w("!!!HomeActivity onDestroy!!!");
         mRBUtil.release();
         super.onDestroy();
     }
@@ -93,7 +95,7 @@ public class HomeActivity extends FragmentActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (HomeFragment.getInstance().isVisible()) {
+            if (mHomeFragment.isVisible()) {
                 return true;
             }
         }
@@ -108,7 +110,14 @@ public class HomeActivity extends FragmentActivity {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
             mRBUtil.init(holder);
-            mRBUtil.setScene(RBUtil.Scene.Home);
+            if(!DeviceTestFragment.Enabled) {
+                mRBUtil.addSources();
+                mRBUtil.setScene(RBUtil.Scene.Home);
+            }
+
+            mFragmentTransaction.add(R.id.fragmentLayout, mHomeFragment, HomeFragment.TAG);
+            mFragmentTransaction.addToBackStack(null);
+            mFragmentTransaction.commit();
         }
 
         @Override

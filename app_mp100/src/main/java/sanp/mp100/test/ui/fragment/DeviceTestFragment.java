@@ -24,7 +24,7 @@ import sanp.mp100.test.utils.ProductionTesting;
 
 public class DeviceTestFragment extends BaseFragment {
 
-    static public final boolean Enabled = true;
+    static public final boolean Enabled = false;
 
     public static final String TAG = "DeviceTestFragment";
 

@@ -46,8 +46,10 @@ public class HomeFragment extends BaseFragment {
     }
 
     public void initView(View view) {
-        showCourseTable();
-        //showDeviceTest();
+        if(DeviceTestFragment.Enabled)
+            showDeviceTest();
+        else
+            showCourseTable();
     }
 
     @Override
@@ -63,12 +65,10 @@ public class HomeFragment extends BaseFragment {
 
     // @brief Changes fragment to show course table
     public void showCourseTable() {
-        CourseTableFragment fragment = CourseTableFragment.getInstance();
-        showFragment(TAG, R.id.fragmentLayout, fragment, CourseTableFragment.TAG);
+        showFragment(TAG, R.id.fragmentLayout, CourseTableFragment.getInstance(), CourseTableFragment.TAG);
     }
 
     public void showDeviceTest() {
-        DeviceTestFragment fragment = new DeviceTestFragment();
-        showFragment(TAG, R.id.fragmentLayout, fragment, DeviceTestFragment.TAG);
+        showFragment(TAG, R.id.fragmentLayout, new DeviceTestFragment(), DeviceTestFragment.TAG);
     }
 }
