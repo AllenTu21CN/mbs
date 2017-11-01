@@ -179,7 +179,7 @@ public final class MediaEngine implements Choreographer.FrameCallback {
                     && (bitrate >= 1 && bitrate <= 12000000)
                     && (frameRate >= 1 && frameRate <= 30)
                     && (keyFrameInterval >= 1)
-                    && (mimeType == MIME_TYPE_H264)) {
+                    && (mimeType.equals(MIME_TYPE_H264))) {
                 return true;
             } else {
                 return false;
