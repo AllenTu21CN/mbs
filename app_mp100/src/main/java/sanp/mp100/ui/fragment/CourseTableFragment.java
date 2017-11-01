@@ -1,7 +1,6 @@
 package sanp.mp100.ui.fragment;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -62,7 +61,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     private CourseThread  mCourseThread = null;
 
 
-    // ui thread message handler
+    // course table message handler
     private Handler mHandler = null;
 
     // message
@@ -82,7 +81,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     // - The course thread is Ready
     @Override
     public void onReady() {
-        LogManager.i("CourseTableFragment onReady, send msg to the ui thread");
+        LogManager.i("CourseTableFragment onReady, send msg to ui thread");
 
         // prepare message: ready
         Message msg = Message.obtain();
@@ -152,7 +151,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         LogManager.i("CourseTableFragment onCreateView, init message handler and views");
 
         // init message handler
-        initUiMessageHandler();
+        initMessageHandler();
 
         // load all view: date line bar, course table gridview and so on.
         initView();
@@ -287,22 +286,22 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         mSundayDataView.setText(format.format(sunday));
     }
 
-    // init ui message handler
-    private void initUiMessageHandler() {
+    // init course table message handler
+    private void initMessageHandler() {
        mHandler = new Handler() {
            @Override
            public void handleMessage(Message msg) {
                switch (msg.what) {
                case MSG_COURSE_TABLE_READY:
-                   LogManager.i("Ui Thread handle MSG_COURSE_TABLE_READY");
+                   LogManager.i("CourseTable handle MSG_COURSE_TABLE_READY");
                    checkoutCourseForCurrent();
                    break;
                case MSG_UPDATE_COURSE_TABLE:
-                   LogManager.i("Ui Thread handle MSG_UPDATE_COURSE_TABLE");
+                   LogManager.i("CourseTable handle MSG_UPDATE_COURSE_TABLE");
                    updateCourseTable((List<TimeTable>)msg.obj);
                    break;
                default:
-                   LogManager.w("Ui Thread handle unknown message: " + msg.what);
+                   LogManager.w("CourseTable handle unknown message: " + msg.what);
                    break;
                }
            }
