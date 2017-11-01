@@ -200,7 +200,7 @@ public class BusinessPlatform {
 
     private int mCurrentRetryConnectTimes;
 
-    private Tuple3<Long/*timetable_id*/, Integer/*output_id*/, String/*url*/> inClassLesson = null;
+    private Map<Long, Integer> mRtmpOutputs = new HashMap<>();
 
     BusinessPlatform() {
         reset();
@@ -561,15 +561,6 @@ public class BusinessPlatform {
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
             throw new RuntimeException("init first");
-        if(inClassLesson != null) {
-            if(inClassLesson.first == timetable_id) {
-                LogManager.w(String.format("the class[%d] had been started", timetable_id));
-                return;
-            } else {
-                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%d)",
-                        inClassLesson.first, inClassLesson.second, inClassLesson.third, timetable_id));
-            }
-        }
 
         List<LessonInfo> infos = new ArrayList<>();
         mPlatformPostman.syncInvokeResultAsList(infos, LessonInfo.class, PROCEDURE_NAME_LESSON_START_PLANNED, timetable_id);
@@ -585,15 +576,6 @@ public class BusinessPlatform {
     public int startPlanned(long timetable_id, Callback resultCallback) {
         if (!mInited)
             throw new RuntimeException("init first");
-        if(inClassLesson != null) {
-            if(inClassLesson.first == timetable_id) {
-                LogManager.w(String.format("the class[%d] had been started", timetable_id));
-                return BPError.ERROR_IMPORTANT_ACTION_SKIP;
-            } else {
-                throw new RuntimeException(String.format("logical error: has been in class(timetable_id-%ld output_id-%d url-%s)!!!can't start new class(%d)",
-                        inClassLesson.first, inClassLesson.second, inClassLesson.third, timetable_id));
-            }
-        }
 
         return mPlatformPostman.asyncInvokeResultAsList(
                 ((value, args, kwargs) -> {
@@ -619,15 +601,9 @@ public class BusinessPlatform {
             throws RuntimeException, InterruptedException, InternalError {
         if (!mInited)
             throw new RuntimeException("init first");
-        if(inClassLesson == null)
-            throw new RuntimeException(String.format("logical error: the class[%d] has not been started", timetable_id));
-        if(inClassLesson.first != timetable_id)
-            throw new RuntimeException(String.format("logical error: the timetable_id[%d] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
-                    timetable_id, inClassLesson.first, inClassLesson.second, inClassLesson.third));
 
-        RBUtil.getInstance().removeOutput(inClassLesson.second);
+        stopRtmpOutput(timetable_id);
         mPlatformPostman.syncInvoke(PROCEDURE_NAME_LESSON_STOP_PLANNED, Arrays.asList(timetable_id), null);
-        inClassLesson = null;
     }
 
     /**
@@ -639,13 +615,8 @@ public class BusinessPlatform {
     public int stopPlanned(long timetable_id, Callback resultCallback) {
         if (!mInited)
             throw new RuntimeException("init first");
-        if(inClassLesson == null)
-            throw new RuntimeException(String.format("logical error: the class[%d] has not been started", timetable_id));
-        if(inClassLesson.first != timetable_id)
-            throw new RuntimeException(String.format("logical error: the timetable_id[%d] is not match current class(timetable_id-%ld output_id-%d url-%s)!!!",
-                    timetable_id, inClassLesson.first, inClassLesson.second, inClassLesson.third));
 
-        RBUtil.getInstance().removeOutput(inClassLesson.second);
+        stopRtmpOutput(timetable_id);
         return mPlatformPostman.asyncInvoke(PROCEDURE_NAME_LESSON_STOP_PLANNED, Arrays.asList(timetable_id), null, resultCallback);
     }
 
@@ -858,6 +829,13 @@ public class BusinessPlatform {
         int id = RBUtil.getInstance().addOutput(url);
         if(id < 0)
             throw new InternalError(String.format("create rtmp[%s] output failed with %d", url, id));
-        inClassLesson = new Tuple3<>(timetable_id, id, url);
+        mRtmpOutputs.put(timetable_id, id);
+    }
+
+    private void stopRtmpOutput(long timetable_id) {
+        Integer id = mRtmpOutputs.get(timetable_id);
+        if(id == null)
+            return;
+        RBUtil.getInstance().removeOutput(id);
     }
 }
