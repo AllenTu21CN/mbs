@@ -13,6 +13,7 @@ import java.util.List;
 import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
+import sanp.mp100.integration.BusinessPlatformPostman;
 import sanp.mp100.integration.RBUtil;
 
 /**
@@ -23,11 +24,13 @@ import sanp.mp100.integration.RBUtil;
  * @date 2017/10/27
  * */
 
-public class CourseThread implements Runnable {
+public class CourseThread implements Runnable, BusinessPlatform.Observer {
+
+    public static final int ERROR_LOST_CONNECTION = 1;
 
     public interface Notify {
-        // The course thread is Ready
-        void onCourseThreadReady();
+        // The course thread is ready
+        void onReady();
 
         // Something error is happened
         void onError(int error);
@@ -173,14 +176,20 @@ public class CourseThread implements Runnable {
     public void run() {
         mClassRoom = BusinessPlatform.getInstance();
         if (mClassRoom == null) {
-            LogManager.e("CourseTable get classroom from @BusinessPlatform.class");
+            LogManager.e("CourseThread get classroom from @BusinessPlatform.class");
             return;
         }
 
-        LogManager.i("Enter course table thread process function");
+        // add notify callback into business platform
+        mClassRoom.addStateObserver(this);
+
+        LogManager.i("CourseThread: Enter course table thread process function");
 
         // notify CourseTable thread is ready.
-        mNotify.onCourseThreadReady();
+        if (mClassRoom.connectingState() == BusinessPlatformPostman.State.READY) {
+            LogManager.i("CourseThread is ready: business platform is connected");
+            mNotify.onReady();
+        }
 
         Looper.prepare();
 
@@ -202,7 +211,7 @@ public class CourseThread implements Runnable {
                     onStopClassMsg((TimeTable)msg.obj);
                     break;
                 default:
-                    LogManager.w("Unknown message: " + msg.what);
+                    LogManager.w("CourseThread Unknown message: " + msg.what);
                     break;
                 }
             }
@@ -211,8 +220,11 @@ public class CourseThread implements Runnable {
         // enter message handle loop
         Looper.loop();
 
+        // remove notify callback into business platform
+        mClassRoom.removeStateObserver(this);
+
         // exit
-        LogManager.i("Exit course thread process function");
+        LogManager.i("CourseThread: Exit course thread ..");
     }
 
     // process checkout course message
@@ -231,8 +243,8 @@ public class CourseThread implements Runnable {
         String date_string = format.format(date);
         String end_string  = format.format(end);
 
-        LogManager.i("onCheckoutCourseMsg: try to checkout courses(" +
-                date_string + " ~ " + end_string  + ") from service");
+        LogManager.i("CourseThread onCheckoutCourseMsg: try to checkout courses" +
+                "(" + date_string + " ~ " + end_string  + ") from service");
 
         try {
             // checkout courses from classroom(BusinessPlatform)
@@ -288,5 +300,26 @@ public class CourseThread implements Runnable {
 
         // notify the result of stop class
         if (mClassNotify != null) mClassNotify.onStopClass(result);
+    }
+
+    // Implements BusinessPlatform.Observer
+    public void onConnectingState(boolean connected) {
+        if (connected) {
+            LogManager.i("CourseThread success to connect with service");
+            mNotify.onReady();
+        } else {
+            LogManager.w("CourseThread lost connection with service");
+            mNotify.onError(ERROR_LOST_CONNECTION);
+        }
+    }
+
+    public void onActivatingState(boolean activated) {
+        LogManager.i("CourseThread onActivatingState: " + activated);
+        //do nothing
+    }
+
+    public void onBindingState(boolean bound) {
+        LogManager.i("CourseThread onBindingState: " + bound);
+        //do nothing
     }
 }

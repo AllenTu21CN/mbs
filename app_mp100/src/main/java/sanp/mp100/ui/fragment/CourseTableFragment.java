@@ -60,14 +60,13 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     private CourseAdapter mCourseAdapter = null;
     // checkout course thread
     private CourseThread  mCourseThread = null;
-    private Boolean       mCourseThreadRunning = false;
 
 
     // ui thread message handler
     private Handler mHandler = null;
 
     // message
-    private static final int MSG_COURSE_THREAD_READY = 0;
+    private static final int MSG_COURSE_TABLE_READY = 0;
     private static final int MSG_UPDATE_COURSE_TABLE = 1;
 
     // course table fragment single instance
@@ -82,15 +81,15 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     // @brief Implements from CourseThread.Notify
     // - The course thread is Ready
     @Override
-    public void onCourseThreadReady() {
-        LogManager.i("CourseTableFragment onCourseThreadReady, send msg to the ui thread");
+    public void onReady() {
+        LogManager.i("CourseTableFragment onReady, send msg to the ui thread");
 
         // prepare message: ready
         Message msg = Message.obtain();
-        msg.what = MSG_COURSE_THREAD_READY;
+        msg.what = MSG_COURSE_TABLE_READY;
 
         if (!mHandler.sendMessage(msg)) {
-            LogManager.e("CourseTableFragment onCourseThreadReady, send message failed");
+            LogManager.e("CourseTableFragment onReady, send message failed");
             return;
         }
 
@@ -101,7 +100,6 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     @Override
     public void onError(int error) {
         //TODO
-        mCourseThreadRunning = false;
     }
 
     // - Checkout courses suc
@@ -295,9 +293,8 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
            @Override
            public void handleMessage(Message msg) {
                switch (msg.what) {
-               case MSG_COURSE_THREAD_READY:
-                   LogManager.i("Ui Thread handle MSG_COURSE_THREAD_READY");
-                   mCourseThreadRunning = true;
+               case MSG_COURSE_TABLE_READY:
+                   LogManager.i("Ui Thread handle MSG_COURSE_TABLE_READY");
                    checkoutCourseForCurrent();
                    break;
                case MSG_UPDATE_COURSE_TABLE:
@@ -361,20 +358,6 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     // @brief Calculates days between date1 and date2: date2 - date1
     public static int daysBetween(Date date1,Date date2)
     {
-        /*
-        Calendar cal = Calendar.getInstance();
-
-        cal.setTime(date1);
-        long time1 = cal.getTimeInMillis();
-
-        cal.setTime(date2);
-        long time2 = cal.getTimeInMillis();
-
-        long between_days=(time2-time1)/(1000*3600*24);
-
-        return Integer.parseInt(String.valueOf(between_days));
-        */
-
         java.util.Calendar calst = java.util.Calendar.getInstance();
         java.util.Calendar caled = java.util.Calendar.getInstance();
         calst.setTime(date1);

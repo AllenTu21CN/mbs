@@ -61,18 +61,18 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     private Handler mHandler = null;
 
     // message
-    private static final int MSG_COURSE_THREAD_READY = 0;
+    private static final int MSG_COURSE_TABLE_READY = 0;
     private static final int MSG_UPDATE_COURSE_TABLE = 1;
 
     // @brief Implements from CourseThread.Notify
     // - The course thread is Ready
     @Override
-    public void onCourseThreadReady() {
+    public void onReady() {
         LogManager.i("CourseTable onCourseThreadReady, send msg to the ui thread");
 
         // prepare message: ready
         Message msg = Message.obtain();
-        msg.what = MSG_COURSE_THREAD_READY;
+        msg.what = MSG_COURSE_TABLE_READY;
 
         if (!mHandler.sendMessage(msg)) {
             LogManager.e("CourseTable onCourseThreadReady, send message failed");
@@ -225,8 +225,8 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
            @Override
            public void handleMessage(Message msg) {
                switch (msg.what) {
-               case MSG_COURSE_THREAD_READY:
-                   LogManager.i("Ui Thread handle MSG_COURSE_THREAD_READY");
+               case MSG_COURSE_TABLE_READY:
+                   LogManager.i("Ui Thread handle MSG_COURSE_TABLE_READY");
                    mCourseThreadRunning = true;
                    checkoutCourseForCurrent();
                    break;
