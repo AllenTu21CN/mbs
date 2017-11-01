@@ -272,12 +272,14 @@ public class CourseThread implements Runnable, BusinessPlatform.Observer {
 
         try {
             BusinessPlatform.getInstance().startPlanned(course.id);
+            LogManager.i("CourseThread success to start class");
         } catch (InternalError|Exception e) {
             e.printStackTrace();
             LogManager.w("onStartClass start class failed: " + e);
             result = -1;
         }
 
+        LogManager.i("CourseThread notify ui start class suc");
         // notify the result of start class
         if (mClassNotify != null) mClassNotify.onStartClass(result);
     }
@@ -292,12 +294,14 @@ public class CourseThread implements Runnable, BusinessPlatform.Observer {
 
         try {
             BusinessPlatform.getInstance().stopPlanned(course.id);
+            LogManager.i("CourseThread success to stop class");
         } catch (InternalError|Exception e) {
             e.printStackTrace();
             LogManager.w("onStopClass stop class failed: " + e);
             result = -1;
         }
 
+        LogManager.i("CourseThread notify ui stop class suc");
         // notify the result of stop class
         if (mClassNotify != null) mClassNotify.onStopClass(result);
     }
