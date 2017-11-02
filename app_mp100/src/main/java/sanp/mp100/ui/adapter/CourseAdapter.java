@@ -209,7 +209,8 @@ public class CourseAdapter extends BaseAdapter {
 
         dialog.setCourseName(course.subject_name);
         dialog.setCourseTeacher(course.teacher_name);
-        dialog.setCourseTime(course.date + " 第" + course.section + "节");
+        dialog.setCourseTime(CourseTableFragment.dateWithWeekDay(course.date) +
+            " 第" + course.section + "节");
         dialog.setCourseContent(course.title);
 
         dialog.setYesOnclickListener("进入", () -> {
