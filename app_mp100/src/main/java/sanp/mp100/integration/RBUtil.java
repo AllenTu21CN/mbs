@@ -45,19 +45,14 @@ public class RBUtil implements MediaController.Observer {
     }
 
     private static RBUtil gRBUtil = null;
-
-    public static RBUtil allocateInstance(Context context) {
+    public static RBUtil getInstance() {
         if (gRBUtil == null) {
             synchronized (RBUtil.class) {
                 if (gRBUtil == null) {
-                    gRBUtil = new RBUtil(context);
+                    gRBUtil = new RBUtil();
                 }
             }
         }
-        return gRBUtil;
-    }
-
-    public static RBUtil getInstance() {
         return gRBUtil;
     }
 
@@ -221,46 +216,72 @@ public class RBUtil implements MediaController.Observer {
         }
     }
 
-    private Object mLock = new Object();
-    private Context mContext = null;
-    private SharedPreferences mSharedPref = null;
-    private MediaController mMediaController = null;
+    private boolean mInited = false;
 
+    private Object mLock = new Object();
+    private Context mContext;
+    private SharedPreferences mSharedPref;
+    private MediaController mMediaController;
+
+    private List<Source> mSources;
+
+    private Map<Scene, List<Content>> mSupportingScenes;
+    private Scene mCurrentScene;
+    private Content mCurrentContent;
+    private Map<Integer, Role> mCurrentContentRoles = new HashMap<>();
+
+    private Quality mDefaultQuality;
+    private Map<Quality, OutputFormat> mSupportingOutputFormats;
+
+    private Map<Integer, String> mOutputs = new HashMap<>();
     private List<StateObserver> mStateObservers = new ArrayList<>();
     private List<StatisObserver> mStatisObservers = new ArrayList<>();
 
-    private List<Source> mSources = null;
-    private Map<Integer, String> mOutputs = new HashMap<>();
-
-    private Map<Scene, List<Content>> mSupportingScenes = null;
-    private Scene mCurrentScene = Scene.Unspecified;
-    private Content mCurrentContent = null;
-    private Map<Integer, Role> mCurrentContentRoles = new HashMap<>();
-
-    private Quality mDefaultQuality = Quality.Middle;
-    private Map<Quality, OutputFormat> mSupportingOutputFormats = null;
-
-    private RBUtil(Context context) {
-        mContext = context;
-
-        mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_local_video_preferences), Context.MODE_PRIVATE);
-        loadPreferences();
-
-        mMediaController = MediaController.allocateInstance(mContext);
+    private RBUtil() {
+        MediaEngine.enableAttachSPSPPPS2IFrame(false);
+        mMediaController = MediaController.getInstance();
         mMediaController.addObserver(this);
+        reset();
+    }
+
+    private void reset() {
+        mContext = null;
+        mSharedPref = null;
+
+        mSources = null;
+
+        mSupportingScenes = null;
+        mCurrentScene = Scene.Unspecified;
+        mCurrentContent = null;
+
+        mDefaultQuality = Quality.Middle;
+        mSupportingOutputFormats = null;
+    }
+
+    public void init(Context context, SurfaceHolder holder) {
+        synchronized (mLock) {
+            if(mInited)
+                return;
+
+            mContext = context;
+            mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_local_video_preferences), Context.MODE_PRIVATE);
+            loadPreferences();
+
+            mMediaController.init(mContext, holder);
+
+            mInited = true;
+        }
     }
 
     public void release() {
-        LogManager.d("RBUtil release in");
-        if (mMediaController != null) {
-            mMediaController.release();
-            mMediaController = null;
-        }
-        LogManager.d("RBUtil release out");
-    }
+        synchronized (mLock) {
+            if(!mInited)
+                return;
 
-    public void init(SurfaceHolder holder) {
-        mMediaController.init(holder);
+            mMediaController.release();
+            reset();
+            mInited = false;
+        }
     }
 
     public void changeSurface(SurfaceHolder holder, int format, int width, int height) {
@@ -306,6 +327,10 @@ public class RBUtil implements MediaController.Observer {
                 }
             }
         }
+    }
+
+    public Scene currentScene() {
+        return mCurrentScene;
     }
 
     public int setScene(Scene scene) {

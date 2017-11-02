@@ -1,5 +1,6 @@
 package sanp.mp100.ui;
 
+import android.content.Context;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -27,12 +28,12 @@ import sanp.mp100.R;
 
 public class HomeActivity extends FragmentActivity {
 
+    private Context mContext;
     private FragmentManager mFragmentManager;
     private FragmentTransaction mFragmentTransaction;
     private HomeFragment mHomeFragment;
     private SurfaceView mSurfaceView;
-
-    private RBUtil mRBUtil;
+    private SurfaceHolder.Callback mSurfaceCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +45,11 @@ public class HomeActivity extends FragmentActivity {
     }
 
     private void initData() {
-        mRBUtil = mRBUtil.allocateInstance(this);
-        BusinessPlatform.getInstance().init(this);
+        mContext = this;
     }
 
     public void initView() {
+        mSurfaceCallback = new SurfaceHolderCallback();
         mSurfaceView = (SurfaceView) findViewById(R.id.surfaceView);
         SurfaceHolder surfaceHolder = mSurfaceView.getHolder();
         surfaceHolder.setFormat(PixelFormat.TRANSPARENT);
@@ -64,7 +65,8 @@ public class HomeActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         LogManager.w("!!!HomeActivity onDestroy!!!");
-        mRBUtil.release();
+        BusinessPlatform.getInstance().release();
+        RBUtil.getInstance().release();
         super.onDestroy();
     }
 
@@ -104,16 +106,16 @@ public class HomeActivity extends FragmentActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private SurfaceHolder.Callback mSurfaceCallback = new SurfaceHolderCallback();
-
     class SurfaceHolderCallback implements SurfaceHolder.Callback {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
-            mRBUtil.init(holder);
+            RBUtil rb = RBUtil.getInstance();
+            rb.init(mContext, holder);
             if(!DeviceTestFragment.Enabled) {
-                mRBUtil.addSources();
-                mRBUtil.setScene(RBUtil.Scene.Home);
+                rb.addSources();
+                rb.setScene(RBUtil.Scene.Home);
             }
+            BusinessPlatform.getInstance().init(mContext);
 
             mFragmentTransaction.add(R.id.fragmentLayout, mHomeFragment, HomeFragment.TAG);
             mFragmentTransaction.addToBackStack(null);
@@ -122,7 +124,7 @@ public class HomeActivity extends FragmentActivity {
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            mRBUtil.changeSurface(holder, format, width, height);
+            RBUtil.getInstance().changeSurface(holder, format, width, height);
         }
 
         @Override

@@ -196,10 +196,9 @@ public class BusinessPlatform {
     private SharedPreferences mSharedPref;
     private BusinessPlatformPostman mPlatformPostman;
 
-    private List<Observer> mObservers = new ArrayList<>();
-
     private int mCurrentRetryConnectTimes;
 
+    private List<Observer> mObservers = new ArrayList<>();
     private Map<Long, Integer> mRtmpOutputs = new HashMap<>();
 
     BusinessPlatform() {
@@ -228,16 +227,17 @@ public class BusinessPlatform {
     }
 
     public void init(Context context) {
-        if(mInited)
-            return;
+        synchronized (mLock) {
+            if(mInited)
+                return;
 
-        mContext = context;
-        mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_platform_preferences), Context.MODE_PRIVATE);
-        mPlatformPostman = new BusinessPlatformPostman();
+            mContext = context;
+            mSharedPref = mContext.getSharedPreferences(mContext.getString(R.string.my_platform_preferences), Context.MODE_PRIVATE);
+            mPlatformPostman = new BusinessPlatformPostman();
 
-        loadPreferences();
-        mInited = true;
-
+            loadPreferences();
+            mInited = true;
+        }
         tryConnect();
     }
 
@@ -833,7 +833,7 @@ public class BusinessPlatform {
     }
 
     private void stopRtmpOutput(long timetable_id) {
-        Integer id = mRtmpOutputs.get(timetable_id);
+        Integer id = mRtmpOutputs.remove(timetable_id);
         if(id == null)
             return;
         RBUtil.getInstance().removeOutput(id);
