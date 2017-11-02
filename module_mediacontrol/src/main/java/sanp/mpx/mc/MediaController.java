@@ -76,18 +76,15 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
     private static final long RETRY_STEP_INTERVAL_MS = 1000;
     private static final long TASK_DELAY_MS = 0;
 
-    public static MediaController allocateInstance(Context context) {
+    private static MediaController gMediaController = null;
+    public static MediaController getInstance() {
         if (gMediaController == null) {
             synchronized (MediaController.class) {
                 if (gMediaController == null) {
-                    gMediaController = new MediaController(context);
+                    gMediaController = new MediaController();
                 }
             }
         }
-        return gMediaController;
-    }
-
-    public static MediaController getInstance() {
         return gMediaController;
     }
 
@@ -1202,34 +1199,43 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         }
     };
 
-    private static MediaController gMediaController = null;
-
-    private MediaEngine mMediaEngine = null;
-    private IOEngine mIOEngine = new IOEngine();
+    private boolean mInited = false;
+    private IOEngine mIOEngine;
+    private MediaEngine mMediaEngine;
 
     private List<Observer> mObservers = new ArrayList<>();
-
     private Scene[] mScenes = {null, null};
     private Map<Integer, Tuple<AudioStream, VideoStream>> mSource2Streams = new HashMap<>(MediaEngine.MAXIMUM_VIDEO_STREAM_COUNT);
-
     private Map<Integer, OutputSession> mOutputs = new HashMap<>();
 
-    private Thread mThread = null;
-    private boolean mRunning = false;
-    private TaskHandler mTaskHandler = null;
     private Object mRunningLock = new Object();
+    private Thread mThread;
+    private boolean mRunning;
+    private TaskHandler mTaskHandler;
 
-    private Context mContext;
-
-    private MediaController(Context context) {
-        if (context != null) {
-            mContext = context;
-        }
-        mMediaEngine = MediaEngine.allocateInstance(mContext);
-        mMediaEngine.setCallback(this);
+    private MediaController() {
+        reset();
     }
 
-    public int init(SurfaceHolder holder) {
+    private void reset() {
+        mIOEngine = null;
+        mMediaEngine = null;
+        mThread = null;
+        mRunning = false;
+        mTaskHandler = null;
+        mSource2Streams.clear();
+        mOutputs.clear();
+    }
+
+    public int init(Context context, SurfaceHolder holder) {
+        if(mInited)
+            return 0;
+
+        mIOEngine = new IOEngine();
+
+        mMediaEngine = MediaEngine.allocateInstance(context);
+        mMediaEngine.setCallback(this);
+
         Scene scene = new Scene(mMediaEngine, holder.getSurface());
         scene.setBackgroundColor(BACKGROUND_DEFAULT_COLOR, false);
         scene.flush();
@@ -1240,22 +1246,31 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             mThread.start();
             waitUntilReady();
         }
+
+        mInited = true;
         return 0;
     }
 
     public int release() {
+        if(!mInited)
+            return 0;
 
         clean();
 
-        Scene scene = mScenes[SCENE_IDX_LOCAL_DISPLAY];
-        if(scene != null) {
-            scene.release();
-            mScenes[SCENE_IDX_LOCAL_DISPLAY] = null;
+        for(int i = 0 ; i < mScenes.length ; ++i) {
+            Scene scene = mScenes[i];
+            if(scene != null) {
+                scene.release();
+                mScenes[i] = null;
+            }
         }
 
         if (mMediaEngine != null) {
             mMediaEngine.setCallback(null);
-            mMediaEngine = null;
+        }
+
+        if(mIOEngine != null) {
+            // do nothing
         }
 
         if (mThread != null) {
@@ -1269,7 +1284,8 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             mThread = null;
         }
 
-        mIOEngine = null;
+        reset();
+        mInited = false;
         return 0;
     }
 
@@ -1489,11 +1505,6 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         }
     }
     public void releaseExtraScene(int sceneIdx) {
-        if(DEBUG) {
-            LogManager.e("!!!!Tuyj Debug here");
-            return;
-        }
-
         if(sceneIdx == SCENE_IDX_LOCAL_DISPLAY) {
             throw new RuntimeException("logical error: can't release local display scene");
         }

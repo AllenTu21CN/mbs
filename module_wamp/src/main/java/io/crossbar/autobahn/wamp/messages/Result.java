@@ -35,7 +35,9 @@ public class Result implements IMessage {
     }
 
     public static Result parse(List<Object> wmsg) {
-        MessageUtil.validateMessage(wmsg, MESSAGE_TYPE, "RESULT", 4, 6);
+        // ------> @tuyj: compat result is null
+        // MessageUtil.validateMessage(wmsg, MESSAGE_TYPE, "RESULT", 4, 6);
+        MessageUtil.validateMessage(wmsg, MESSAGE_TYPE, "RESULT", 3, 6);
 
         long request = MessageUtil.parseRequestID(wmsg.get(1));
         List<Object> args = null;

@@ -79,6 +79,12 @@ public final class MediaEngine implements Choreographer.FrameCallback {
     private static final long VIDEO_RENDER_PRECISION_NS = 5000000;
     private static final boolean VIDEO_ENCODING_DROPPING = (VIDEO_RENDER_FPS >= 48.0f);
 
+    private static boolean ATTACH_SPSPPS_TO_IFRAME = false;
+
+    public static void enableAttachSPSPPPS2IFrame(boolean able) {
+        ATTACH_SPSPPS_TO_IFRAME = able;
+    }
+
     private static MediaEngine mInstance = null;
     private Callback mCallback = null;
     private static Context mContext = null;
@@ -2985,6 +2991,7 @@ public final class MediaEngine implements Choreographer.FrameCallback {
             public void drainEncoder(boolean endOfStream) {
                 final int TIMEOUT_USEC = 10000;
                 final int TIMEOUT_MS = 33;
+                final boolean attachSPSPPPS2IFrame = ATTACH_SPSPPS_TO_IFRAME;
 
                 if (endOfStream) {
                     //if (VERBOSE) LogManager.d("sending EOS to encoder");
@@ -3069,7 +3076,7 @@ public final class MediaEngine implements Choreographer.FrameCallback {
                                                 bakData.clear();
                                                 bakData.put(encodedData);
                                                 bakData.flip();
-                                            }else if(pkt.isKeyFrame() && mCodecSpecificData != null) {
+                                            } else if(attachSPSPPPS2IFrame && pkt.isKeyFrame() && mCodecSpecificData != null) {
                                                 AVPacket pkt2 = output.output_channel.pollIdlePacket(TIMEOUT_MS);
                                                 if(pkt2 != null) {
                                                     ByteBuffer bakData = mCodecSpecificData.getPayload();

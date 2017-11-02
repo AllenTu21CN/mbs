@@ -233,7 +233,7 @@ public class BusinessPlatformPostman implements Runnable {
 
         synchronized(mLock) {
             if (mState != State.READY) {
-                throw new RuntimeException("connnet first");
+                throw new RuntimeException("BusinessPlatformPostman connnet first");
             }
 
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args, kwargs, (Class<CallResult>) null);
@@ -279,7 +279,7 @@ public class BusinessPlatformPostman implements Runnable {
     public int asyncInvoke(String procedureName, List<Object> args, Map<String, Object> kwargs, Callback resultCallback) {
         synchronized(mLock) {
             if(mState != State.READY) {
-                LogManager.w("connnet first");
+                LogManager.w("BusinessPlatformPostman connnet first");
                 return BPError.ERROR_IMPORTANT_LOGICAL_ERROR;
             }
 
@@ -305,16 +305,18 @@ public class BusinessPlatformPostman implements Runnable {
 
         synchronized(mLock) {
             if (mState != State.READY) {
-                throw new RuntimeException("connnet first");
+                throw new RuntimeException("BusinessPlatformPostman connnet first");
             }
 
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args);
             f.whenComplete((callResult, throwable) -> {
                 synchronized (lock) {
                     if (throwable == null) {
-                        Gson gson = new Gson();
-                        for (Object item : callResult.results) {
-                            result.add(gson.fromJson(item.toString(), classof));
+                        if(callResult.results != null) {
+                            Gson gson = new Gson();
+                            for (Object item : callResult.results) {
+                                result.add(gson.fromJson(item.toString(), classof));
+                            }
                         }
                         rets.add(BPError.ACTION_SUCCESS);
                     } else {
@@ -352,7 +354,7 @@ public class BusinessPlatformPostman implements Runnable {
     public <T> int asyncInvokeResultAsList(Callback resultCallback, Class<T> classof, String procedureName, Object... args) {
         synchronized(mLock) {
             if(mState != State.READY) {
-                LogManager.w("connnet first");
+                LogManager.w("BusinessPlatformPostman connnet first");
                 return BPError.ERROR_IMPORTANT_LOGICAL_ERROR;
             }
 
@@ -431,9 +433,11 @@ public class BusinessPlatformPostman implements Runnable {
     private void onCallCompleted(CallResult callResult, Throwable throwable, Class classof, Callback resultCallback) {
         if (throwable == null) {
             List<Object> objs = new ArrayList<>();
-            Gson gson = new Gson();
-            for(Object item: callResult.results) {
-                objs.add(gson.fromJson(item.toString(), classof));
+            if(callResult.results != null) {
+                Gson gson = new Gson();
+                for (Object item : callResult.results) {
+                    objs.add(gson.fromJson(item.toString(), classof));
+                }
             }
             resultCallback.done(0, objs, null);
         } else {

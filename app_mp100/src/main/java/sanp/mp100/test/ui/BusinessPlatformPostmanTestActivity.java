@@ -221,8 +221,13 @@ public class BusinessPlatformPostmanTestActivity extends AppCompatActivity imple
 
         try {
             CallResult result = mBusinessPlatformPostman.syncInvoke(procedureName, args, null);
-            LogManager.i("Sum: " + result.results.get(0));
-            mMsg += result.results.get(0) + "\n";
+            if(result.results == null || result.results.size() == 0) {
+                LogManager.i("Sum is none");
+                mMsg += "result is none \n";
+            } else {
+                LogManager.i("Sum: " + result.results.get(0));
+                mMsg += result.results.get(0) + "\n";
+            }
             mMsgText.setText(mMsg);
         } catch (InterruptedException | InternalError e) {
             e.printStackTrace();
@@ -247,8 +252,13 @@ public class BusinessPlatformPostmanTestActivity extends AppCompatActivity imple
                 null,
                 (value, args, kwargs) -> {
                     if(value == 0) {
-                        LogManager.i("Sum: " + args.get(0));
-                        mMsg += args.get(0) + "\n";
+                        if(args == null || args.size() == 0) {
+                            LogManager.i("Sum is none");
+                            mMsg += "result is none\n";
+                        } else {
+                            LogManager.i("Sum: " + args.get(0));
+                            mMsg += args.get(0) + "\n";
+                        }
                         flushMsgView();
                     } else {
                         LogManager.e("invokeFuncSum2 fail: " + kwargs.get("message"));
