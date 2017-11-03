@@ -92,7 +92,7 @@ public class CommonDialog extends Dialog {
         // load layout xml: common_dialog.xml
         setContentView(R.layout.common_dialog);
 
-        // ?? Don't cancel ani when touch empty area.
+        // Don't close(? dismiss) dialog when touch empty area.
         setCanceledOnTouchOutside(false);
 
         // init views, data and set listener
