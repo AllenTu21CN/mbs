@@ -327,14 +327,16 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         LogManager.i(courses);
         */
 
-        //TODO, update course table view
         //2017/10/28
-
         // update course adapter course-list
         mCourseAdapter.updateCourseList(list, mCourseTableMonday);
 
         // notify to adapter update course table
         mCourseAdapter.notifyDataSetChanged();
+
+        // set default focus on 1st course
+        mCourseTable.requestFocusFromTouch();
+        mCourseTable.setSelection(0);
 
         return;
     }

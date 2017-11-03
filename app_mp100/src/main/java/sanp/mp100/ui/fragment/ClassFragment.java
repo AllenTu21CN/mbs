@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,7 +54,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
     private BusinessPlatform.TimeTable mCourse;
 
-    private Boolean mIsTakingClass;
+    private Boolean mInClass;
 
     // course thread
     private CourseThread mCourseThread;
@@ -63,6 +64,9 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     // class fragment message handler
     private Handler mHandler;
 
+    // class waiting, warning, error confirm dialog
+    private CommonDialog mDialog;
+
     private static final int BUTTON_ENABLE_TEXT_COLOR  = 0xffffffff;
     private static final int BUTTON_DISABLE_TEXT_COLOR = 0x646a6a6b;
 
@@ -70,7 +74,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     private static final String CLASS_STATE_IN_CLASS   = "in_class";
     private static final String CLASS_STATE_PLANNED    = "planned";
     private static final String CLASS_STATE_STARTING   = "starting";
-    private static final String CLASS_STATE_STOPING    = "stopping";
+    private static final String CLASS_STATE_STOPPING   = "stopping";
 
     // @brief Implements Fragment
     @Override
@@ -92,6 +96,24 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         initView();
 
         return mClassViewGroup;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        LogManager.i("ClassFragment: onKeyDown, key code: " + keyCode);
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            LogManager.i("ClassFragment: key code is back-key");
+
+            // show the class fragment if it isn't visibility
+            if (mClassViewGroup.getVisibility() == View.GONE)
+                mClassViewGroup.setVisibility(View.VISIBLE);
+
+            showConfirmDialog();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 
     private void initView() {
@@ -136,12 +158,14 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.taking_class_ctrl:
-                if (!mIsTakingClass) startClass();
+                if (!mInClass) startClass();
                 else stopClass();
 
                 break;
             case R.id.hidden_this_view:
-                //TODO
+                LogManager.i("ClassFragment hidden this fragment view");
+                mClassViewGroup.setVisibility(view.GONE);
+
                 break;
             default:
                 break;
@@ -212,6 +236,12 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         // update class fragment view
         updateClassFragmentView();
 
+        if (result == 0 && mDialog != null && mDialog.type() == CommonDialog.DIALOG_CONFIRM) {
+            mDialog.dismiss();
+            mDialog = null;
+            popFragment();
+        }
+
         return;
     }
 
@@ -259,7 +289,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
         mCourseThread.stopClass(mCourse);
 
         // change course state
-        mCourse.status = CLASS_STATE_STOPING;
+        mCourse.status = CLASS_STATE_STOPPING;
 
         // update class card(fragment) view
         updateClassFragmentView();
@@ -278,7 +308,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
         // set class status and ctrl btn view
         if (mCourse.status.equals(CLASS_STATE_PLANNED)) {
-            mIsTakingClass = false;
+            mInClass = false;
 
             mClassStatusView.setText("课程信息");
 
@@ -289,7 +319,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mClassCtrlBtn.setFocusable(true);
 
         } else if (mCourse.status.equals(CLASS_STATE_IN_CLASS)) {
-            mIsTakingClass = true;
+            mInClass = true;
 
             mClassStatusView.setText("正在上课");
 
@@ -300,7 +330,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mClassCtrlBtn.setFocusable(true);
 
         } else if (mCourse.status.equals(CLASS_STATE_FINISHED)) {
-            mIsTakingClass = false;
+            mInClass = false;
 
             mClassStatusView.setText("课程已结束");
 
@@ -322,7 +352,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mClassCtrlBtn.setEnabled(false);
             mClassCtrlBtn.setFocusable(false);
 
-        } else if (mCourse.status.equals(CLASS_STATE_STOPING)) {
+        } else if (mCourse.status.equals(CLASS_STATE_STOPPING)) {
 
             // update class card view
             mClassStatusView.setText("正在结束课程");
@@ -334,5 +364,40 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
             mClassCtrlBtn.setEnabled(false);
             mClassCtrlBtn.setFocusable(false);
         }
+    }
+
+
+    /// Confirm, Warning, Error, Waiting dialog
+
+    public void showConfirmDialog() {
+        mDialog = new CommonDialog(mContext, CommonDialog.DIALOG_CONFIRM);
+
+        mDialog.setTitle("确认退出");
+
+        if (mInClass) mDialog.setExtraText("正在上课, 退出会结束课程！");
+
+        // set dialog button on click listener
+        mDialog.setButtonOnClickListener("取消", "退出", (int button)-> {
+            switch (button) {
+            case CommonDialog.LEFT_BUTTON:
+                mDialog.dismiss();
+                mDialog = null;
+                break;
+            case CommonDialog.RIGHT_BUTTON:
+                if (mInClass) {
+                    LogManager.i("ClassFragment Confirm dialog in-class, stop class");
+                    stopClass();
+                } else {
+                    mDialog.dismiss();
+                    mDialog = null;
+                    popFragment();
+                }
+                break;
+            default:
+                break;
+            }
+        });
+
+        mDialog.show();
     }
 }
