@@ -102,12 +102,13 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         LogManager.i("ClassFragment: onKeyDown, key code: " + keyCode);
 
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            LogManager.i("ClassFragment: key code is back-key");
+        // show the class fragment if it isn't visibility
+        if (mClassViewGroup.getVisibility() == View.GONE) {
+            mClassViewGroup.setVisibility(View.VISIBLE);
+        }
 
-            // show the class fragment if it isn't visibility
-            if (mClassViewGroup.getVisibility() == View.GONE)
-                mClassViewGroup.setVisibility(View.VISIBLE);
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            LogManager.i("ClassFragment: on key is back");
 
             showConfirmDialog();
             return true;
@@ -117,15 +118,15 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     }
 
     private void initView() {
-        mClassStatusView  = (TextView) mClassViewGroup.findViewById(R.id.class_status);
+        mClassStatusView  = mClassViewGroup.findViewById(R.id.class_status);
 
-        mClassNameView    = (TextView) mClassViewGroup.findViewById(R.id.class_name);
-        mClassTeacherView = (TextView) mClassViewGroup.findViewById(R.id.class_teacher);
-        mClassTimeView    = (TextView) mClassViewGroup.findViewById(R.id.class_time);
-        mClassContentView = (TextView) mClassViewGroup.findViewById(R.id.class_content);
+        mClassNameView    = mClassViewGroup.findViewById(R.id.class_name);
+        mClassTeacherView = mClassViewGroup.findViewById(R.id.class_teacher);
+        mClassTimeView    = mClassViewGroup.findViewById(R.id.class_time);
+        mClassContentView = mClassViewGroup.findViewById(R.id.class_content);
 
-        mClassCtrlBtn  = (Button) mClassViewGroup.findViewById(R.id.taking_class_ctrl);
-        mHiddenThisBtn = (Button) mClassViewGroup.findViewById(R.id.hidden_this_view);
+        mClassCtrlBtn  = mClassViewGroup.findViewById(R.id.taking_class_ctrl);
+        mHiddenThisBtn = mClassViewGroup.findViewById(R.id.hidden_this_view);
 
         mClassCtrlBtn.setOnClickListener(this);
         mHiddenThisBtn.setOnClickListener(this);

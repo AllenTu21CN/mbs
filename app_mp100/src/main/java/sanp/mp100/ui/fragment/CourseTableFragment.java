@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -201,15 +202,43 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         super.onResume();
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            LogManager.i("CourseTableFragment: on key is back");
+
+            CommonDialog dialog = new CommonDialog(mContext, CommonDialog.DIALOG_ERROR);
+            dialog.setTitle("确认退出");
+            dialog.setButtonOnClickListener("取消", "退出", (int button)-> {
+                switch (button) {
+                    case CommonDialog.LEFT_BUTTON:
+                        dialog.dismiss();
+                        break;
+                    case CommonDialog.RIGHT_BUTTON:
+                        dialog.dismiss();
+                        popFragment();
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            dialog.show();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
     // @brief Init course table view
     private void initView() {
         // find the course tables
-        mCourseTable  = (GridView) mCourseTableViewGroup.findViewById(R.id.course_table_grid_view);
+        mCourseTable  = mCourseTableViewGroup.findViewById(R.id.course_table_grid_view);
 
         // course date line bar
-        mPrevWeekBtn = (Button) mCourseTableViewGroup.findViewById(R.id.prev_week_btn);
-        mNextWeekBtn = (Button) mCourseTableViewGroup.findViewById(R.id.next_week_btn);
-        mRefreshBtn  = (Button) mCourseTableViewGroup.findViewById(R.id.refresh_btn);
+        mPrevWeekBtn = mCourseTableViewGroup.findViewById(R.id.prev_week_btn);
+        mNextWeekBtn = mCourseTableViewGroup.findViewById(R.id.next_week_btn);
+        mRefreshBtn  = mCourseTableViewGroup.findViewById(R.id.refresh_btn);
 
         //TODO: enable after course thread is running
         //mRefreshBtn.setEnabled(false);
@@ -220,8 +249,8 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         mNextWeekBtn.setOnClickListener(this);
         mRefreshBtn.setOnClickListener(this);
 
-        mMondayDateView = (TextView) mCourseTableViewGroup.findViewById(R.id.monday_date_view);
-        mSundayDataView = (TextView) mCourseTableViewGroup.findViewById(R.id.sunday_date_view);
+        mMondayDateView = mCourseTableViewGroup.findViewById(R.id.monday_date_view);
+        mSundayDataView = mCourseTableViewGroup.findViewById(R.id.sunday_date_view);
 
         // init course table gridview
         initCourseTableGridView();
