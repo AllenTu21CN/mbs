@@ -171,7 +171,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         mIsReady = false;
         mLoadingProgressDialog = new LoadingProgressDialog(mContext, "请稍候, 连接服务中");
 
-        // don't cancel dialog when KEY-BACK
+        // Don't cancel dialog when KEY-BACK
         mLoadingProgressDialog.setCancelable(false);
         mLoadingProgressDialog.show();
 
