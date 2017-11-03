@@ -375,7 +375,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
 
         mDialog.setTitle("确认退出");
 
-        if (mInClass) mDialog.setExtraText("正在上课, 退出会结束课程！");
+        if (mInClass) mDialog.setExtraText("正在上课, 退出会结束课程");
 
         // set dialog button on click listener
         mDialog.setButtonOnClickListener("取消", "退出", (int button)-> {
