@@ -153,7 +153,7 @@ public class CourseAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
+        ViewHolder holder;
         if (convertView == null) {
             holder = new ViewHolder();
 
@@ -173,38 +173,22 @@ public class CourseAdapter extends BaseAdapter {
             TimeTable course = mCourseList.get(position);
             holder.mCourseView.setText(course.subject_name);
 
-            /* TODO, disable item if the course is null
-            // check whether the course is valid
-            if (course.id != -1) {
-                //LogManager.i("Course: " + course.subject_name + " is valid");
-                convertView.setEnabled(true);
-                convertView.setFocusable(true);
-            } else {
-                //LogManager.i("Course[" + position + "] is invalid");
-                convertView.setEnabled(false);
-                convertView.setFocusable(false);
-            }
-            */
-
-            setCourseViewClickHandler(convertView, course);
+            // set view click listener: show a course dialog
+            convertView.setOnClickListener((View v) -> {
+                showCourseDialog(course);
+            });
         }
 
         return convertView;
     }
 
-    // @brief Sets course view item click handler
-    private void setCourseViewClickHandler(View view, TimeTable course) {
-
-        if (course.id == -1) return;
-
-        // set on click listener: show a course dialog
-        view.setOnClickListener((View v) -> { showCourseDialog(course); });
-
-        return;
-    }
-
     // @brief Shows course dialog
     private void showCourseDialog(TimeTable course) {
+        if (course.id == -1) {
+            LogManager.i("CourseAdapter: show course dialog, but id is -1, ignore");
+            return;
+        }
+
         CourseDialog dialog = new CourseDialog(mContext);
 
         dialog.setCourseName(course.subject_name);
@@ -232,13 +216,7 @@ public class CourseAdapter extends BaseAdapter {
 
     // @brief Shows course dialog according to item position
     public void showCourseDialog(int position) {
-        TimeTable course = mCourseList.get(position);
-
-        if (course.id == -1) return;
-
-        showCourseDialog(course);
-
-        return;
+        showCourseDialog(mCourseList.get(position));
     }
 
     private class ViewHolder {

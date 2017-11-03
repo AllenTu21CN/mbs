@@ -241,7 +241,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         // set adapter into course table view
         mCourseTable.setAdapter(mCourseAdapter);
 
-        // set gridview item click handler
+        // set grid view item click handler
         mCourseTable.setOnItemClickListener(
                 (AdapterView<?> parent, View view, int position, long id) -> {
                     mCourseAdapter.showCourseDialog(position);
