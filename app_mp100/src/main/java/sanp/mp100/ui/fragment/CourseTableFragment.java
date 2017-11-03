@@ -1,6 +1,7 @@
 package sanp.mp100.ui.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -169,6 +170,9 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
         mIsReady = false;
         mLoadingProgressDialog = new LoadingProgressDialog(mContext, "请稍候, 连接服务中");
+
+        // don't cancel dialog when KEY-BACK
+        mLoadingProgressDialog.setCancelable(false);
         mLoadingProgressDialog.show();
 
         return mCourseTableViewGroup;
