@@ -102,11 +102,11 @@ public class CommonDialog extends Dialog {
     }
 
     private void initView() {
-        mTitleView = findViewById(R.id.dialog_title_view);
-        mLeftBtn   = findViewById(R.id.dialog_left_btn);
-        mRightBtn  = findViewById(R.id.dialog_right_btn);
+        mTitleView = (TextView) findViewById(R.id.dialog_title_view);
+        mLeftBtn   = (Button) findViewById(R.id.dialog_left_btn);
+        mRightBtn  = (Button) findViewById(R.id.dialog_right_btn);
 
-        mExtraTextView = findViewById(R.id.dialog_extra_text_view);
+        mExtraTextView = (TextView) findViewById(R.id.dialog_extra_text_view);
     }
 
     private void initViewData() {

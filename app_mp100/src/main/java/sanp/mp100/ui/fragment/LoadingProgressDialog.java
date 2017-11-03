@@ -38,11 +38,11 @@ public class LoadingProgressDialog extends Dialog {
         setCanceledOnTouchOutside(false);
 
         // set tip text view
-        TextView  tipsTextView = findViewById(R.id.loading_progress_text_view);
+        TextView  tipsTextView = (TextView) findViewById(R.id.loading_progress_text_view);
         tipsTextView.setText(mLoadingProgressTips);
 
         // set loading progress animation image
-        ImageView imageView = findViewById(R.id.loading_progress_image_view);
+        ImageView imageView = (ImageView) findViewById(R.id.loading_progress_image_view);
         Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.loading_progress_anim);
         imageView.startAnimation(animation);
     }

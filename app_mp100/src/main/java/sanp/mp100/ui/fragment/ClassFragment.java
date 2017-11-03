@@ -118,15 +118,15 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     }
 
     private void initView() {
-        mClassStatusView  = mClassViewGroup.findViewById(R.id.class_status);
+        mClassStatusView  = (TextView) mClassViewGroup.findViewById(R.id.class_status);
 
-        mClassNameView    = mClassViewGroup.findViewById(R.id.class_name);
-        mClassTeacherView = mClassViewGroup.findViewById(R.id.class_teacher);
-        mClassTimeView    = mClassViewGroup.findViewById(R.id.class_time);
-        mClassContentView = mClassViewGroup.findViewById(R.id.class_content);
+        mClassNameView    = (TextView) mClassViewGroup.findViewById(R.id.class_name);
+        mClassTeacherView = (TextView) mClassViewGroup.findViewById(R.id.class_teacher);
+        mClassTimeView    = (TextView) mClassViewGroup.findViewById(R.id.class_time);
+        mClassContentView = (TextView) mClassViewGroup.findViewById(R.id.class_content);
 
-        mClassCtrlBtn  = mClassViewGroup.findViewById(R.id.taking_class_ctrl);
-        mHiddenThisBtn = mClassViewGroup.findViewById(R.id.hidden_this_view);
+        mClassCtrlBtn  = (Button) mClassViewGroup.findViewById(R.id.taking_class_ctrl);
+        mHiddenThisBtn = (Button) mClassViewGroup.findViewById(R.id.hidden_this_view);
 
         mClassCtrlBtn.setOnClickListener(this);
         mHiddenThisBtn.setOnClickListener(this);

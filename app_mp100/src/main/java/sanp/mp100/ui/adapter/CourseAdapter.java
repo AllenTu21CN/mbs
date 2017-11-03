@@ -156,7 +156,7 @@ public class CourseAdapter extends BaseAdapter {
             holder = new ViewHolder();
 
             convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item, null);
-            holder.mCourseView = convertView.findViewById(R.id.course_name_view);
+            holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view);
 
             //convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item_bak, null);
             //holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view_bak);
