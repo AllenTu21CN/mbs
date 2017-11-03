@@ -83,7 +83,7 @@ public class CourseAdapter extends BaseAdapter {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
         for(TimeTable it : list) {
-            Date date = null;
+            Date date;
             try {
                 date = format.parse(it.date);
             } catch (Exception e) {
@@ -93,7 +93,7 @@ public class CourseAdapter extends BaseAdapter {
             }
 
             // calc days from monday in week
-            int days = CourseTable.daysBetween(monday, date);
+            int days = CourseTableFragment.daysBetween(monday, date);
             if (days < 0 || days >= 7) {
                 LogManager.w("Course: " + it.subject_name  + ", Section: " +
                     it.section + ", date: " + it.date + " is not in this week");
@@ -136,8 +136,6 @@ public class CourseAdapter extends BaseAdapter {
             course.duration     = it.duration;
             course.status       = it.status;
         }
-
-        return;
     }
 
     @Override
@@ -158,7 +156,7 @@ public class CourseAdapter extends BaseAdapter {
             holder = new ViewHolder();
 
             convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item, null);
-            holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view);
+            holder.mCourseView = convertView.findViewById(R.id.course_name_view);
 
             //convertView = LayoutInflater.from(mContext).inflate(R.layout.course_item_bak, null);
             //holder.mCourseView = (TextView) convertView.findViewById(R.id.course_name_view_bak);
