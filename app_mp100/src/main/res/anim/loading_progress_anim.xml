@@ -13,7 +13,7 @@
         android:repeatCount="-1"
         android:repeatMode="restart"
         android:interpolator="@android:anim/linear_interpolator"
-        android:duration="800"
+        android:duration="2500"
         />
     <!--
         fromDegrees   动画开始时的角度

@@ -65,6 +65,10 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     // course table message handler
     private Handler mHandler = null;
 
+    // course table loading progress dialog
+    private LoadingProgressDialog mLoadingProgressDialog;
+    private boolean mIsReady;
+
     // message
     private static final int MSG_COURSE_TABLE_READY = 0;
     private static final int MSG_UPDATE_COURSE_TABLE = 1;
@@ -99,7 +103,13 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     // - Something error is happened
     @Override
     public void onError(int error) {
-        //TODO
+        /*
+        mIsReady = false;
+        mLoadingProgressDialog = new LoadingProgressDialog(mContext, "请稍候, 连接服务中");
+        mLoadingProgressDialog.show();
+        */
+
+        //TODO, send message to ui thread and then show loading progress dialog
     }
 
     // - Checkout courses suc
@@ -157,6 +167,10 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         // load all view: date line bar, course table gridview and so on.
         initView();
 
+        mIsReady = false;
+        mLoadingProgressDialog = new LoadingProgressDialog(mContext, "请稍候, 连接服务中");
+        mLoadingProgressDialog.show();
+
         return mCourseTableViewGroup;
     }
 
@@ -204,6 +218,8 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (!mIsReady) return true; // Service is un-connected
+
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             LogManager.i("CourseTableFragment: on key is back");
 
@@ -323,6 +339,15 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
                switch (msg.what) {
                case MSG_COURSE_TABLE_READY:
                    LogManager.i("CourseTable handle MSG_COURSE_TABLE_READY");
+
+                   // dismiss load-progress dialog
+                   if (mLoadingProgressDialog != null) {
+                       mLoadingProgressDialog.dismiss();
+                       mLoadingProgressDialog = null;
+
+                       mIsReady = true;
+                   }
+
                    checkoutCourseForCurrent();
                    break;
                case MSG_UPDATE_COURSE_TABLE:
