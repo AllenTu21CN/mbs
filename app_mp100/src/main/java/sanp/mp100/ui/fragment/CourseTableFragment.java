@@ -1,7 +1,6 @@
 package sanp.mp100.ui.fragment;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -71,8 +70,9 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     private boolean mIsReady;
 
     // message
-    private static final int MSG_COURSE_TABLE_READY = 0;
-    private static final int MSG_UPDATE_COURSE_TABLE = 1;
+    private static final int MSG_COURSE_TABLE_READY           = 0;
+    private static final int MSG_COURSE_TABLE_LOST_CONNECTION = 1;
+    private static final int MSG_UPDATE_COURSE_TABLE          = 2;
 
     // course table fragment single instance
     private static CourseTableFragment mCourseTableFragment = null;
@@ -110,7 +110,19 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         mLoadingProgressDialog.show();
         */
 
-        //TODO, send message to ui thread and then show loading progress dialog
+        LogManager.i("CourseTableFragment onError, send msg to ui thread");
+
+        // prepare message: lost connection
+        Message msg = Message.obtain();
+        msg.what = MSG_COURSE_TABLE_LOST_CONNECTION;
+        msg.arg1 = error;
+
+        if (!mHandler.sendMessage(msg)) {
+            LogManager.e("CourseTableFragment onError, send message failed");
+            return;
+        }
+
+        return;
     }
 
     // - Checkout courses suc
@@ -358,6 +370,15 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
                    LogManager.i("CourseTable handle MSG_UPDATE_COURSE_TABLE");
                    updateCourseTable((List<TimeTable>)msg.obj);
                    break;
+               case MSG_COURSE_TABLE_LOST_CONNECTION:
+                   LogManager.i("CourseTable handle MSG_TABLE_LOST_CONNECTION");
+                   mIsReady = false;
+
+                   mLoadingProgressDialog = new LoadingProgressDialog(mContext,
+                       "连接断开, 重连中");
+                   mLoadingProgressDialog.setCancelable(false);
+                   mLoadingProgressDialog.show();
+                   break;
                default:
                    LogManager.w("CourseTable handle unknown message: " + msg.what);
                    break;
@@ -374,12 +395,9 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
          * it'll be output in CourseAdapter.updateCourseList()
         String courses = "Table:\n";
         for (TimeTable it : list) {
-            courses += "Id: " + it.id +
-                "; Type: " + it.type +
-                "; Subject Name: " + it.subject_name +
-                "; Title:  " + it.title +
-                "; Date: " + it.date +
-                "; Section: "+ it.section + "\n";
+            courses += "Id: " + it.id + "; Type: " + it.type +
+                "; Subject Name: " + it.subject_name + "; Title:  " + it.title +
+                "; Date: " + it.date + "; Section: "+ it.section + "\n";
         }
 
         LogManager.i(courses);
