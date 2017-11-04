@@ -250,7 +250,7 @@ public class ClassFragment extends BaseFragment implements View.OnClickListener,
     public void setClassCourse(BusinessPlatform.TimeTable course) {
         mCourse = course;
         // calc class time: date + week-day
-        mClassTime = CourseTableFragment.dateWithWeekDay(course.date) + " 第" + course.section + "节";
+        mClassTime = CourseTableFragment.date2WeekDay(course.date) + " 第" + course.section + "节";
     }
 
     // @brief Sets course thread handler

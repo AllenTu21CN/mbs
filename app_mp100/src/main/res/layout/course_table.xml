@@ -12,106 +12,117 @@
         android:background="@drawable/bk_cyan_1440_900"
         android:orientation="vertical">
 
-        <!-- Dateline -->
         <LinearLayout
-            android:id="@+id/course_table_dateline"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40px"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal"
-            android:background="@color/date_bar_color"
-            >
+            android:orientation="horizontal">
 
-            <!--
-            sidebar     date line      sidebar
-            + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
-            |260px|      1400px        |260px|
-            + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
-            -->
-
-            <!-- Button size: 80*35 px -->
-
-            <!-- Prev week button -->
-            <Button
-                android:id="@+id/prev_week_btn"
-                android:layout_width="100px"
-                android:layout_height="50px"
-                android:layout_marginLeft="3px"
-                android:layout_marginBottom="3px"
-                android:layout_marginTop="3px"
-                android:background="@drawable/week_button_selector"
-                android:text="前一周"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:nextFocusLeft="@id/refresh_btn"
-                android:nextFocusDown="@id/course_table_grid_view"
-                android:nextFocusUp="@null"/>
+            <!-- Dateline -->
+            <LinearLayout
+                android:layout_width="580px"
+                android:layout_height="120px"
+                android:layout_marginLeft="260px"
+                android:layout_marginTop="10px"
+                android:orientation="vertical"
+                android:background="@drawable/course_table_date_bar_bk">
 
 
-            <!-- Shows Monday and Sunday date time -->
-            <TextView
-                android:id="@+id/monday_date_view"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:layout_marginLeft="20px"
-                android:layout_gravity="center_vertical"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"/>
+                <!-- Today's date -->
+                <TextView
+                    android:id="@+id/today_date_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="今日日期 2017/11/6 星期一"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10px"
-                android:layout_gravity="center_vertical"
-                android:text=" ~ "
-                android:textColor="@android:color/white"
-                android:textSize="18sp"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1px"
+                    android:background="@android:color/white"/>
 
-            <TextView
-                android:id="@+id/sunday_date_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10px"
-                android:layout_gravity="center_vertical"
-                android:textColor="@android:color/white"
-                android:textSize="18sp"/>
+                <TextView
+                    android:id="@+id/course_table_date_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="课表日期 2017/11/6 - 2017/11/12"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"/>
 
-            <!-- Next week button -->
-            <Button
-                android:id="@+id/next_week_btn"
-                android:layout_width="100px"
-                android:layout_height="50px"
-                android:layout_marginLeft="20px"
-                android:layout_marginRight="3px"
-                android:layout_marginTop="3px"
-                android:layout_marginBottom="3px"
-                android:background="@drawable/week_button_selector"
-                android:text="后一周"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:nextFocusDown="@id/course_table_grid_view"
-                android:nextFocusUp="@null"/>
+            </LinearLayout>
 
-            <!-- refresh button -->
-            <Button
-                android:id="@+id/refresh_btn"
-                android:layout_width="134px"
-                android:layout_height="50px"
-                android:layout_marginLeft="20px"
-                android:layout_marginRight="3px"
-                android:layout_marginTop="3px"
-                android:layout_marginBottom="3px"
-                android:background="@drawable/week_button_selector"
-                android:text="刷新课表"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
-                android:nextFocusRight="@id/prev_week_btn"
-                android:nextFocusDown="@id/course_table_grid_view"
-                android:nextFocusUp="@null"/>
+            <LinearLayout
+                android:layout_width="500px"
+                android:layout_height="80px"
+                android:layout_marginLeft="160px"
+                android:layout_marginTop="50px"
+                android:orientation="horizontal"
+                android:background="@drawable/course_table_date_bar_button_bk">
+                <!-- #f9f9f9 -->
 
+                <!-- Prev week button -->
+                <Button
+                    android:id="@+id/prev_week_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/course_table_date_bar_button_selector"
+                    android:gravity="center"
+                    android:nextFocusLeft="@id/next_week_btn"
+                    android:nextFocusDown="@id/course_table_grid_view"
+                    android:nextFocusUp="@null"
+                    android:text="前一周"
+                    android:textSize="16sp"
+                    android:textColor="#b8b8b8" />
+
+                <View
+                    android:layout_width="1px"
+                    android:layout_height="match_parent"
+                    android:background="#717070"/>
+
+                <!-- Refresh course table button -->
+                <Button
+                    android:id="@+id/refresh_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/course_table_date_bar_button_selector"
+                    android:gravity="center"
+                    android:nextFocusDown="@id/course_table_grid_view"
+                    android:nextFocusUp="@null"
+                    android:text="刷新课表"
+                    android:textSize="16sp"
+                    android:textColor="#b8b8b8" />
+
+                <View
+                    android:layout_width="1px"
+                    android:layout_height="match_parent"
+                    android:background="#717070"/>
+
+                <!-- Next week button -->
+                <Button
+                    android:id="@+id/next_week_btn"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/course_table_date_bar_button_selector"
+                    android:gravity="center"
+                    android:nextFocusRight="@id/prev_week_btn"
+                    android:nextFocusDown="@id/course_table_grid_view"
+                    android:nextFocusUp="@null"
+                    android:text="后一周"
+                    android:textSize="16sp"
+                    android:textColor="#b8b8b8" />
+
+
+            </LinearLayout>
 
         </LinearLayout>
+
 
         <!-- author: will@1dao2.com
              date:   2017/10/22

@@ -15,7 +15,6 @@ import java.util.List;
 import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.ui.CourseDialog;
-import sanp.mp100.ui.CourseTable;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
 import sanp.mp100.ui.fragment.CourseTableFragment;
 
@@ -191,7 +190,7 @@ public class CourseAdapter extends BaseAdapter {
 
         dialog.setCourseName(course.subject_name);
         dialog.setCourseTeacher(course.teacher_name);
-        dialog.setCourseTime(CourseTableFragment.dateWithWeekDay(course.date) +
+        dialog.setCourseTime(CourseTableFragment.date2WeekDay(course.date) +
             " 第" + course.section + "节");
         dialog.setCourseContent(course.title);
 

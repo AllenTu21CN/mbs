@@ -53,8 +53,9 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     private Button   mPrevWeekBtn;
     private Button   mNextWeekBtn;
     private Button   mRefreshBtn;
-    private TextView mMondayDateView;
-    private TextView mSundayDataView;
+
+    private TextView mTodayView;
+    private TextView mCourseTableDateView;
 
     // course adapter
     private CourseAdapter mCourseAdapter = null;
@@ -282,8 +283,8 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         mNextWeekBtn.setOnClickListener(this);
         mRefreshBtn.setOnClickListener(this);
 
-        mMondayDateView = (TextView) mCourseTableViewGroup.findViewById(R.id.monday_date_view);
-        mSundayDataView = (TextView) mCourseTableViewGroup.findViewById(R.id.sunday_date_view);
+        mTodayView = (TextView) mCourseTableViewGroup.findViewById(R.id.today_date_view);
+        mCourseTableDateView = (TextView) mCourseTableViewGroup.findViewById(R.id.course_table_date_view);
 
         // init course table grid view
         initCourseTableGridView();
@@ -333,9 +334,11 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     private void updateDateLineBarView() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-        // set monday's date
-        mMondayDateView.setText(format.format(mCourseTableMonday));
+        // set today's date, todo: move this into onCreateView
+        Date date = new Date();
+        mTodayView.setText("今日日期 " + format.format(date) + " " + date2WeekDay(date));
 
+        // set current course table date
         Calendar calendar = Calendar.getInstance();
 
         // calc sunday's date
@@ -344,8 +347,8 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
         Date sunday = calendar.getTime();
 
-        // set sunday's date
-        mSundayDataView.setText(format.format(sunday));
+        mCourseTableDateView.setText("课表日期 " + format.format(mCourseTableMonday) +
+            " - " + format.format(sunday));
     }
 
     // init course table message handler
@@ -467,7 +470,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         return days;
     }
 
-    public static String dateWithWeekDay(String date) {
+    public static String date2WeekDay(String date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
         Date time;
@@ -475,10 +478,13 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
             return date;
         }
 
-        Calendar calendar= Calendar.getInstance();
-        calendar.setTime(time);
-        String day = "";
+        return date2WeekDay(time);
+    }
 
+    public static String date2WeekDay(Date date) {
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTime(date);
+        String day = "";
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.MONDAY:    day = "星期一"; break;
             case Calendar.TUESDAY:   day = "星期二"; break;
