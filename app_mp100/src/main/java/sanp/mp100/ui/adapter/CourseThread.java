@@ -268,8 +268,6 @@ public class CourseThread implements Runnable, BusinessPlatform.Observer {
 
         LogManager.i("CourseThread onStartClass: start class");
 
-        RBUtil.getInstance().setScene(RBUtil.Scene.InClass);
-
         try {
             BusinessPlatform.getInstance().startPlanned(course.id);
             LogManager.i("CourseThread success to start class");
@@ -289,8 +287,6 @@ public class CourseThread implements Runnable, BusinessPlatform.Observer {
         int result = 0;
 
         LogManager.i("CourseThread onStopClass: stop class");
-
-        RBUtil.getInstance().setScene(RBUtil.Scene.ShowTimeTable);
 
         try {
             BusinessPlatform.getInstance().stopPlanned(course.id);

@@ -27,6 +27,15 @@ public class MP100Application extends Application {
     public static final String HOME_EXTERNAL_PATH = EXTERNAL_STORAGE_DIRECTORY  + "MP100";
     public static final String TMP_FILE_PATH = EXTERNAL_STORAGE_DIRECTORY  + TMP_FILE_PREFIX;
 
+    private static final Map<String, Integer> RES_BG_FILES = new HashMap<String, Integer>() {{
+        put("video_bg.jpg", R.raw.video_bg);
+        put("overlapping_1.jpg", R.raw.overlapping_1);
+        put("overlapping_2.jpg", R.raw.overlapping_2);
+        put("overlapping_3.jpg", R.raw.overlapping_3);
+        put("overlapping_4.jpg", R.raw.overlapping_4);
+        put("symmetrical_2.jpg", R.raw.symmetrical_2);
+        put("asymmetric_3.jpg", R.raw.asymmetric_3);
+    }};
 
     private static final Map<String, Integer> TMP_SETTINGS_FILES = new HashMap<String, Integer>() {{
         put("connection.json", R.raw.connection);
@@ -46,6 +55,7 @@ public class MP100Application extends Application {
     public void onCreate() {
         super.onCreate();
 
+        saveResBgPicturesToStorage();
         saveTmpSettingsFilesToStorage();
         saveMp4ToStorage();
     }
@@ -71,6 +81,16 @@ public class MP100Application extends Application {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException("not found " + tmpFile);
+        }
+    }
+
+    private void saveResBgPicturesToStorage() {
+        for(String filename: RES_BG_FILES.keySet()) {
+            try {
+                FileSaveUtils.saveToSDCard(this, HOME_EXTERNAL_PATH, filename, RES_BG_FILES.get(filename));
+            } catch (Throwable e) {
+                LogManager.e("saveResBgPicturesToStorage error " + e);
+            }
         }
     }
 

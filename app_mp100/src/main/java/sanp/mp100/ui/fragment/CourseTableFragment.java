@@ -479,6 +479,15 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
     //@brief Enter course's course_class to decide taking course_class
     public void enterTakingClassFragment(@NonNull TimeTable course) {
+        LessonHomeFragment fragment = LessonHomeFragment.getInstance();
+
+        fragment.reset(course, mCourseThread);
+
+        // show class fragment
+        showFragment(TAG, R.id.fragmentLayout, fragment, LessonHomeFragment.TAG);
+    }
+
+    public void enterTakingClassFragment2(@NonNull TimeTable course) {
         ClassFragment fragment = ClassFragment.getInstance();
 
         // set course thread

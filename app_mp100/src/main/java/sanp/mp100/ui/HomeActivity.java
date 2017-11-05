@@ -96,13 +96,9 @@ public class HomeActivity extends FragmentActivity {
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if (mHomeFragment.isVisible()) {
-                return true;
-            }
-        }
         if (BaseFragment.mFragmentList.size() > 0)
-            BaseFragment.mFragmentList.get(0).onKeyDown(keyCode, event);
+            if(BaseFragment.mFragmentList.get(0).onKeyDown(keyCode, event))
+                return true;
         return super.onKeyDown(keyCode, event);
     }
 

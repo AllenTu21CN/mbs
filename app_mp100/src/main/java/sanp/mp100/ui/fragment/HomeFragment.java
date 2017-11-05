@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import sanp.avalon.libs.base.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.test.ui.fragment.DeviceTestFragment;
 
@@ -46,29 +47,31 @@ public class HomeFragment extends BaseFragment {
     }
 
     public void initView(View view) {
+        showNextFragment();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            showNextFragment();
+            return true;
+        }
+        LogManager.w("TODO: captured other keys");
+        return false;
+    }
+
+    private void showNextFragment() {
         if(DeviceTestFragment.Enabled)
             showDeviceTest();
         else
             showCourseTable();
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        return super.onKeyDown(keyCode, event);
-    }
-
-    @Override
-    public boolean onBackDown(int keyCode, KeyEvent event) {
-        getActivity().onBackPressed();
-        return super.onBackDown(keyCode, event);
-    }
-
-    // @brief Changes fragment to show course table
-    public void showCourseTable() {
+    private void showCourseTable() {
         showFragment(TAG, R.id.fragmentLayout, CourseTableFragment.getInstance(), CourseTableFragment.TAG);
     }
 
-    public void showDeviceTest() {
+    private void showDeviceTest() {
         showFragment(TAG, R.id.fragmentLayout, new DeviceTestFragment(), DeviceTestFragment.TAG);
     }
 }

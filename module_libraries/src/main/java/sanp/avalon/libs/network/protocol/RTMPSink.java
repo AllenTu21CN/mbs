@@ -230,6 +230,7 @@ public class RTMPSink implements Runnable, RTMPPushClient.Callback {
         LogManager.i("RTMPSink thread started!");
         AVPacket pkt = null;
         long first_video_pts = -1;
+        long last_video_pts = -1;
         boolean is_wait_iframe = true;
         boolean is_weak = false;
         long encoded_frames = 0;
@@ -297,9 +298,18 @@ public class RTMPSink implements Runnable, RTMPPushClient.Callback {
                         }
                     }
                     pts = pts - first_video_pts;
+                    if(pkt.getMediaType() == DataType.VIDEO) {
+                        pts = pts / 1000;
+                        if(last_video_pts != -1 && pts <= last_video_pts) {
+                            pts = last_video_pts + 1;
+                            LogManager.w("!!! fix encoded frame pts");
+                        }
+                        last_video_pts = pts;
+                        pts = pts * 1000;
+                    }
                     int stream_id = m_track2stream_IDs.get(track_id);
                     m_rtmp_client.write(stream_id, payload.array(), payload.position(), payload.remaining(), pts, flag);
-                    // LogManager.i("id-" + stream_id + " pts-" + pts);
+                    //LogManager.i("id-" + stream_id + " pts-" + pts);
                 }
                 resetPkt(pkt);
             }

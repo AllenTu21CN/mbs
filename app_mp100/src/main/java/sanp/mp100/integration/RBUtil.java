@@ -240,6 +240,7 @@ public class RBUtil implements MediaController.Observer {
     private RBUtil() {
         MediaEngine.enableAttachSPSPPPS2IFrame(false);
         mMediaController = MediaController.getInstance();
+        mMediaController.RES_PATH = MP100Application.HOME_EXTERNAL_PATH;
         mMediaController.addObserver(this);
         reset();
     }
@@ -376,7 +377,11 @@ public class RBUtil implements MediaController.Observer {
         return -1;
     }
 
-    public List<String> getSceneContentName(Scene scene) {
+    public List<String> getSceneContentNames() {
+        return getSceneContentNames(mCurrentScene);
+    }
+
+    public List<String> getSceneContentNames(Scene scene) {
         synchronized (mLock) {
             List<Content> contents = mSupportingScenes.get(scene);
             if(contents == null) {
@@ -387,6 +392,49 @@ public class RBUtil implements MediaController.Observer {
             for(Content content: contents)
                 names.add(content.name);
             return names;
+        }
+    }
+
+    public List<Role> getSceneContentMainRoles() {
+        synchronized (mLock) {
+            List<Role> roles = new ArrayList<>();
+            if(mCurrentContent != null) {
+                roles.addAll(mCurrentContent.roleCandidates.get(0));
+            }
+            return roles;
+        }
+    }
+
+    public List<Role> getSceneContentMainRoles(Scene scene, String contentName) {
+        return null;
+    }
+
+    public int selectMainSreenRole(Role role) {
+        return selectSubScreenRole(0, role);
+    }
+
+    public int selectSubScreenRole(int subScreenIndex, Role role) {
+        synchronized (mLock) {
+            if(mCurrentContent == null)
+                throw new RuntimeException("RBUtil logical error: has no content in current scene");
+            List<Role> roles = mCurrentContent.roleCandidates.get(subScreenIndex);
+            if(roles == null)
+                throw new RuntimeException("RBUtil logical error: current content has no this sub-screen-" + subScreenIndex);
+            if(!roles.contains(role))
+                throw new RuntimeException("RBUtil logical error: current content sub-screen-" + subScreenIndex + " has no this role-" + role.toString());
+
+            Source source = getSourceByRole(role);
+            if(source == null) // this role has not been bound with any source
+                return -1;
+
+            Role curRoleInThisSubScreen = mCurrentContentRoles.get(subScreenIndex);
+            if(curRoleInThisSubScreen != null && curRoleInThisSubScreen == role) // this role has in the screen
+                return 0;
+
+            String pos = ScreenLayout.getSubScreenPosition(mCurrentContent.layout, mCurrentContent.subScreenCnt, subScreenIndex);
+            mMediaController.setSourcePosition(source.id, source.pattern, pos);
+            mCurrentContentRoles.put(subScreenIndex, role);
+            return 0;
         }
     }
 
