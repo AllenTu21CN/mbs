@@ -22,6 +22,7 @@ import sanp.mp100.R;
 import sanp.mp100.ui.adapter.CourseAdapter;
 import sanp.mp100.ui.adapter.CourseThread;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
+import sanp.mp100.ui.fragment.CourseTableFragment;
 
 /**
  * @brief Course table activity, It will show courses on course table view.
@@ -47,8 +48,9 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     private Button   mPrevWeekBtn;
     private Button   mNextWeekBtn;
     private Button   mRefreshBtn;
-    private TextView mMondayDateView;
-    private TextView mSundayDataView;
+
+    private TextView mTodayView;
+    private TextView mCourseTableDateView;
 
     // course adapter
     private CourseAdapter mCourseAdapter = null;
@@ -153,8 +155,8 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
         mNextWeekBtn.setOnClickListener(this);
         mRefreshBtn.setOnClickListener(this);
 
-        mMondayDateView = (TextView) findViewById(R.id.monday_date_view);
-        mSundayDataView = (TextView) findViewById(R.id.sunday_date_view);
+        mTodayView = (TextView) findViewById(R.id.today_date_view);
+        mCourseTableDateView = (TextView) findViewById(R.id.course_table_date_view);
 
         // init course table gridview
         initCourseTableGridView();
@@ -204,8 +206,10 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
     private void updateDateLineBarView() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-        // set monday's date
-        mMondayDateView.setText(format.format(mCourseTableMonday));
+        // set today's date, todo: move this into onCreate
+        Date date = new Date();
+        mTodayView.setText("今日日期 " + format.format(date) + " " +
+                CourseTableFragment.date2WeekDay(date));
 
         Calendar calendar = Calendar.getInstance();
 
@@ -215,8 +219,8 @@ public class CourseTable extends Activity implements View.OnClickListener, Cours
 
         Date sunday = calendar.getTime();
 
-        // set sunday's date
-        mSundayDataView.setText(format.format(sunday));
+        mCourseTableDateView.setText("课表日期 " + format.format(mCourseTableMonday) +
+                " - " + format.format(sunday));
     }
 
     // init ui message handler

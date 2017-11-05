@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,8 +53,9 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     private Button   mPrevWeekBtn;
     private Button   mNextWeekBtn;
     private Button   mRefreshBtn;
-    private TextView mMondayDateView;
-    private TextView mSundayDataView;
+
+    private TextView mTodayView;
+    private TextView mCourseTableDateView;
 
     // course adapter
     private CourseAdapter mCourseAdapter = null;
@@ -64,9 +66,19 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     // course table message handler
     private Handler mHandler = null;
 
+    // course table loading progress dialog
+    private LoadingProgressDialog mLoadingProgressDialog;
+    private boolean mIsReady;
+
     // message
-    private static final int MSG_COURSE_TABLE_READY = 0;
-    private static final int MSG_UPDATE_COURSE_TABLE = 1;
+    private static final int MSG_COURSE_TABLE_READY           = 0;
+    private static final int MSG_COURSE_TABLE_LOST_CONNECTION = 1;
+    private static final int MSG_UPDATE_COURSE_TABLE          = 2;
+
+    // week
+    private static final int CURRENT_WEEK = 0;
+    private static final int PREV_WEEK    = 1;
+    private static final int NEXT_WEEK    = 2;
 
     // course table fragment single instance
     private static CourseTableFragment mCourseTableFragment = null;
@@ -98,7 +110,25 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     // - Something error is happened
     @Override
     public void onError(int error) {
-        //TODO
+        /*
+        mIsReady = false;
+        mLoadingProgressDialog = new LoadingProgressDialog(mContext, "请稍候, 连接服务中");
+        mLoadingProgressDialog.show();
+        */
+
+        LogManager.i("CourseTableFragment onError, send msg to ui thread");
+
+        // prepare message: lost connection
+        Message msg = Message.obtain();
+        msg.what = MSG_COURSE_TABLE_LOST_CONNECTION;
+        msg.arg1 = error;
+
+        if (!mHandler.sendMessage(msg)) {
+            LogManager.e("CourseTableFragment onError, send message failed");
+            return;
+        }
+
+        return;
     }
 
     // - Checkout courses suc
@@ -156,6 +186,13 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         // load all view: date line bar, course table gridview and so on.
         initView();
 
+        mIsReady = false;
+        mLoadingProgressDialog = new LoadingProgressDialog(mContext, "请稍候, 连接服务中");
+
+        // Don't cancel dialog when KEY-BACK
+        mLoadingProgressDialog.setCancelable(false);
+        mLoadingProgressDialog.show();
+
         return mCourseTableViewGroup;
     }
 
@@ -201,6 +238,36 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         super.onResume();
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (!mIsReady) return true; // Service is un-connected
+
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            LogManager.i("CourseTableFragment: on key is back");
+
+            CommonDialog dialog = new CommonDialog(mContext, CommonDialog.DIALOG_ERROR);
+            dialog.setTitle("确认退出");
+            dialog.setButtonOnClickListener("取消", "退出", (int button)-> {
+                switch (button) {
+                    case CommonDialog.LEFT_BUTTON:
+                        dialog.dismiss();
+                        break;
+                    case CommonDialog.RIGHT_BUTTON:
+                        dialog.dismiss();
+                        popFragment();
+                        break;
+                    default:
+                        break;
+                }
+            });
+
+            dialog.show();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
     // @brief Init course table view
     private void initView() {
         // find the course tables
@@ -211,19 +278,15 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         mNextWeekBtn = (Button) mCourseTableViewGroup.findViewById(R.id.next_week_btn);
         mRefreshBtn  = (Button) mCourseTableViewGroup.findViewById(R.id.refresh_btn);
 
-        //TODO: enable after course thread is running
-        //mRefreshBtn.setEnabled(false);
-        //mRefreshBtn.setFocusable(false);
-
-
+        // set button on click listener
         mPrevWeekBtn.setOnClickListener(this);
         mNextWeekBtn.setOnClickListener(this);
         mRefreshBtn.setOnClickListener(this);
 
-        mMondayDateView = (TextView) mCourseTableViewGroup.findViewById(R.id.monday_date_view);
-        mSundayDataView = (TextView) mCourseTableViewGroup.findViewById(R.id.sunday_date_view);
+        mTodayView = (TextView) mCourseTableViewGroup.findViewById(R.id.today_date_view);
+        mCourseTableDateView = (TextView) mCourseTableViewGroup.findViewById(R.id.course_table_date_view);
 
-        // init course table gridview
+        // init course table grid view
         initCourseTableGridView();
 
         // init date
@@ -241,7 +304,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         // set adapter into course table view
         mCourseTable.setAdapter(mCourseAdapter);
 
-        // set gridview item click handler
+        // set grid view item click handler
         mCourseTable.setOnItemClickListener(
                 (AdapterView<?> parent, View view, int position, long id) -> {
                     mCourseAdapter.showCourseDialog(position);
@@ -271,9 +334,11 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     private void updateDateLineBarView() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
-        // set monday's date
-        mMondayDateView.setText(format.format(mCourseTableMonday));
+        // set today's date, todo: move this into onCreateView
+        Date date = new Date();
+        mTodayView.setText("今日日期 " + format.format(date) + " " + date2WeekDay(date));
 
+        // set current course table date
         Calendar calendar = Calendar.getInstance();
 
         // calc sunday's date
@@ -282,8 +347,8 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
 
         Date sunday = calendar.getTime();
 
-        // set sunday's date
-        mSundayDataView.setText(format.format(sunday));
+        mCourseTableDateView.setText("课表日期 " + format.format(mCourseTableMonday) +
+            " - " + format.format(sunday));
     }
 
     // init course table message handler
@@ -294,11 +359,32 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
                switch (msg.what) {
                case MSG_COURSE_TABLE_READY:
                    LogManager.i("CourseTable handle MSG_COURSE_TABLE_READY");
-                   checkoutCourseForCurrent();
+
+                   // dismiss load-progress dialog
+                   if (mLoadingProgressDialog != null) {
+                       mLoadingProgressDialog.dismiss();
+                       mLoadingProgressDialog = null;
+
+                       mIsReady = true;
+                   }
+
+                   // checkout current week course table
+                   checkoutCourseTable(CURRENT_WEEK);
                    break;
                case MSG_UPDATE_COURSE_TABLE:
                    LogManager.i("CourseTable handle MSG_UPDATE_COURSE_TABLE");
                    updateCourseTable((List<TimeTable>)msg.obj);
+                   break;
+               case MSG_COURSE_TABLE_LOST_CONNECTION:
+                   LogManager.i("CourseTable handle MSG_TABLE_LOST_CONNECTION");
+                   mIsReady = false;
+
+                   if (mLoadingProgressDialog == null) {
+                       mLoadingProgressDialog = new LoadingProgressDialog(mContext,
+                               "连接断开, 重连中");
+                       mLoadingProgressDialog.setCancelable(false);
+                       mLoadingProgressDialog.show();
+                   }
                    break;
                default:
                    LogManager.w("CourseTable handle unknown message: " + msg.what);
@@ -316,25 +402,33 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
          * it'll be output in CourseAdapter.updateCourseList()
         String courses = "Table:\n";
         for (TimeTable it : list) {
-            courses += "Id: " + it.id +
-                "; Type: " + it.type +
-                "; Subject Name: " + it.subject_name +
-                "; Title:  " + it.title +
-                "; Date: " + it.date +
-                "; Section: "+ it.section + "\n";
+            courses += "Id: " + it.id + "; Type: " + it.type +
+                "; Subject Name: " + it.subject_name + "; Title:  " + it.title +
+                "; Date: " + it.date + "; Section: "+ it.section + "\n";
         }
 
         LogManager.i(courses);
         */
 
-        //TODO, update course table view
-        //2017/10/28
+        // dismiss the checkout course loading-progress dialog
+        if (mLoadingProgressDialog != null) {
+            mLoadingProgressDialog.dismiss();
+            mLoadingProgressDialog = null;
+        }
 
+        // update week time bar
+        updateDateLineBarView();
+
+        //2017/10/28
         // update course adapter course-list
         mCourseAdapter.updateCourseList(list, mCourseTableMonday);
 
         // notify to adapter update course table
         mCourseAdapter.notifyDataSetChanged();
+
+        // set default focus on 1st course
+        mCourseTable.requestFocusFromTouch();
+        mCourseTable.setSelection(0);
 
         return;
     }
@@ -376,7 +470,7 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         return days;
     }
 
-    public static String dateWithWeekDay(String date) {
+    public static String date2WeekDay(String date) {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
         Date time;
@@ -384,10 +478,13 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
             return date;
         }
 
-        Calendar calendar= Calendar.getInstance();
-        calendar.setTime(time);
-        String day = "";
+        return date2WeekDay(time);
+    }
 
+    public static String date2WeekDay(Date date) {
+        Calendar calendar= Calendar.getInstance();
+        calendar.setTime(date);
+        String day = "";
         switch (calendar.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.MONDAY:    day = "星期一"; break;
             case Calendar.TUESDAY:   day = "星期二"; break;
@@ -405,14 +502,13 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.prev_week_btn:
-                checkoutPrevWeekCourse();
+                checkoutCourseTable(PREV_WEEK);
                 break;
             case R.id.next_week_btn:
-                checkoutNextWeekCourse();
+                checkoutCourseTable(NEXT_WEEK);
                 break;
-
             case R.id.refresh_btn:
-                checkoutCourseForCurrent();
+                checkoutCourseTable(CURRENT_WEEK);
                 break;
 
             default:
@@ -420,61 +516,40 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         }
     }
 
-    // @brief Checkouts current time courses
-    private void checkoutCourseForCurrent() {
-        LogManager.i("CourseTableFragment checkout current week's courses");
-
-        // checkout this week's courses
-        // days: 6 + include monday = 7 days
-        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
-    }
-
-    // @brief Checkouts prev week courses
-    private void checkoutPrevWeekCourse() {
-        LogManager.i("CourseTableFragment checkout prev week's courses");
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-        LogManager.i("CourseTableFragment table date: " + format.format(mCourseTableMonday));
-
-        Calendar calendar= Calendar.getInstance();
+    // Checkout course table for a whole week
+    // @param: week, CURRENT_WEEK; PREV_WEEK; NEXT_WEEK.
+    private void checkoutCourseTable(int week) {
+        // calc course date time
+        Calendar calendar = Calendar.getInstance();
         calendar.setTime(mCourseTableMonday);
 
-        // calculate prev week
-        calendar.add(Calendar.DAY_OF_YEAR, -7);
+        switch (week) {
+            case PREV_WEEK:
+                // calculate prev week
+                calendar.add(Calendar.DAY_OF_YEAR, -7);
+                mCourseTableMonday = calendar.getTime();
+                break;
+            case NEXT_WEEK:
+                // calculate next week
+                calendar.add(Calendar.DAY_OF_YEAR, 7);
+                mCourseTableMonday = calendar.getTime();
+                break;
+            default: // current week
+                break;
+        }
 
-        mCourseTableMonday = calendar.getTime();
-        LogManager.i("CourseTableFragment prev week: " + format.format(mCourseTableMonday));
+        LogManager.i("CourseTableFragment checkout course table, week:" + week);
 
-        // update date line text view
-        updateDateLineBarView();
+        // checkout the course table for the whole week
+        if (mCourseThread.checkoutCourse(mCourseTableMonday, 6) != 0) {
+            LogManager.e("CourseTableFragment checkout course failed");
+            return;
+        }
 
-        // checkout this week's courses
-        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
-    }
-
-    // @brief Checkouts next week courses
-    private void checkoutNextWeekCourse() {
-        LogManager.i("CourseTableFragment checkout next week's courses");
-
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-
-        LogManager.i("CourseTableFragment table date: " + format.format(mCourseTableMonday));
-
-        Calendar calendar= Calendar.getInstance();
-        calendar.setTime(mCourseTableMonday);
-
-        // calculate prev week
-        calendar.add(Calendar.DAY_OF_YEAR, 7);
-
-        mCourseTableMonday = calendar.getTime();
-        LogManager.i("CourseTableFragment next week: " + format.format(mCourseTableMonday));
-
-        // update date line text view
-        updateDateLineBarView();
-
-        // checkout this week's courses
-        mCourseThread.checkoutCourse(mCourseTableMonday, 6);
+        // show the waiting dialog
+        mLoadingProgressDialog = new LoadingProgressDialog(mContext, "请求中");
+        mLoadingProgressDialog.setCancelable(false);
+        mLoadingProgressDialog.show();
     }
 
     //@brief Enter course's course_class to decide taking course_class
@@ -499,4 +574,3 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         showFragment(TAG, R.id.fragmentLayout, fragment, ClassFragment.TAG);
     }
 }
-

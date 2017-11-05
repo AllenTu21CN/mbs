@@ -150,6 +150,10 @@ public abstract class BaseFragment extends Fragment {
        mFragmentManager.popBackStackImmediate(name,flags);
     }
 
+    public void popFragment() {
+        mFragmentManager.popBackStack();
+    }
+
     /**
      * 获取屏幕宽度
      *

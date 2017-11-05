@@ -75,7 +75,7 @@ public class CourseDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.course_dialog);
-        //按空白处不能取消动画
+        //点击外部不允许关闭dialog
         setCanceledOnTouchOutside(false);
 
         //初始化界面控件
