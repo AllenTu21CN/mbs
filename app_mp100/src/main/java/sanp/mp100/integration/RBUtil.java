@@ -428,8 +428,13 @@ public class RBUtil implements MediaController.Observer {
                 return -1;
 
             Role curRoleInThisSubScreen = mCurrentContentRoles.get(subScreenIndex);
-            if(curRoleInThisSubScreen != null && curRoleInThisSubScreen == role) // this role has in the screen
-                return 0;
+            if(curRoleInThisSubScreen != null) {
+                if(curRoleInThisSubScreen == role) // this role has in the screen
+                    return 0;
+                Source old = getSourceByRole(curRoleInThisSubScreen);
+                if(old != null)
+                    mMediaController.displaySource(old.id, false);
+            }
 
             String pos = ScreenLayout.getSubScreenPosition(mCurrentContent.layout, mCurrentContent.subScreenCnt, subScreenIndex);
             mMediaController.setSourcePosition(source.id, source.pattern, pos);
@@ -787,6 +792,9 @@ public class RBUtil implements MediaController.Observer {
                                     } else if(this_priority > cur_priority) { // this source's role priority is lower than the current one
                                         throw new BreakOut();
                                     }
+                                    Source old = getSourceByRole(curRoleInThisSubScreen);
+                                    if(old != null)
+                                        mMediaController.displaySource(old.id, false);
                                 }
 
                                 // fill the sub-screen with this source
