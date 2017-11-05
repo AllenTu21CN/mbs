@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/white"
-            android:background="@drawable/course_dialog_button_no_selector"
+            android:background="@drawable/course_table_date_bar_button_selector"
             android:text="开始上课" />
 
         <View
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/white"
-            android:background="@drawable/course_dialog_button_no_selector"
+            android:background="@drawable/course_table_date_bar_button_selector"
             android:text="切换分屏" />
 
         <View
@@ -47,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/white"
-            android:background="@drawable/course_dialog_button_no_selector"
+            android:background="@drawable/course_table_date_bar_button_selector"
             android:text="切换主画面" />
 
     </LinearLayout>

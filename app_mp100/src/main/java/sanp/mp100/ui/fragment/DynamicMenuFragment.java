@@ -70,7 +70,7 @@ public class DynamicMenuFragment extends BaseFragment {
             Button btn = new Button(mContext);
             btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
             btn.setTextColor(mContext.getResources().getColor(R.color.white));
-            btn.setBackground(mContext.getResources().getDrawable(R.drawable.course_dialog_button_no_selector));
+            btn.setBackground(mContext.getResources().getDrawable(R.drawable.course_table_date_bar_button_selector));
             btn.setText(name);
             btn.setOnClickListener(listener);
             mViewGroup.addView(btn);

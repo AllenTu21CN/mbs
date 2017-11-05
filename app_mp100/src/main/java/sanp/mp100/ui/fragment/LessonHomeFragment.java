@@ -185,7 +185,7 @@ public class LessonHomeFragment extends BaseFragment implements View.OnClickList
     }
 
     private void updateView() {
-        String time = CourseTableFragment.dateWithWeekDay(mLessonInfo.date) + " 第" + mLessonInfo.section + "节";
+        String time = CourseTableFragment.date2WeekDay(mLessonInfo.date) + " 第" + mLessonInfo.section + "节";
         mTextLessonInfo.setText(String.format("%s %s: %s", time, mLessonInfo.teacher_name, mLessonInfo.title));
         mTextLessonStatus.setText(mState.toString());
 
