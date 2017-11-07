@@ -426,9 +426,12 @@ public class CourseTableFragment extends BaseFragment implements View.OnClickLis
         // notify to adapter update course table
         mCourseAdapter.notifyDataSetChanged();
 
+        /* Don't focus when checkout prev/next/current week course table.
+         * TODO: focus when checkout first time
         // set default focus on 1st course
         mCourseTable.requestFocusFromTouch();
         mCourseTable.setSelection(0);
+        */
 
         return;
     }
