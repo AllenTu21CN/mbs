@@ -3064,18 +3064,20 @@ public final class MediaEngine implements Choreographer.FrameCallback {
                                                 pkt.setDataFlag(DataFlag.CODEC_SPECIFIC_DATA);
                                                 // pkt.setIsKeyFrame(true);
 
-                                                encodedData.position(mBufferInfo.offset);
-                                                encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
-                                                mCodecSpecificData = new AVPacket(payload.remaining());
-                                                mCodecSpecificData.setMediaType(pkt.getMediaType());
-                                                mCodecSpecificData.setTrackIndex(pkt.getTrackIndex());
-                                                mCodecSpecificData.setCodecFlags(pkt.getCodecFlags());
-                                                mCodecSpecificData.setIsKeyFrame(pkt.isKeyFrame());
-                                                mCodecSpecificData.setDataFlag(pkt.getDataFlag());
-                                                ByteBuffer bakData = mCodecSpecificData.getPayload();
-                                                bakData.clear();
-                                                bakData.put(encodedData);
-                                                bakData.flip();
+                                                if(attachSPSPPPS2IFrame) {
+                                                    encodedData.position(mBufferInfo.offset);
+                                                    encodedData.limit(mBufferInfo.offset + mBufferInfo.size);
+                                                    mCodecSpecificData = new AVPacket(payload.remaining());
+                                                    mCodecSpecificData.setMediaType(pkt.getMediaType());
+                                                    mCodecSpecificData.setTrackIndex(pkt.getTrackIndex());
+                                                    mCodecSpecificData.setCodecFlags(pkt.getCodecFlags());
+                                                    mCodecSpecificData.setIsKeyFrame(pkt.isKeyFrame());
+                                                    mCodecSpecificData.setDataFlag(pkt.getDataFlag());
+                                                    ByteBuffer bakData = mCodecSpecificData.getPayload();
+                                                    bakData.clear();
+                                                    bakData.put(encodedData);
+                                                    bakData.flip();
+                                                }
                                             } else if(attachSPSPPPS2IFrame && pkt.isKeyFrame() && mCodecSpecificData != null) {
                                                 AVPacket pkt2 = output.output_channel.pollIdlePacket(TIMEOUT_MS);
                                                 if(pkt2 != null) {

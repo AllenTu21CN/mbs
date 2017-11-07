@@ -29,25 +29,34 @@
             }
         },
         {
-            "name": "两分屏(老师+)",
+            "name": "老师+学生(等分屏)",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 2,
             "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
-                "1": ["StudentFullView", "StudentFeature", "Courseware"]
+                "1": ["StudentFullView", "StudentFeature"]
             }
         },
         {
-            "name": "两分屏(课件+)",
+            "name": "老师+课件(等分屏)",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 2,
             "roleCandidates": {
-                "0": ["Courseware"],
-                "1": ["StudentFullView", "StudentFeature", "TeacherFullView", "TeacherFeature", "TeacherBlackboard"]
+                "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
+                "1": ["Courseware"]
             }
         },
         {
-            "name": "三分屏",
+            "name": "学生+课件(等分屏)",
+            "layout": "SYMMETRICAL",
+            "subScreenCnt": 2,
+            "roleCandidates": {
+                "0": ["StudentFullView", "StudentFeature"],
+                "1": ["Courseware"]
+            }
+        },
+        {
+            "name": "三等分屏",
             "layout": "SYMMETRICAL",
             "subScreenCnt": 3,
             "roleCandidates": {
@@ -57,21 +66,21 @@
             }
         },
         {
-            "name": "画中画(老师+)",
+            "name": "老师+学生(画中画-右下)",
             "layout": "ASYMMETRY_OVERLAPPING",
             "subScreenCnt": 5,
             "roleCandidates": {
                 "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
-                "4": ["StudentFullView", "StudentFeature", "Courseware"]
+                "4": ["StudentFullView", "StudentFeature"]
             }
         },
         {
-            "name": "画中画(课件+)",
+            "name": "老师+课件(画中画-右下)",
             "layout": "ASYMMETRY_OVERLAPPING",
             "subScreenCnt": 5,
             "roleCandidates": {
-                "0": ["Courseware"],
-                "4": ["StudentFullView", "StudentFeature", "TeacherFullView", "TeacherFeature", "TeacherBlackboard"]
+                "0": ["TeacherFullView", "TeacherFeature", "TeacherBlackboard"],
+                "4": ["Courseware"]
             }
         }
     ],

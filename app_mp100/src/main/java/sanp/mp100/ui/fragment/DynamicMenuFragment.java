@@ -22,15 +22,40 @@ import sanp.mp100.R;
 public class DynamicMenuFragment extends BaseFragment {
     public static final String TAG = "DynamicMenuFragment";
 
+    public static class Item {
+        public String name;
+        public View.OnClickListener listener;
+        public Item() {
+        }
+        public Item(String name, View.OnClickListener listener) {
+            this.name = name;
+            this.listener = listener;
+        }
+    }
+
+    public static class ItemGroup {
+        public String name;
+        public List<Item> items;
+        public ItemGroup() {
+            name = null;
+            items = new ArrayList<>();
+        }
+        public ItemGroup(String name, List<Item> items) {
+            this();
+            this.name = name;
+            this.items.addAll(items);
+        }
+    }
+
     private static DynamicMenuFragment mDynamicMenuFragment;
-    public static DynamicMenuFragment getInstance(List<Pair<String/*itemName*/, View.OnClickListener>> items) {
+    public static DynamicMenuFragment getInstance(List<ItemGroup> itemGroups) {
         synchronized (DynamicMenuFragment.class) {
             if (mDynamicMenuFragment == null) {
                 if (mDynamicMenuFragment == null) {
                     mDynamicMenuFragment = new DynamicMenuFragment();
                 }
             }
-            mDynamicMenuFragment.setItems(items);
+            mDynamicMenuFragment.setItems(itemGroups);
             return mDynamicMenuFragment;
         }
     }
@@ -38,11 +63,10 @@ public class DynamicMenuFragment extends BaseFragment {
     private View mView;
     private LinearLayout mViewGroup;
 
-    private List<Pair<String/*itemName*/, View.OnClickListener>> mItems;
+    private List<ItemGroup> mItemGroups;
 
-    private void setItems(List<Pair<String/*itemName*/, View.OnClickListener>> items) {
-        mItems = new ArrayList<>();
-        mItems.addAll(items);
+    private void setItems(List<ItemGroup> itemGroups) {
+        mItemGroups = itemGroups;
     }
 
     @Override
@@ -64,22 +88,32 @@ public class DynamicMenuFragment extends BaseFragment {
     }
 
     private void initChilView() {
-        for(Pair<String/*itemName*/, View.OnClickListener> item: mItems) {
-            String name = item.first;
-            View.OnClickListener listener = item.second;
-            Button btn = new Button(mContext);
-            btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            btn.setTextColor(mContext.getResources().getColor(R.color.white));
-            btn.setBackground(mContext.getResources().getDrawable(R.drawable.course_table_date_bar_button_selector));
-            btn.setText(name);
-            btn.setOnClickListener(listener);
-            mViewGroup.addView(btn);
+        for(ItemGroup group: mItemGroups) {
+            if(group.name != null && !group.name.isEmpty()) { // add group title
+                TextView text = new TextView(mContext);
+                text.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                text.setTextColor(mContext.getResources().getColor(R.color.white));
+                text.setBackground(mContext.getResources().getDrawable(R.drawable.course_table_date_bar_button_selector));
+                text.setText(group.name);
+                text.getPaint().setFakeBoldText(true);
+                mViewGroup.addView(text);
+            }
+
+            for(Item item: group.items) {
+                Button btn = new Button(mContext);
+                btn.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                btn.setTextColor(mContext.getResources().getColor(R.color.white));
+                btn.setBackground(mContext.getResources().getDrawable(R.drawable.course_table_date_bar_button_selector));
+                btn.setText(item.name);
+                btn.setOnClickListener(item.listener);
+                mViewGroup.addView(btn);
 
 //            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 1);
 //            View vi = new View(mContext);
 //            vi.setBackgroundColor(mContext.getResources().getColor(R.color.course_dialog_line_color));
 //            vi.setLayoutParams(params);
 //            mViewGroup.addView(vi);
+            }
         }
     }
 

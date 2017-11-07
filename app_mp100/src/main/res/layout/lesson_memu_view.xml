@@ -42,13 +42,13 @@
             android:background="@color/course_dialog_line_color" />
 
         <Button
-            android:id="@+id/button_switch_main"
+            android:id="@+id/button_switch_subscreen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@android:color/white"
             android:background="@drawable/course_table_date_bar_button_selector"
-            android:text="切换主画面" />
+            android:text="切换画面" />
 
     </LinearLayout>
 

@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import sanp.avalon.libs.base.utils.LogManager;
@@ -38,7 +39,7 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
 
     private Button mBtnSwitchClass;
     private Button mBtnSwitchContent;
-    private Button mBtnSwitchMain;
+    private Button mBtnSwitchSubScreen;
 
     private LessonHomeFragment mParent;
 
@@ -66,8 +67,8 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
             case R.id.button_switch_content:
                 showContentMenu();
                 break;
-            case R.id.button_switch_main:
-                showMainMenu();
+            case R.id.button_switch_subscreen:
+                showSubScreenMenu();
                 break;
             default:
                 break;
@@ -88,11 +89,11 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
     private void initView() {
         mBtnSwitchClass = mMenuView.findViewById(R.id.button_switch_class);
         mBtnSwitchContent = mMenuView.findViewById(R.id.button_switch_content);
-        mBtnSwitchMain = mMenuView.findViewById(R.id.button_switch_main);
+        mBtnSwitchSubScreen = mMenuView.findViewById(R.id.button_switch_subscreen);
 
         mBtnSwitchClass.setOnClickListener(this);
         mBtnSwitchContent.setOnClickListener(this);
-        mBtnSwitchMain.setOnClickListener(this);
+        mBtnSwitchSubScreen.setOnClickListener(this);
 
         updateMenuItemsAsStatus();
     }
@@ -129,37 +130,61 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
     }
 
     private void showContentMenu() {
-        // mMenuView.setVisibility(View.INVISIBLE);
+        DynamicMenuFragment.ItemGroup itemGroup = new DynamicMenuFragment.ItemGroup();
+        itemGroup.name = null; // has no title name
+
         RBUtil rb = RBUtil.getInstance();
-        List<Pair<String/*itemName*/, View.OnClickListener>> items = new ArrayList<>();
         RBUtil.Scene scene = rb.currentScene();
         List<String> names = rb.getSceneContentNames();
         for(String name: names) {
-            items.add(new Pair<>(name, ((v) -> {
+            itemGroup.items.add(new DynamicMenuFragment.Item(name, ((v) -> {
                 rb.setScene(scene, name);
             })));
         }
-        showFragment(TAG, R.id.fragmentLayout, DynamicMenuFragment.getInstance(items), DynamicMenuFragment.TAG);
+
+        List<DynamicMenuFragment.ItemGroup> itemGroups = new ArrayList<>();
+        itemGroups.add(itemGroup);
+
+        showFragment(TAG, R.id.fragmentLayout, DynamicMenuFragment.getInstance(itemGroups), DynamicMenuFragment.TAG);
     }
 
-    private void showMainMenu() {
-        // mMenuView.setVisibility(View.INVISIBLE);
+    private void showSubScreenMenu() {
+        List<DynamicMenuFragment.ItemGroup> itemGroups = new ArrayList<>();
+
         RBUtil rb = RBUtil.getInstance();
-        List<Pair<String/*itemName*/, View.OnClickListener>> items = new ArrayList<>();
-        RBUtil.Scene scene = rb.currentScene();
-        List<RBUtil.Role> roles = rb.getSceneContentMainRoles();
-        for(RBUtil.Role role: roles) {
-            items.add(new Pair<>(role.toString(), ((v) -> {
-                int ret = rb.selectMainSreenRole(role);
-                if(ret != 0) {
-                    if(ret == -1) {
-                        ToastManager.showToast(mContext, "该角色尚未绑定任何源");
-                    } else {
-                        ToastManager.showToast(mContext, "切换角色(" + role.toString() + ")失败: " + ret);
-                    }
+        RBUtil.Content content = rb.currentContent();
+
+        int subscreenCnt = content.roleCandidates.size();
+        Integer[] idxs = content.roleCandidates.keySet().toArray(new Integer[subscreenCnt]);
+        List<Integer> indexs = java.util.Arrays.asList(idxs);
+        Collections.sort(indexs);
+        for(int index: indexs) {
+            List<RBUtil.Role> roles = content.roleCandidates.get(index);
+            DynamicMenuFragment.ItemGroup itemGroup = new DynamicMenuFragment.ItemGroup();
+            if(index == 0) {
+                itemGroup.name = "主分屏";
+            } else {
+                if(subscreenCnt == 2) {
+                    itemGroup.name = "子分屏";
+                } else {
+                    itemGroup.name = "第" + index + "子分屏";
                 }
-            })));
+            }
+            for(RBUtil.Role role: roles) {
+                itemGroup.items.add(new DynamicMenuFragment.Item(role.toString(), ((v) -> {
+                    int ret = rb.selectSubScreenRole(index, role);
+                    if(ret != 0) {
+                        if(ret == -1) {
+                            ToastManager.showToast(mContext, "该角色尚未绑定任何源");
+                        } else {
+                            ToastManager.showToast(mContext, "切换角色(" + role.toString() + ")失败: " + ret);
+                        }
+                    }
+                })));
+            }
+            itemGroups.add(itemGroup);
         }
-        showFragment(TAG, R.id.fragmentLayout, DynamicMenuFragment.getInstance(items), DynamicMenuFragment.TAG);
+
+        showFragment(TAG, R.id.fragmentLayout, DynamicMenuFragment.getInstance(itemGroups), DynamicMenuFragment.TAG);
     }
 }

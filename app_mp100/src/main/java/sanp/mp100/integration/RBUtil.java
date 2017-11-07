@@ -334,6 +334,10 @@ public class RBUtil implements MediaController.Observer {
         return mCurrentScene;
     }
 
+    public Content currentContent() {
+        return mCurrentContent;
+    }
+
     public int setScene(Scene scene) {
         return setScene(scene, 0);
     }
