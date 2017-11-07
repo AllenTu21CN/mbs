@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 import android.media.MediaFormat;
 import android.util.Pair;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.Tuple3;
+import sanp.tools.utils.LogManager;
+import sanp.avalon.libs.base.Tuple3;
 import sanp.avalon.libs.media.base.AVChannel;
 import sanp.avalon.libs.media.base.AVDefines.DataType;
 import sanp.avalon.libs.media.format.MP4Muxer;

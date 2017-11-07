@@ -2,9 +2,9 @@ package sanp.avalon.libs.network.protocol;
 
 import android.content.Context;
 
-import sanp.avalon.libs.SimpleTesting;
-import sanp.avalon.libs.base.utils.FileSaveUtils;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.avalon.libs.base.SimpleTesting;
+import sanp.tools.utils.FileSaveUtils;
+import sanp.tools.utils.LogManager;
 
 import sanp.multimedia.R;
 

@@ -34,10 +34,10 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.Tuple;
-import sanp.avalon.libs.base.utils.Tuple3;
-import sanp.avalon.libs.SimpleTesting;
+import sanp.tools.utils.LogManager;
+import sanp.avalon.libs.base.Tuple;
+import sanp.avalon.libs.base.Tuple3;
+import sanp.avalon.libs.base.SimpleTesting;
 import sanp.avalon.libs.media.audio.AudioEncoder;
 import sanp.avalon.libs.media.base.AVChannel;
 import sanp.avalon.libs.media.base.AVDefines.DataType;

@@ -7,9 +7,9 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import sanp.avalon.libs.base.utils.LogManager;
 import sanp.avalon.libs.media.base.AVChannel;
 import sanp.avalon.libs.media.base.AVPacket;
+import sanp.tools.utils.LogManager;
 
 /**
  * Created by Tuyj on 2017/10/19.

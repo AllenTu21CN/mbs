@@ -2,8 +2,8 @@ package sanp.mp100.utils;
 
 import java.io.IOException;
 
-import sanp.avalon.libs.base.utils.ExecutorThreadUtil;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.ExecutorThreadUtil;
+import sanp.tools.utils.LogManager;
 
 /**
  * Created by zhangxd on 2017/7/25.

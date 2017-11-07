@@ -13,9 +13,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import sanp.avalon.libs.base.db.DbSettingsManager;
-import sanp.avalon.libs.base.utils.PreferencesUtils;
-import sanp.avalon.libs.base.utils.ScreenUtils;
+import sanp.tools.db.DbSettingsManager;
+import sanp.tools.utils.PreferencesUtils;
+import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
 
 /**

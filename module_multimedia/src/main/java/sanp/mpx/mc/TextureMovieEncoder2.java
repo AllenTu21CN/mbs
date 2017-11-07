@@ -22,7 +22,7 @@ import android.os.Message;
 
 import java.lang.ref.WeakReference;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.avalon.libs.media.video.VideoEncoderCore;
 
 /**

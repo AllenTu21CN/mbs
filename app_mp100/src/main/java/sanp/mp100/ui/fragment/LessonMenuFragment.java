@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.ToastManager;
+import sanp.tools.utils.LogManager;
+import sanp.tools.utils.ToastManager;
 import sanp.mp100.R;
 import sanp.mp100.integration.RBUtil;
 
@@ -87,9 +87,9 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
     }
 
     private void initView() {
-        mBtnSwitchClass = mMenuView.findViewById(R.id.button_switch_class);
-        mBtnSwitchContent = mMenuView.findViewById(R.id.button_switch_content);
-        mBtnSwitchSubScreen = mMenuView.findViewById(R.id.button_switch_subscreen);
+        mBtnSwitchClass = (Button) mMenuView.findViewById(R.id.button_switch_class);
+        mBtnSwitchContent = (Button) mMenuView.findViewById(R.id.button_switch_content);
+        mBtnSwitchSubScreen = (Button) mMenuView.findViewById(R.id.button_switch_subscreen);
 
         mBtnSwitchClass.setOnClickListener(this);
         mBtnSwitchContent.setOnClickListener(this);

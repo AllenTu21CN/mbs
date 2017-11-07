@@ -5,8 +5,8 @@ import java.io.IOException;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.SpeedController;
+import sanp.tools.utils.LogManager;
+import sanp.tools.utils.SpeedController;
 import sanp.avalon.libs.media.base.AVChannel;
 import sanp.avalon.libs.media.base.AVPacket;
 

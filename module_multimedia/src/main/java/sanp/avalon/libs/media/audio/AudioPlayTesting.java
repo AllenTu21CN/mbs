@@ -6,8 +6,8 @@ import android.media.MediaPlayer;
 import android.media.audiofx.Visualizer;
 
 import sanp.multimedia.R;
-import sanp.avalon.libs.SimpleTesting;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.avalon.libs.base.SimpleTesting;
+import sanp.tools.utils.LogManager;
 
 /**
  * Created by Tuyj on 2017/7/25.

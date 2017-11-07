@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.ui.adapter.CourseThread;

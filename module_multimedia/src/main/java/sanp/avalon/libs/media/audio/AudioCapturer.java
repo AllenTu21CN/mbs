@@ -16,8 +16,8 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 
-import sanp.avalon.libs.SimpleTesting;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.avalon.libs.base.SimpleTesting;
+import sanp.tools.utils.LogManager;
 
 /**
  * Created by Tuyj on 2017/6/9.

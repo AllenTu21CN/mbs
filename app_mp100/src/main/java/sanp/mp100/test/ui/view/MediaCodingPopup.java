@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.ScreenUtils;
+import sanp.tools.utils.LogManager;
+import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
 import sanp.mp100.test.utils.ProductionTesting;
 

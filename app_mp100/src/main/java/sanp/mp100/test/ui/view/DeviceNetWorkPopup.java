@@ -14,14 +14,15 @@ import android.widget.Toast;
 
 import java.lang.reflect.InvocationTargetException;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.ScreenUtils;
-import sanp.avalon.libs.network.ip.EthernetManager;
-import sanp.avalon.libs.network.ip.IpCfg;
-import sanp.avalon.libs.network.ip.StaticIpConfiguration;
+import sanp.tools.utils.LogManager;
+import sanp.tools.utils.ScreenUtils;
+
 import sanp.mp100.R;
 import sanp.mp100.utils.PingNetUtil;
 import sanp.mp100.test.ui.utils.WifiManagerUtil;
+import sanp.tools.utils.net.EthernetManager;
+import sanp.tools.utils.net.IpCfg;
+import sanp.tools.utils.net.StaticIpConfiguration;
 
 /**
  * Created by zhangxd on 2017/7/25.

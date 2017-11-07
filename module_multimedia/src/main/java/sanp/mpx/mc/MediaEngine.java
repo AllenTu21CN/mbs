@@ -46,9 +46,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import sanp.avalon.libs.SimpleTesting;
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.Tuple;
+import sanp.avalon.libs.base.SimpleTesting;
+import sanp.tools.utils.LogManager;
+import sanp.avalon.libs.base.Tuple;
 import sanp.avalon.libs.media.audio.AudioCapturer;
 import sanp.avalon.libs.media.audio.AudioDecoder;
 import sanp.avalon.libs.media.base.AVChannel;

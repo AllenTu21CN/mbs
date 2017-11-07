@@ -14,7 +14,7 @@ import java.util.List;
 
 import io.crossbar.autobahn.wamp.types.CallResult;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.BusinessPlatformPostman;

@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.ToastManager;
+import sanp.tools.utils.LogManager;
+import sanp.tools.utils.ToastManager;
 import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.RBUtil;

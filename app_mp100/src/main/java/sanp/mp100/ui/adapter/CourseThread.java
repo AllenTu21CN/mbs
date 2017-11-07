@@ -10,7 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
 import sanp.mp100.integration.BusinessPlatformPostman;

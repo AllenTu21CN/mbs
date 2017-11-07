@@ -9,8 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.ScreenUtils;
+import sanp.tools.utils.LogManager;
+import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
 
 /**

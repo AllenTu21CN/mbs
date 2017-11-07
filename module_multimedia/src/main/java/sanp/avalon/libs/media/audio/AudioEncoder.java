@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sanp.avalon.libs.SimpleTesting;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.avalon.libs.base.SimpleTesting;
+import sanp.tools.utils.LogManager;
 import sanp.avalon.libs.media.base.AVChannel;
 import sanp.avalon.libs.media.base.AVDefines;
 import sanp.avalon.libs.media.base.AVPacket;

@@ -8,8 +8,8 @@ import android.view.View;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
-import sanp.avalon.libs.base.utils.LogManager;
-import sanp.avalon.libs.base.utils.ScreenUtils;
+import sanp.tools.utils.LogManager;
+import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
 import sanp.mp100.test.utils.ProductionTesting;
 

@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.test.ui.view.MediaCodingPopup;
 import sanp.mp100.test.utils.ProductionTesting;

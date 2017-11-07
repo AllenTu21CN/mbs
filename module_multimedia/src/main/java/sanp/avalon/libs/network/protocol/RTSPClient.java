@@ -4,7 +4,7 @@ import android.media.MediaFormat;
 
 import sanp.avalon.libs.media.base.AudioInfo;
 import sanp.avalon.libs.media.base.VideoInfo;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 
 public class RTSPClient {
     

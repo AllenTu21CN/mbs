@@ -6,7 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.test.utils.ProductionTesting;
 import sanp.mp100.ui.fragment.BaseFragment;

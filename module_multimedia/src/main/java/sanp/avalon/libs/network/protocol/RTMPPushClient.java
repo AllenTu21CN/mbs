@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.json.JSONObject;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 
 public class RTMPPushClient {
     static{

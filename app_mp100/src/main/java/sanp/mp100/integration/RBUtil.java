@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.avalon.libs.media.base.AVDefines;
 import sanp.mp100.MP100Application;
 import sanp.mp100.R;

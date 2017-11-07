@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 25
     buildToolsVersion "26.0.2"
     defaultConfig {
         minSdkVersion 21
@@ -47,7 +47,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile project(':module_multimedia')
     compile project(':module_wamp')
-
+    compile project(':module_tools')
     // used for wamp-autobahn
     implementation 'com.android.support.constraint:constraint-layout:+'
     compile 'com.google.code.gson:gson:2.8.0'

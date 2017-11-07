@@ -10,8 +10,8 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import java.util.List;
 
-import sanp.avalon.libs.base.utils.CmdUtils;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.CmdUtils;
+import sanp.tools.utils.LogManager;
 
 /**
  * Created by zhangxd on 2017/7/26.

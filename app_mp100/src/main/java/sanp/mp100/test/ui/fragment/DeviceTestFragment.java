@@ -10,8 +10,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 
-import sanp.avalon.libs.base.utils.ExecutorThreadUtil;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.ExecutorThreadUtil;
+import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.test.ui.adapter.DeviceTestAdapter;
 import sanp.mp100.ui.fragment.BaseFragment;

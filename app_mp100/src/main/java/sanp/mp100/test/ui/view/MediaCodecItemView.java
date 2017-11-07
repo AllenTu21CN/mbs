@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import sanp.avalon.libs.base.utils.ScreenUtils;
+import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
 import sanp.mp100.test.utils.ProductionTesting;
 

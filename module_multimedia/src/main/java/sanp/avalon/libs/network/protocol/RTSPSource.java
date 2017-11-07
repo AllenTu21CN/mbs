@@ -8,7 +8,7 @@ import java.util.Map;
 
 import android.media.MediaFormat;
 
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 import sanp.avalon.libs.media.base.AVChannel;
 import sanp.avalon.libs.media.base.AVPacket;
 import sanp.avalon.libs.media.base.MediaInfo;

@@ -14,7 +14,7 @@ import sanp.avalon.libs.media.base.AVDefines;
 import sanp.avalon.libs.media.base.AVChannel;
 import sanp.avalon.libs.media.base.AVPacket;
 import sanp.avalon.libs.media.base.AVDefines.DataFlag;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 
 public class MP4Muxer implements Runnable {
     

@@ -12,8 +12,8 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-import sanp.avalon.libs.base.utils.FileSaveUtils;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.FileSaveUtils;
+import sanp.tools.utils.LogManager;
 
 
 /**

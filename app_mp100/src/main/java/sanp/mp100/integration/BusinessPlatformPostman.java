@@ -18,7 +18,7 @@ import io.crossbar.autobahn.wamp.types.CallResult;
 import io.crossbar.autobahn.wamp.types.CloseDetails;
 import io.crossbar.autobahn.wamp.types.SessionDetails;
 import java8.util.concurrent.CompletableFuture;
-import sanp.avalon.libs.base.utils.LogManager;
+import sanp.tools.utils.LogManager;
 
 import sanp.mp100.integration.BusinessPlatform.Callback;
 

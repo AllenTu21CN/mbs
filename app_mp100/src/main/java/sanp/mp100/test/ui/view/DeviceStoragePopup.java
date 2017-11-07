@@ -11,10 +11,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import sanp.avalon.libs.base.bean.eventbean.UsbInfo;
-import sanp.avalon.libs.base.utils.ScreenUtils;
+import sanp.tools.utils.ScreenUtils;
+
 import sanp.mp100.R;
 import sanp.mp100.test.ui.utils.StorageUtils;
+import sanp.tools.utils.UsbInfo;
 
 /**
  * Created by zhangxd on 2017/7/22.
