@@ -1,1 +1,1 @@
-include ':app_mp100', ':module_libraries', ':module_mediacontrol', 'module_wamp'
+include ':app_mp100', ':module_multimedia', 'module_wamp'

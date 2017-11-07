@@ -13,15 +13,15 @@ GIT_REV_VERSION=${GIT_REV_STRING:0:8}
 
 echo "rm -rf ${MPX_TOP_DIR}/app_mp100/build" && rm -rf ${MPX_TOP_DIR}/app/build
 echo "rm -rf ${MPX_TOP_DIR}/module_mediacontrol/build" && rm -rf ${MPX_TOP_DIR}/module_mediacontrol/build
-echo "rm -rf ${MPX_TOP_DIR}/module_libraries/build" && rm -rf ${MPX_TOP_DIR}/module_libraries/build
-echo "rm -rf ${MPX_TOP_DIR}/module_libraries/.externalNativeBuild" && rm -rf ${MPX_TOP_DIR}/module_libraries/.externalNativeBuild
-echo "rm -rf ${MPX_TOP_DIR}/module_libraries/src/main/cpp/avalon" && rm -rf ${MPX_TOP_DIR}/module_libraries/src/main/cpp/avalon
-echo "rm -rf ${MPX_TOP_DIR}/module_libraries/src/main/jniLibs" && rm -rf ${MPX_TOP_DIR}/module_libraries/src/main/jniLibs
+echo "rm -rf ${MPX_TOP_DIR}/module_multimedia/build" && rm -rf ${MPX_TOP_DIR}/module_multimedia/build
+echo "rm -rf ${MPX_TOP_DIR}/module_multimedia/.externalNativeBuild" && rm -rf ${MPX_TOP_DIR}/module_multimedia/.externalNativeBuild
+echo "rm -rf ${MPX_TOP_DIR}/module_multimedia/src/main/cpp/avalon" && rm -rf ${MPX_TOP_DIR}/module_multimedia/src/main/cpp/avalon
+echo "rm -rf ${MPX_TOP_DIR}/module_multimedia/src/main/jniLibs" && rm -rf ${MPX_TOP_DIR}/module_multimedia/src/main/jniLibs
 echo "rm -rf ${MPX_TOP_DIR}/local.properties" && rm -rf ${MPX_TOP_DIR}/local.properties
 echo "rm -rf ${MPX_TOP_DIR}/BUILD" && rm -rf ${MPX_TOP_DIR}/BUILD
 
 echo "-----------Gen local.properties" && \
-sh ${MPX_TOP_DIR}/module_libraries/scripts/gen_local_properties.sh "${MPX_TOP_DIR}" && \
+sh ${MPX_TOP_DIR}/module_multimedia/scripts/gen_local_properties.sh "${MPX_TOP_DIR}" && \
 echo '' && \
 \
 \
@@ -31,7 +31,7 @@ gradle makeJni && \
 gradle build && \
 mkdir -p ${BUILD_DIR} && \
 cp app/build/outputs/apk/*.apk ${BUILD_DIR}/ && \
-(([ -d module_libraries/src/main/jniLibs ] && cp -a module_libraries/src/main/jniLibs ${BUILD_DIR}/) || cp -a module_libraries/build/intermediates/cmake/release/obj ${BUILD_DIR}/jniLibs) && \
+(([ -d module_multimedia/src/main/jniLibs ] && cp -a module_multimedia/src/main/jniLibs ${BUILD_DIR}/) || cp -a module_multimedia/build/intermediates/cmake/release/obj ${BUILD_DIR}/jniLibs) && \
 echo '' && echo '' && echo '' && \
 \
 \
