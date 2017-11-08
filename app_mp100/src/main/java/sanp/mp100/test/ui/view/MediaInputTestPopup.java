@@ -8,17 +8,17 @@ import android.view.View;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import sanp.test.MediaTesting;
 import sanp.tools.utils.LogManager;
 import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
-import sanp.mp100.test.utils.ProductionTesting;
 
 /**
  * Created by zhangxd on 2017/7/20
  * 视频输入测试.
  */
 
-public class MediaInputTestPopup extends PopupWindow implements ProductionTesting.Callback {
+public class MediaInputTestPopup extends PopupWindow implements MediaTesting.Callback {
 
     private static final String TAG = "MediaInputTestPopup";
 
@@ -61,7 +61,7 @@ public class MediaInputTestPopup extends PopupWindow implements ProductionTestin
         setHeight(height);
         setContentView(mView);
         initView();
-        ProductionTesting.getInstance().setContext(context);
+        MediaTesting.getInstance().setContext(context);
     }
 
     private void initView() {
@@ -76,8 +76,8 @@ public class MediaInputTestPopup extends PopupWindow implements ProductionTestin
 
     public void startMediaInputTest(int type) {
         showAtLocation(mView, Gravity.CENTER, 0, 0);
-        ProductionTesting.getInstance().setCallback(this);
-        ProductionTesting.getInstance().startCaptureTesting(type);
+        MediaTesting.getInstance().setCallback(this);
+        MediaTesting.getInstance().startCaptureTesting(type);
     }
 
     @Override
@@ -96,12 +96,12 @@ public class MediaInputTestPopup extends PopupWindow implements ProductionTestin
     }
 
     @Override
-    public void onHardwareStatis(ProductionTesting.TestingType type, ProductionTesting.HardwareStatis statis) {
+    public void onHardwareStatis(MediaTesting.TestingType type, MediaTesting.HardwareStatis statis) {
 
     }
 
     @Override
-    public void onOutputAdded(ProductionTesting.TestingType type, int id, String url, int result, int width, int height) {
+    public void onOutputAdded(MediaTesting.TestingType type, int id, String url, int result, int width, int height) {
 
     }
 
@@ -112,6 +112,6 @@ public class MediaInputTestPopup extends PopupWindow implements ProductionTestin
 
     public void dismissPopup() {
         dismiss();
-        ProductionTesting.getInstance().stopMediaTesting();
+        MediaTesting.getInstance().stopMediaTesting();
     }
 }

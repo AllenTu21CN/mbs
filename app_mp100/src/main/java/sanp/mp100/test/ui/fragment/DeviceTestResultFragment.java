@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 
 import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
-import sanp.mp100.test.utils.ProductionTesting;
+import sanp.test.MediaTesting;
 import sanp.mp100.ui.fragment.BaseFragment;
 import sanp.mp100.test.ui.view.DeviceNetWorkPopup;
 import sanp.mp100.test.ui.view.DeviceStoragePopup;
@@ -92,10 +92,10 @@ public class DeviceTestResultFragment extends BaseFragment {
     private void setItemSelected(int item) {
         switch (item) {
             case 0:
-                mediaInputTestPopup.startMediaInputTest(ProductionTesting.CAPTURE_DEVICE_CAMERA0);
+                mediaInputTestPopup.startMediaInputTest(MediaTesting.CAPTURE_DEVICE_CAMERA0);
                 break;
             case 1:
-                mediaInputTestPopup.startMediaInputTest(ProductionTesting.CAPTURE_DEVICE_CAMERA1);
+                mediaInputTestPopup.startMediaInputTest(MediaTesting.CAPTURE_DEVICE_CAMERA1);
                 break;
             case 2:
                 multiMediaPopup.startEnCodingTest();

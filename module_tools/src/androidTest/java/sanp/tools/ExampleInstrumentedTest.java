@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("mc_200.sanbu.app_model.test", appContext.getPackageName());
+        assertEquals("sanp.tools.test", appContext.getPackageName());
     }
 }

@@ -44,14 +44,14 @@ ext {
             "-DLINUX", "-DANDROID", "-std=c++11"
     ]
     jniDepClasses = [
-            file('build/intermediates/classes/release/sanp/avalon/libs/network/protocol/RTSPClient.class'),
-            file('build/intermediates/classes/release/sanp/avalon/libs/network/protocol/RTMPPushClient.class'),
-            file('build/intermediates/classes/release/sanp/avalon/libs/network/protocol/RTMPBandwidthTest.class'),
+            file('build/intermediates/classes/release/sanp/javalon/network/protocol/RTSPClient.class'),
+            file('build/intermediates/classes/release/sanp/javalon/network/protocol/RTMPPushClient.class'),
+            file('build/intermediates/classes/release/sanp/javalon/network/protocol/RTMPBandwidthTest.class'),
     ]
     jniHeads = [
-            file('src/main/cpp/sanp_avalon_libs_network_protocol_RTSPClient.h'),
-            file('src/main/cpp/sanp_avalon_libs_network_protocol_RTMPPushClient.h'),
-            file('src/main/cpp/sanp_avalon_libs_network_protocol_RTMPBandwidthTest.h'),
+            file('src/main/cpp/sanp_javalon_network_protocol_RTSPClient.h'),
+            file('src/main/cpp/sanp_javalon_network_protocol_RTMPPushClient.h'),
+            file('src/main/cpp/sanp_javalon_network_protocol_RTMPBandwidthTest.h'),
     ]
     tmpJNILibs = "\\\\nas.3bu.cn\\temp\\tuyj\\jniLibs"
 

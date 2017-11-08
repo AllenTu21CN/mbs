@@ -10,13 +10,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 
+import sanp.mp100.MP100Application;
+import sanp.test.MediaTesting;
 import sanp.tools.utils.ExecutorThreadUtil;
 import sanp.tools.utils.LogManager;
+
 import sanp.mp100.R;
 import sanp.mp100.test.ui.adapter.DeviceTestAdapter;
 import sanp.mp100.ui.fragment.BaseFragment;
 import sanp.mp100.test.ui.view.DeviceTestGridView;
-import sanp.mp100.test.utils.ProductionTesting;
 
 /**
  * Created by zhangxd on 2017/7/14.
@@ -38,7 +40,7 @@ public class DeviceTestFragment extends BaseFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mTestAdapter = new DeviceTestAdapter(getActivity());
-        ProductionTesting.getInstance().entryTesting();
+        MediaTesting.getInstance().entryTesting();
     }
 
     @Nullable
@@ -92,7 +94,7 @@ public class DeviceTestFragment extends BaseFragment {
             @Override
             public void run() {
                 //该操作有一定的耗时，不进行线程处理会卡顿
-                ProductionTesting.getInstance().exitTesting();
+                MediaTesting.getInstance().exitTesting();
             }
         });
         super.onDestroy();

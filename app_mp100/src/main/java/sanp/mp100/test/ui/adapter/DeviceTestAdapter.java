@@ -81,12 +81,12 @@ public class DeviceTestAdapter extends BaseAdapter {
     }
 
     //    class VideoCodec {
-//        public ProductionTesting.VideoFormat mDecodeFormat;
+//        public MediaTesting.VideoFormat mDecodeFormat;
 //        public int decodeNum;
-//        public ProductionTesting.VideoFormat mEncodeFormat;
+//        public MediaTesting.VideoFormat mEncodeFormat;
 //        public int encodeNum;
 //
-//        public VideoCodec(ProductionTesting.VideoFormat decodeFormat, int decodeNum, ProductionTesting.VideoFormat encodeFormat, int encodeNum) {
+//        public VideoCodec(MediaTesting.VideoFormat decodeFormat, int decodeNum, MediaTesting.VideoFormat encodeFormat, int encodeNum) {
 //            this.mDecodeFormat = decodeFormat;
 //            this.decodeNum = decodeNum;
 //            this.mEncodeFormat = encodeFormat;

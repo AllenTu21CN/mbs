@@ -10,13 +10,13 @@ if exist "%LOCAL_CLASS_PATH%" (echo Using local class path: "%LOCAL_CLASS_PATH%"
 echo Start path is "%CD%"
 
 echo ----Gen head file of RTSPClient to %CD%\%OUT_DIR%\
-javah -d %OUT_DIR% -classpath %LOCAL_CLASS_PATH% sanp.avalon.libs.network.protocol.RTSPClient
+javah -d %OUT_DIR% -classpath %LOCAL_CLASS_PATH% sanp.javalon.network.protocol.RTSPClient
 
 echo ----Gen head file of RTMPPushClient to %CD%\%OUT_DIR%\
-javah -d %OUT_DIR% -classpath %ANDROID_SDK_JAR%;%LOCAL_CLASS_PATH% sanp.avalon.libs.network.protocol.RTMPPushClient
+javah -d %OUT_DIR% -classpath %ANDROID_SDK_JAR%;%LOCAL_CLASS_PATH% sanp.javalon.network.protocol.RTMPPushClient
 
 echo ----Gen head file of RTMPBandwidthTest to %CD%\%OUT_DIR%\
-javah -d %OUT_DIR% -classpath %ANDROID_SDK_JAR%;%LOCAL_CLASS_PATH% sanp.avalon.libs.network.protocol.RTMPBandwidthTest
+javah -d %OUT_DIR% -classpath %ANDROID_SDK_JAR%;%LOCAL_CLASS_PATH% sanp.javalon.network.protocol.RTMPBandwidthTest
 
 goto quit
 

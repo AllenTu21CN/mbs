@@ -16,7 +16,6 @@ import sanp.tools.utils.LogManager;
  */
 
 public class DbLogManager {
-    private DBManager dbm;
     private SQLiteDatabase db;
     private Context mContext;
 
@@ -25,8 +24,7 @@ public class DbLogManager {
     }
 
     public boolean insertInfo(OperateLogInfo info) {
-        dbm = new DBManager(mContext);
-        db = dbm.openDatabase();
+        db = DBManager.getAppDatabase();
         if (db == null) {
             LogManager.e("数据库调用失败");
             return false;
@@ -54,8 +52,7 @@ public class DbLogManager {
 
     public List<OperateLogInfo> selectorInfo(int nowPage, int nowNum) {
         List<OperateLogInfo> infoList = new ArrayList<>();
-        dbm = new DBManager(mContext);
-        db = dbm.openDatabase();
+        db = DBManager.getAppDatabase();
         if (nowPage == 0) {
             nowPage = 1;
         }

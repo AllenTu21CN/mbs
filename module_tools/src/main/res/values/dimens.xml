@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="contents_top">250dp</dimen>
+
     <dimen name="text_size_22">22sp</dimen>
+    <dimen name="text_size_23">23sp</dimen>
     <dimen name="text_size_24">24sp</dimen>
     <dimen name="text_size_48">48sp</dimen>
-    <dimen name="contents_top">250dp</dimen>
+    <dimen name="text_size_66">66sp</dimen>
+    <dimen name="text_size_30">30sp</dimen>
 </resources>

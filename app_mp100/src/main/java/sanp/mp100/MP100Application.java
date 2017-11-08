@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import sanp.InitMultimedia;
 import sanp.tools.utils.FileSaveUtils;
 import sanp.tools.utils.LogManager;
 
@@ -46,18 +47,13 @@ public class MP100Application extends Application {
         put("rtmp_config.json", R.raw.rtmp_config);
     }};
 
-    private static final Map<String, Integer> VIDEO_TEST_FILES = new HashMap<String, Integer>() {{
-        put("test_1080p_24fps_2mbps_32secs.mp4", R.raw.test_1080p_24fps_2mbps_32secs);
-        put("test_720p_24fps_1mbps_17secs.mp4", R.raw.test_720p_24fps_1mbps_17secs);
-    }};
-
     @Override
     public void onCreate() {
         super.onCreate();
 
         saveResBgPicturesToStorage();
         saveTmpSettingsFilesToStorage();
-        saveMp4ToStorage();
+        InitMultimedia.init(this, HOME_EXTERNAL_PATH);
     }
 
     public static <T> T loadSettingsFromTmpFile(String filename, Class<T> classOf) {
@@ -100,16 +96,6 @@ public class MP100Application extends Application {
                 FileSaveUtils.saveToSDCard(this, TMP_FILE_PATH, filename, TMP_SETTINGS_FILES.get(filename));
             } catch (Throwable e) {
                 LogManager.e("saveTmpSettingsFilesToStorage error " + e);
-            }
-        }
-    }
-
-    private void saveMp4ToStorage() {
-        for(String filename: VIDEO_TEST_FILES.keySet()) {
-            try {
-                FileSaveUtils.saveToSDCard(this, TMP_FILE_PATH, filename, VIDEO_TEST_FILES.get(filename));
-            } catch (Throwable e) {
-                LogManager.e("saveMp4ToStorage error " + e);
             }
         }
     }

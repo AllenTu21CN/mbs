@@ -13,9 +13,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import sanp.test.MediaTesting;
 import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
-import sanp.mp100.test.utils.ProductionTesting;
 
 /**
  * Created by zhangxd on 2017/7/21
@@ -108,10 +108,10 @@ public class MediaCodecItemView extends LinearLayout {
         }
     }
 
-    public void setEnCodingTxt(ProductionTesting.VideoFormat videoFormat) {
-        if (videoFormat == ProductionTesting.DEFAULT_1080P_FORMAT) {
+    public void setEnCodingTxt(MediaTesting.VideoFormat videoFormat) {
+        if (videoFormat == MediaTesting.DEFAULT_1080P_FORMAT) {
             mPxTxt.setText(FORMAT_HIGH);
-        } else if (videoFormat == ProductionTesting.DEFAULT_720P_FORMAT) {
+        } else if (videoFormat == MediaTesting.DEFAULT_720P_FORMAT) {
             mPxTxt.setText(FORMAT_MIDDLE);
         } else {
             mPxTxt.setText(FORMAT_LOW);

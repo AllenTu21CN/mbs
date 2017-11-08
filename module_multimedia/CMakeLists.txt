@@ -51,9 +51,9 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              # Associated headers in the same location as their source
              # file are automatically included.
-             src/main/cpp/sanp_avalon_libs_network_protocol_RTSPClient.cpp
-             src/main/cpp/sanp_avalon_libs_network_protocol_RTMPPushClient.cpp
-             src/main/cpp/sanp_avalon_libs_network_protocol_RTMPBandwidthTest.cpp)
+             src/main/cpp/sanp_javalon_network_protocol_RTSPClient.cpp
+             src/main/cpp/sanp_javalon_network_protocol_RTMPPushClient.cpp
+             src/main/cpp/sanp_javalon_network_protocol_RTMPBandwidthTest.cpp)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in the

@@ -16,7 +16,6 @@ import sanp.tools.utils.ToolsManager;
 public class DbSettingsManager {
     private String TAG = "DbSettingsManager";
 
-    private DBManager dbm;
     private SQLiteDatabase db;
     private Context mContext;
 
@@ -25,8 +24,7 @@ public class DbSettingsManager {
     }
 
     public boolean updateInfo(String key, String value) {
-        dbm = new DBManager(mContext);
-        db = dbm.openDatabase();
+        db = DBManager.getAppDatabase();
         if (db == null) {
             LogManager.e(TAG, "数据库调用失败");
             return false;
@@ -44,8 +42,7 @@ public class DbSettingsManager {
     }
 
     public String selectorInfo(String key, String defultValue) {
-        dbm = new DBManager(mContext);
-        db = dbm.openDatabase();
+        db = DBManager.getAppDatabase();
         String sql = "select value from settings where name = '" + key + "'";
         Cursor cursor = db.rawQuery(sql, null);
         if (cursor == null) {
@@ -74,8 +71,7 @@ public class DbSettingsManager {
     }
 
     public void insertInfo(String key, String defultValue) {
-        dbm = new DBManager(mContext);
-        db = dbm.openDatabase();
+        db = DBManager.getAppDatabase();
         String sql = "insert into settings (name,value) values ('" + key + "','" + defultValue + "')";
         try {
             db.execSQL(sql);
@@ -86,8 +82,7 @@ public class DbSettingsManager {
     }
 
     public void cleanInfo() {
-        dbm = new DBManager(mContext);
-        db = dbm.openDatabase();
+        db = DBManager.getAppDatabase();
         String sql = "delete from settings";
         try {
             db.execSQL(sql);

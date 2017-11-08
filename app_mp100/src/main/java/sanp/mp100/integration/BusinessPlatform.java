@@ -2,7 +2,6 @@ package sanp.mp100.integration;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.JsonToken;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -21,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import sanp.tools.utils.LogManager;
-import sanp.avalon.libs.base.Tuple3;
 import sanp.mp100.MP100Application;
 import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatformPostman.BPError;

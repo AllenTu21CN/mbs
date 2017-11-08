@@ -18,16 +18,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sanp.test.MediaTesting;
 import sanp.tools.utils.LogManager;
 import sanp.tools.utils.ScreenUtils;
 import sanp.mp100.R;
-import sanp.mp100.test.utils.ProductionTesting;
 
 /**
  * Created by zhangxd on 2017/7/17.
  */
 
-public class MediaCodingPopup extends PopupWindow implements ProductionTesting.Callback {
+public class MediaCodingPopup extends PopupWindow implements MediaTesting.Callback {
 
     public static final String TAG = "MediaCodingPopup";
 
@@ -61,7 +61,7 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
 
     private LinearLayout mainLayout;
 
-    private ProductionTesting.VideoFormat mEnCodeFormat;
+    private MediaTesting.VideoFormat mEnCodeFormat;
 
     private Map<Integer, View> mViewMap = new HashMap<>();
 
@@ -76,8 +76,8 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
         int height = ScreenUtils.getScreenWidth(mContext) / 2;
         setWidth(width);
         setHeight(height);
-        ProductionTesting.getInstance().setContext(context);
-        ProductionTesting.getInstance().setCallback(this);
+        MediaTesting.getInstance().setContext(context);
+        MediaTesting.getInstance().setCallback(this);
     }
 
 
@@ -91,12 +91,12 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
                     setCodecStatis(bundle);
                     break;
                 case MSG_SHOW_HARDWARE_RESULT:
-                    showHardWareText((ProductionTesting.HardwareStatis) msg.obj);
+                    showHardWareText((MediaTesting.HardwareStatis) msg.obj);
                     break;
                 case MSG_REMOVE_OUTPUT:
                     onMediaCodingShow();
-                    ProductionTesting.getInstance().clean();
-                    ProductionTesting.getInstance().startEncodedTesting2();
+                    MediaTesting.getInstance().clean();
+                    MediaTesting.getInstance().startEncodedTesting2();
                     break;
                 case MSG_SHOW_PX_CHANGE:
                     Bundle pxBundle = (Bundle) msg.obj;
@@ -126,8 +126,8 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
         showAtLocation(mView, Gravity.CENTER, 0, 0);
     }
 
-    public static void startMediaCodingTest(int captureformat, ProductionTesting.VideoFormat deformat, int decoCount, List<ProductionTesting.VideoFormat> encodings) {
-        ProductionTesting.getInstance().startMediaCompositiveTesting(captureformat, deformat, decoCount, encodings);
+    public static void startMediaCodingTest(int captureformat, MediaTesting.VideoFormat deformat, int decoCount, List<MediaTesting.VideoFormat> encodings) {
+        MediaTesting.getInstance().startMediaCompositiveTesting(captureformat, deformat, decoCount, encodings);
     }
 
     /**
@@ -136,7 +136,7 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
     public void startEnCodingTest() {
         showAtLocation(mView, Gravity.CENTER, 0, 0);
         onEnCodingTestShow();
-        ProductionTesting.getInstance().startEncodedTesting1();
+        MediaTesting.getInstance().startEncodedTesting1();
     }
 
 
@@ -156,12 +156,12 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
     public void dismissPopup() {
         dismiss();
         mViewMap.clear();
-        ProductionTesting.getInstance().stopMediaTesting();
+        MediaTesting.getInstance().stopMediaTesting();
     }
 
 
     @Override
-    public void onHardwareStatis(ProductionTesting.TestingType type, ProductionTesting.HardwareStatis statis) {
+    public void onHardwareStatis(MediaTesting.TestingType type, MediaTesting.HardwareStatis statis) {
         Message msg = Message.obtain();
         msg.obj = statis;
         msg.what = MSG_SHOW_HARDWARE_RESULT;
@@ -171,7 +171,7 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
     /**
      * @param statis 硬件相关参数，如CPU,内存
      */
-    private void showHardWareText(ProductionTesting.HardwareStatis statis) {
+    private void showHardWareText(MediaTesting.HardwareStatis statis) {
         String cpurate = df.format(statis.cupUsingRate);
         String cputemp = df.format(statis.cpuTemperature);
         String memrate = df.format(statis.memUsingRate);
@@ -189,8 +189,8 @@ public class MediaCodingPopup extends PopupWindow implements ProductionTesting.C
     }
 
     @Override
-    public void onOutputAdded(ProductionTesting.TestingType type, int id, String url, int result, int width, int height) {
-        if (type == ProductionTesting.TestingType.PRODUCTION_TESTING_ENCODED) {
+    public void onOutputAdded(MediaTesting.TestingType type, int id, String url, int result, int width, int height) {
+        if (type == MediaTesting.TestingType.PRODUCTION_TESTING_ENCODED) {
             handler.sendEmptyMessageDelayed(MSG_REMOVE_OUTPUT, MSG_DELAY);
         }
         sendPxShowMessage(id, width, height);

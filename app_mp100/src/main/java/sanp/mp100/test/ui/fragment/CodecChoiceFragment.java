@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import sanp.test.MediaTesting;
 import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.test.ui.view.MediaCodingPopup;
-import sanp.mp100.test.utils.ProductionTesting;
 import sanp.mp100.ui.fragment.BaseFragment;
 
 /**
@@ -59,7 +59,7 @@ public class CodecChoiceFragment extends BaseFragment implements CompoundButton.
 
     private List<Spinner> mSPinnerList = new ArrayList<>();
 
-    private static Map<Integer, ProductionTesting.VideoFormat> mEncodingFormatMap = new HashMap<>();
+    private static Map<Integer, MediaTesting.VideoFormat> mEncodingFormatMap = new HashMap<>();
 
     private int decodingNum = 0;
 
@@ -71,17 +71,17 @@ public class CodecChoiceFragment extends BaseFragment implements CompoundButton.
 //
 //    private LinearLayout
 
-    private ProductionTesting.VideoFormat decodingFormat = ProductionTesting.DEFAULT_1080P_FORMAT;
+    private MediaTesting.VideoFormat decodingFormat = MediaTesting.DEFAULT_1080P_FORMAT;
 
     static {
-        mEncodingFormatMap.put(0, ProductionTesting.DEFAULT_1080P_FORMAT);
-        mEncodingFormatMap.put(1, ProductionTesting.DEFAULT_720P_FORMAT);
-        mEncodingFormatMap.put(2, ProductionTesting.DEFAULT_480P_FORMAT);
-        mEncodingFormatMap.put(3, ProductionTesting.VideoFormat.FORMAT_1080P_1M_10FPS);
-        mEncodingFormatMap.put(4, ProductionTesting.VideoFormat.FORMAT_720P_1M_10FPS);
+        mEncodingFormatMap.put(0, MediaTesting.DEFAULT_1080P_FORMAT);
+        mEncodingFormatMap.put(1, MediaTesting.DEFAULT_720P_FORMAT);
+        mEncodingFormatMap.put(2, MediaTesting.DEFAULT_480P_FORMAT);
+        mEncodingFormatMap.put(3, MediaTesting.VideoFormat.FORMAT_1080P_1M_10FPS);
+        mEncodingFormatMap.put(4, MediaTesting.VideoFormat.FORMAT_720P_1M_10FPS);
     }
 
-    private static Map<Integer, ProductionTesting.VideoFormat> mSelectedEncodingMap = new HashMap<>();
+    private static Map<Integer, MediaTesting.VideoFormat> mSelectedEncodingMap = new HashMap<>();
 
 
     @Override
@@ -158,7 +158,7 @@ public class CodecChoiceFragment extends BaseFragment implements CompoundButton.
                     if (position == 0) {
                         return;
                     }
-                    ProductionTesting.VideoFormat format = mEncodingFormatMap.get(position - 1);
+                    MediaTesting.VideoFormat format = mEncodingFormatMap.get(position - 1);
                     switch (parent.getId()) {
                         case R.id.endcoing_spinner_one:
                             mSelectedEncodingMap.put(0, format);
@@ -250,24 +250,24 @@ public class CodecChoiceFragment extends BaseFragment implements CompoundButton.
     private void startMediaCompTest() {
         int captureFormat = 0;
         if (mLeftcheckBox.isChecked() && mRightCheckbox.isChecked()) {
-            captureFormat = ProductionTesting.CAPTURE_DEVICE_BOTH;
+            captureFormat = MediaTesting.CAPTURE_DEVICE_BOTH;
         } else if (mLeftcheckBox.isChecked()) {
-            captureFormat = ProductionTesting.CAPTURE_DEVICE_CAMERA0;
+            captureFormat = MediaTesting.CAPTURE_DEVICE_CAMERA0;
         } else if (mRightCheckbox.isChecked()) {
-            captureFormat = ProductionTesting.CAPTURE_DEVICE_CAMERA1;
+            captureFormat = MediaTesting.CAPTURE_DEVICE_CAMERA1;
         } else {
-            captureFormat = ProductionTesting.CAPTURE_DEVICE_NONE;
+            captureFormat = MediaTesting.CAPTURE_DEVICE_NONE;
         }
-        List<ProductionTesting.VideoFormat> mTempList = new ArrayList<>(mSelectedEncodingMap.values());
+        List<MediaTesting.VideoFormat> mTempList = new ArrayList<>(mSelectedEncodingMap.values());
         MediaCodingPopup.startMediaCodingTest(captureFormat, decodingFormat, decodingNum, mTempList);
     }
 
     @Override
     public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
         if (checkedId == R.id.high_px_radio) {
-            decodingFormat = ProductionTesting.DEFAULT_1080P_FORMAT;
+            decodingFormat = MediaTesting.DEFAULT_1080P_FORMAT;
         } else {
-            decodingFormat = ProductionTesting.DEFAULT_720P_FORMAT;
+            decodingFormat = MediaTesting.DEFAULT_720P_FORMAT;
         }
     }
 }

@@ -15,14 +15,14 @@ import java.util.List;
 import java.util.Map;
 
 import sanp.tools.utils.LogManager;
-import sanp.avalon.libs.media.base.AVDefines;
+import sanp.javalon.media.base.AVDefines;
 import sanp.mp100.MP100Application;
 import sanp.mp100.R;
-import sanp.mpx.mc.MediaController;
-import sanp.mpx.mc.MediaEngine;
-import sanp.mpx.mc.ScreenLayout;
-import sanp.mpx.mc.ScreenLayout.FillPattern;
-import sanp.mpx.mc.ScreenLayout.LayoutMode;
+import sanp.mpx.MediaController;
+import sanp.mpx.MediaEngine;
+import sanp.mpx.ScreenLayout;
+import sanp.mpx.ScreenLayout.FillPattern;
+import sanp.mpx.ScreenLayout.LayoutMode;
 
 /**
  * Created by Tuyj on 2017/10/28.

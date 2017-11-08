@@ -31,13 +31,13 @@ echo Using local class path: \"${LOCAL_CLASS_PATH}\"
 echo "Start path is \"${PWD}\""
 
 echo "----Gen head file from RTMPPushClient.class to \"${PWD}/${OUT_DIR}/\""
-javah -d ${OUT_DIR} -classpath ${ANDROID_SDK_JAR}:${LOCAL_CLASS_PATH} sanp.avalon.libs.network.protocol.RTMPPushClient
+javah -d ${OUT_DIR} -classpath ${ANDROID_SDK_JAR}:${LOCAL_CLASS_PATH} sanp.javalon.network.protocol.RTMPPushClient
 
 echo "----Gen head file from RTSPClient.class to \"${PWD}/${OUT_DIR}/\""
-javah -d ${OUT_DIR} -classpath ${LOCAL_CLASS_PATH} sanp.avalon.libs.network.protocol.RTSPClient
+javah -d ${OUT_DIR} -classpath ${LOCAL_CLASS_PATH} sanp.javalon.network.protocol.RTSPClient
 
 echo "----Gen head file from RTMPBandwidthTest.class to \"${PWD}/${OUT_DIR}/\""
-javah -d ${OUT_DIR} -classpath ${ANDROID_SDK_JAR}:${LOCAL_CLASS_PATH} sanp.avalon.libs.network.protocol.RTMPBandwidthTest
+javah -d ${OUT_DIR} -classpath ${ANDROID_SDK_JAR}:${LOCAL_CLASS_PATH} sanp.javalon.network.protocol.RTMPBandwidthTest
 
 cd ${START_PATH}
 
