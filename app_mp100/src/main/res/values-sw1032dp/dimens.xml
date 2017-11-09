@@ -92,6 +92,10 @@
     <dimen name="course_common_bk_stroke_width">1dp</dimen>
     <dimen name="course_common_bk_radius">6dp</dimen>
 
+    <!-- course loading progress dialog -->
+    <dimen name="loading_progress_bk_stroke_width">1dp</dimen>
+    <dimen name="loading_progress_bk_radius">6dp</dimen>
+
 
     <!-- course table font size -->
     <dimen name="course_table_date_font_size">30sp</dimen>
@@ -100,6 +104,7 @@
     <dimen name="course_name_font_size">36sp</dimen>
     <dimen name="course_table_week_font_size">38sp</dimen>
     <dimen name="course_table_section_font_size">38sp</dimen>
+
 
 
     <!-- Text Font size -->
