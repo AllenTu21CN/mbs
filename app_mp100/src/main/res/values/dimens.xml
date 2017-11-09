@@ -91,7 +91,7 @@
 
 
     <!-- course table font size -->
-    <dimen name="course_table_date_font_size">16sp</dimen>
+    <dimen name="course_table_date_font_size">14sp</dimen>
     <dimen name="course_table_date_button_font_size">16sp</dimen>
 
     <dimen name="course_name_font_size">20sp</dimen>
