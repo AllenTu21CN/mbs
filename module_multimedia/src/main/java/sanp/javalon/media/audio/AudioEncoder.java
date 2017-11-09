@@ -421,11 +421,11 @@ public class AudioEncoder implements AudioCapturer.Callback {
             mIndex = mMediaCodec.dequeueOutputBuffer(mBufferInfo, timeoutMs*1000);
             if(mIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 //do nothing
-                LogManager.d("wait encoded data");
+                LogManager.d("android audio encoder wait data");
                 return null;
             } else if (mIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 MediaFormat newFormat = mMediaCodec.getOutputFormat();
-                LogManager.w("audio encoder output format changed: " + newFormat);
+                LogManager.w("android audio encoder output format changed: " + newFormat);
                 return null;
             } else if (mIndex < 0) {
                 LogManager.w("unexpected result from encoder.dequeueOutputBuffer: " + mIndex);

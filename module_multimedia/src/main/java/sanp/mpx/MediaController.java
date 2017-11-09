@@ -2876,7 +2876,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
     static public class Tester extends CameraManager.AvailabilityCallback implements SimpleTesting.Tester, Observer {
 
         static private boolean mTestFromFile = false;
-        static private boolean mOutFromFile = false;
+        static private boolean mOutFromFile = true;
         static private boolean mSourceFromFile = false;
         static private MediaEngine.VideoSinkConfig mVideoSinkConfs[] = {
                 /*0*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1920, 1088, 25, 2 * 1024 * 1024, 10),
@@ -2886,6 +2886,8 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                 /*4*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1280, 720, 10, 1 * 1024 * 1024, 10),
         };
         static private MediaEngine.AudioSinkConfig mAudioSinkConf = new MediaEngine.AudioSinkConfig(AudioEncoder.Supporting.ENC_NAME_AAC, 64000, AudioEncoder.Supporting.ENC_AAC_PROFILE_RECOMMENDED);
+        static private final boolean mAudioOutput = true;
+
 
         private MediaController mMediaController = null;
         private List<Integer> mOutputIds = new ArrayList<>();
@@ -2947,7 +2949,6 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                     /*3*/Environment.getExternalStorageDirectory() + "/test1080p10",
                     /*4*/Environment.getExternalStorageDirectory() + "/test720p10",
             };
-            final boolean audioOutput = true;
 
             List<String> captureIndexs = new ArrayList<>();
             int decodingCnt = 0;
@@ -2984,7 +2985,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             }
 
             MediaEngine.AudioSinkConfig audioSinkConf = null;
-            if (audioOutput)
+            if (mAudioOutput)
                 audioSinkConf = mAudioSinkConf;
             for (String i : encodingIndexs) {
                 i = i.trim();
@@ -3000,6 +3001,54 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             }
         }
 
+        private void startOutputFromCode() {
+            final Map<String, Integer> outputUrls = new HashMap<String, Integer>() {{
+//                put(Environment.getExternalStorageDirectory() + "/test0.mp4", 1);
+//                put(Environment.getExternalStorageDirectory() + "/test1.mp4", 1);
+                put("rtmp://10.1.36.4:1935/live/090e17a5-8890-406a-bcf2-a74a1af078da?s=tuyj", 1);
+//                put("rtmp://lbblscy.3322.org:1935/live/b82627b3-ec1d-46ed-9d71-516d5cd38bc1?s=lesson.main", 1);
+            }};
+
+            MediaEngine.AudioSinkConfig audioSinkConf;
+            if (mAudioOutput)
+                audioSinkConf = mAudioSinkConf;
+            if (!mOutFromFile) {
+                for (String url : outputUrls.keySet()) {
+                    int index = outputUrls.get(url);
+                    MediaEngine.VideoSinkConfig cfg = mVideoSinkConfs[index];
+                    int id = mMediaController.addOutput(url, cfg, audioSinkConf, RECOMMENDED_REOPEN_CNT);
+                    mOutputIds.add(id);
+                    cfg.bitrate += 10;
+                }
+            }
+        }
+
+        private void startOutputFromFile() {
+            MediaEngine.AudioSinkConfig audioSinkConf;
+            if (mAudioOutput)
+                audioSinkConf = mAudioSinkConf;
+            if (mOutFromFile) {
+                try {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/out.txt"))));
+                    String out_url = br.readLine();
+                    while(out_url != null) {
+                        out_url = out_url.trim();
+                        if(!out_url.equals("")) {
+                            out_url = Environment.getExternalStorageDirectory() + "/" + out_url;
+                            int id = mMediaController.addOutput(out_url, mVideoSinkConfs[0], audioSinkConf, RECOMMENDED_REOPEN_CNT);
+                            mOutputIds.add(id);
+                        }
+                        out_url = br.readLine();
+                    }
+                    br.close();
+                } catch (FileNotFoundException e) {
+                    LogManager.e(e);
+                } catch (IOException e) {
+                    LogManager.e(e);
+                }
+            }
+        }
+
         public void startFromCode() {
             final String[] sourceUrls = {
                 "capture://none?type=video&id=0",
@@ -3012,12 +3061,6 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 //                "rtsp://10.1.83.200:5000/main.h264",
 //                "rtsp://10.1.83.200:5000/main.h264",
             };
-            final Map<String, Integer> outputUrls = new HashMap<String, Integer>() {{
-                put(Environment.getExternalStorageDirectory() + "/test0.mp4", 1);
-//                put(Environment.getExternalStorageDirectory() + "/test1.mp4", 1);
-//                put("rtmp://10.1.36.4:1935/live/cd834c28-91bc-4293-8856-00eaa110a5d8?s=tuyj", 0);
-            }};
-            final boolean audioOutput = true;
 
             if (mSourceFromFile) {
                 try {
@@ -3041,38 +3084,6 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                 for (int i = 0; i < sourceUrls.length; ++i) {
                     int id = mMediaController.addSource(sourceUrls[i],  Arrays.asList(DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
                     mSourceIds.add(id);
-                }
-            }
-
-            MediaEngine.AudioSinkConfig audioSinkConf = null;
-            if (audioOutput)
-                audioSinkConf = mAudioSinkConf;
-            if (mOutFromFile) {
-                try {
-                    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/out.txt"))));
-                    String out_url = br.readLine();
-                    while(out_url != null) {
-                        out_url = out_url.trim();
-                        if(!out_url.equals("")) {
-                            out_url = Environment.getExternalStorageDirectory() + "/" + out_url;
-                            int id = mMediaController.addOutput(out_url, mVideoSinkConfs[0], audioSinkConf, RECOMMENDED_REOPEN_CNT);
-                            mOutputIds.add(id);
-                        }
-                        out_url = br.readLine();
-                    }
-                    br.close();
-                } catch (FileNotFoundException e) {
-                    LogManager.e(e);
-                } catch (IOException e) {
-                    LogManager.e(e);
-                }
-            } else {
-                for (String url : outputUrls.keySet()) {
-                    int index = outputUrls.get(url);
-                    MediaEngine.VideoSinkConfig cfg = mVideoSinkConfs[index];
-                    int id = mMediaController.addOutput(url, cfg, audioSinkConf, RECOMMENDED_REOPEN_CNT);
-                    mOutputIds.add(id);
-                    cfg.bitrate += 10;
                 }
             }
         }
@@ -3120,6 +3131,10 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             } else {
                 if (true) {
                     if (mTestingStep == 4) {
+                        if(mOutFromFile)
+                            startOutputFromFile();
+                        else
+                            startOutputFromCode();
                     } else if (mTestingStep == 3) {
                     } else if (mTestingStep == 2) {
                     } else if (mTestingStep == 1) {
