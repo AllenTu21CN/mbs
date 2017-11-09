@@ -93,9 +93,16 @@
     <dimen name="course_common_bk_radius">6dp</dimen>
 
 
+    <!-- course table font size -->
+    <dimen name="course_table_date_font_size">28sp</dimen>
+    <dimen name="course_table_date_button_font_size">28sp</dimen>
+
+    <dimen name="course_name_font_size">32sp</dimen>
+    <dimen name="course_table_week_font_size">34sp</dimen>
+    <dimen name="course_table_section_font_size">34sp</dimen>
+
+
     <!-- Text Font size -->
-    <dimen name="week_text_font_size">22sp</dimen>
-    <dimen name="table_time_text_font_size">22sp</dimen>
 
     <dimen name="device_storage_item_magrintop">50dp</dimen>
     <dimen name="device_test_item_height">120dp</dimen>
