@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import sanp.test.SimpleTesting;
 import sanp.tools.utils.LogManager;
 import sanp.mp100.R;
 import sanp.mp100.test.ui.fragment.DeviceTestFragment;
@@ -24,7 +25,7 @@ public class HomeFragment extends BaseFragment {
     public static final String TAG = "HomeFragment";
     public static HomeFragment mHomeFragment;
 
-    private View view;
+    private View mView;
 
     public static HomeFragment getInstance() {
         if (mHomeFragment == null) {
@@ -36,22 +37,27 @@ public class HomeFragment extends BaseFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        view = View.inflate(getActivity(), R.layout.home_fragment, null);
+        mView = View.inflate(getActivity(), R.layout.home_fragment, null);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        initView(view);
-        return view;
+        initView();
+        return mView;
     }
 
-    public void initView(View view) {
+    public void initView() {
         showNextFragment();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (SimpleTesting.Enabled) {
+            SimpleTesting.getInstance().next();
+            return true;
+        }
+
         if(keyCode == KeyEvent.KEYCODE_BACK) {
             showNextFragment();
             return true;
@@ -61,9 +67,11 @@ public class HomeFragment extends BaseFragment {
     }
 
     private void showNextFragment() {
-        if(DeviceTestFragment.Enabled)
+        if (DeviceTestFragment.Enabled) {
             showDeviceTest();
-        else
+        } else if (SimpleTesting.Enabled) {
+            SimpleTesting.getInstance().test(mContext);
+        } else
             showCourseTable();
     }
 

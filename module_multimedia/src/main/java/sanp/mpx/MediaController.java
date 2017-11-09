@@ -2880,7 +2880,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         static private boolean mSourceFromFile = false;
         static private MediaEngine.VideoSinkConfig mVideoSinkConfs[] = {
                 /*0*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1920, 1088, 25, 2 * 1024 * 1024, 10),
-                /*1*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1280, 720, 25, 1 * 1024 * 1024, 10),
+                /*1*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1280, 720, 25, 2 * 1024 * 1024, 10),
                 /*2*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 856, 480, 25, 512 * 1024, 10),
                 /*3*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1920, 1088, 10, 1 * 1024 * 1024, 10),
                 /*4*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1280, 720, 10, 1 * 1024 * 1024, 10),
@@ -2895,13 +2895,14 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 
         public void start(Object obj) {
             mMediaController = MediaController.getInstance();
+            mMediaController.cleanObservers();
             mMediaController.addObserver(this);
             mMediaController.setDisplayName(
                     "测试",
                     MediaController.HORIZONTAL_HCENTER,
                     MediaController.VERTICAL_TOP,
                     "");
-            mMediaController.enableDisplayTestingItems(true);
+            // mMediaController.enableDisplayTestingItems(true);
             /*
              mMediaController.displayName(false);
              mMediaController.setBackgroundImage("file:///" + MyApplication.RES_PATH + "/" + MyApplication.VIDEO_BG);
@@ -3006,13 +3007,13 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 //                Environment.getExternalStorageDirectory() + "/MPX/test_1080p.mp4?loop=true",
 //                Environment.getExternalStorageDirectory() + "/sample/test-2.mp4?loop=true",
 //                Environment.getExternalStorageDirectory() + "/sample/test-3.mp4?loop=true",
-//                "rtsp://10.1.83.200:5000/main.h264",
-//                "rtsp://10.1.83.201:5000/main.h264",
+                "rtsp://10.1.83.200:5000/main.h264",
+                "rtsp://10.1.83.201:5000/main.h264",
 //                "rtsp://10.1.83.200:5000/main.h264",
 //                "rtsp://10.1.83.200:5000/main.h264",
             };
             final Map<String, Integer> outputUrls = new HashMap<String, Integer>() {{
-                put(Environment.getExternalStorageDirectory() + "/test0.mp4", 0);
+                put(Environment.getExternalStorageDirectory() + "/test0.mp4", 1);
 //                put(Environment.getExternalStorageDirectory() + "/test1.mp4", 1);
 //                put("rtmp://10.1.36.4:1935/live/cd834c28-91bc-4293-8856-00eaa110a5d8?s=tuyj", 0);
             }};

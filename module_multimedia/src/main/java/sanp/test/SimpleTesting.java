@@ -46,9 +46,9 @@ public class SimpleTesting {
         mTesters.add(tester);
     }
 
-    public void test(Context context, Tester tester) {
+    public void test(Context context) {
         mTesters.clear();
-        mCurrentTester = tester;
+        mCurrentTester = new MediaController.Tester();
         mCurrentTester.start(context);
     }
 

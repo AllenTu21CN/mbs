@@ -270,7 +270,11 @@ public final class MediaEngine implements Choreographer.FrameCallback {
                         delayMs = (mNextRenderTimeNs - currNs) / 1000000;
                     } else {
                         delayMs = 0;
-                        LogManager.d("!!!Performance issue: Choreographer is late to callback");
+                        if(mNextRenderTimeNs < currNs) {
+                            LogManager.w("!!!Performance issue: Choreographer is late to callback: us " + ((currNs-mNextRenderTimeNs)/1000));
+                        } else {
+                            LogManager.d("!!!Performance issue: left too short delay to callback: us " + ((mNextRenderTimeNs-currNs)/1000));
+                        }
                     }
                 }
                 Choreographer.getInstance().postFrameCallbackDelayed(this, delayMs);

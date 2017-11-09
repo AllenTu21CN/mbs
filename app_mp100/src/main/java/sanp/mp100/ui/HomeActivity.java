@@ -13,6 +13,7 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
+import sanp.test.SimpleTesting;
 import sanp.tools.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.RBUtil;
@@ -34,6 +35,7 @@ public class HomeActivity extends FragmentActivity {
     private HomeFragment mHomeFragment;
     private SurfaceView mSurfaceView;
     private SurfaceHolder.Callback mSurfaceCallback;
+    private boolean inTestMode = DeviceTestFragment.Enabled || SimpleTesting.Enabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +67,8 @@ public class HomeActivity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         LogManager.w("!!!HomeActivity onDestroy!!!");
-        BusinessPlatform.getInstance().release();
+        if(!inTestMode)
+            BusinessPlatform.getInstance().release();
         RBUtil.getInstance().release();
         super.onDestroy();
     }
@@ -107,11 +110,11 @@ public class HomeActivity extends FragmentActivity {
         public void surfaceCreated(SurfaceHolder holder) {
             RBUtil rb = RBUtil.getInstance();
             rb.init(mContext, holder);
-            if(!DeviceTestFragment.Enabled) {
+            if(!inTestMode) {
                 rb.addSources();
                 rb.setScene(RBUtil.Scene.Home);
+                BusinessPlatform.getInstance().init(mContext);
             }
-            BusinessPlatform.getInstance().init(mContext);
 
             mFragmentTransaction.add(R.id.fragmentLayout, mHomeFragment, HomeFragment.TAG);
             mFragmentTransaction.addToBackStack(null);

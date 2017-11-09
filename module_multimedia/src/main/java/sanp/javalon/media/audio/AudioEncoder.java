@@ -207,6 +207,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
     private void outputThreadLoop() {
         mEncoder.start();
 
+        long last_pts = -1;
         mRunning = true;
         LogManager.i("Start to audio encode");
         while (mRunning) {
@@ -215,12 +216,21 @@ public class AudioEncoder implements AudioCapturer.Callback {
             if(encodedData == null)
                 continue;
             MediaCodec.BufferInfo bufferInfo = mEncoder.getEncodedInfo();
+            long pts = bufferInfo.presentationTimeUs;
 
-            //LogManager.d(String.format("Encoder output %d bytes with pts %d", encodedData.limit()-encodedData.position(), bufferInfo.presentationTimeUs));
+            if(last_pts != -1) {
+                if(pts <= last_pts) {
+                    LogManager.w(String.format("!!!!! audio encoder: last-%d cur-%d, fix it", last_pts, pts));
+                    pts = last_pts + 5;
+                }
+            }
+            last_pts = pts;
+
+            //LogManager.d(String.format("Encoder output %d bytes with pts %d", encodedData.limit()-encodedData.position(), pts));
             int pos = encodedData.position();
             synchronized(mCallbacks) {
                 for(Callback cb: mCallbacks) {
-                    cb.onData(encodedData, bufferInfo.presentationTimeUs, bufferInfo.flags);
+                    cb.onData(encodedData, pts, bufferInfo.flags);
                     encodedData.position(pos);
                 }
             }
