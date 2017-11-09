@@ -29,12 +29,19 @@
 
     <dimen name="course_table_width">1400px</dimen>
     <dimen name="course_table_height">640px</dimen>
+    <dimen name="course_table_stroke_width">2px</dimen>
+
     <dimen name="course_table_item_width">200px</dimen>
     <dimen name="course_table_item_height">80px</dimen>
+    <dimen name="course_table_item_internal_padding">2px</dimen>
+    <dimen name="course_table_item_stroke_width">1px</dimen>
+    <dimen name="course_table_item_selected_stroke_width">4px</dimen>
+    <dimen name="course_table_item_selected_radius">6px</dimen>
 
     <dimen name="course_table_sidebar_width">260px</dimen>
     <dimen name="course_table_with_sidebar_width">1660px</dimen>
 
+    <!-- see @dimen/course_table_stroke_width: 2px -->
     <dimen name="course_table_divider_width">2px</dimen>
     <dimen name="course_table_width_with_divider">1402px</dimen>
     <dimen name="course_table_height_with_divider">642px</dimen>
@@ -50,6 +57,37 @@
     <dimen name="course_table_canvas_margin_top_week">10px</dimen>
 
 
+    <!-- course table date bar -->
+    <dimen name="course_table_date_bar_width">580px</dimen>
+    <dimen name="course_table_date_bar_height">120px</dimen>
+    <dimen name="course_table_date_bar_bk_radius">4px</dimen>
+    <dimen name="course_table_date_margin_top">10px</dimen>
+
+    <dimen name="course_table_date_line_width">1px</dimen>
+
+    <dimen name="course_table_date_button_bk_width">500px</dimen>
+    <dimen name="course_table_date_button_bk_height">80px</dimen>
+    <dimen name="course_table_date_button_bk_margin_left">160px</dimen>
+    <dimen name="course_table_date_button_bk_margin_top">50px</dimen>
+
+    <dimen name="course_table_date_button_layer">4px</dimen>
+
+    <dimen name="course_table_date_button_disabled_stroke_width">1px</dimen>
+
+    <!-- course week -->
+    <dimen name="course_table_week_item_padding">5px</dimen>
+
+
+    <!-- when set "android:layout_weight=1" -->
+    <dimen name="course_table_none_size">0px</dimen>
+
+    <!-- course dialog -->
+    <dimen name="course_dialog_stroke_width">1px</dimen>
+    <dimen name="course_dialog_radius">6px</dimen>
+
+    <!-- course common bk  -->
+    <dimen name="course_common_bk_stroke_width">1px</dimen>
+    <dimen name="course_common_bk_radius">6px</dimen>
 
 
     <!-- Text Font size -->

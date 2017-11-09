@@ -8,9 +8,9 @@
      -->
 
     <stroke
-        android:width="4px"
+        android:width="@dimen/course_table_item_selected_stroke_width"
         android:color="@android:color/holo_orange_light"
         />
 
-    <corners android:radius="6px" />
+    <corners android:radius="@dimen/course_table_item_selected_radius" />
 </shape>

@@ -3,7 +3,7 @@
 
     <solid android:color="@color/transparent"/>
 
-    <stroke android:width="2px"
+    <stroke android:width="@dimen/course_table_stroke_width"
         android:color="@color/course_item_stroke_color"/>
 
 </shape>

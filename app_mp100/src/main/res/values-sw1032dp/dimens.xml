@@ -1,0 +1,103 @@
+<resources>
+    <dimen name="action_text_size">16dp</dimen>
+
+    <!-- values-sw1032dp, DPI:160dp, 1920 * 1032, 1dp = 1px -->
+
+    <!-- author: will@1dao2.com
+         date:   2017/11/09
+
+         course table canvas:
+         1920 x 1080
+
+         sidebar      table         sidebar
+         + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
+    week |258dp|      1400dp        |260dp|
+         + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
+         |     |                    |     |
+         |Time |    Course Table    |EMPTY|
+         |     |                    |     |
+           ... |       ...            ...
+              2dp: divider line
+
+         Table: 7 x 8 => 1400dp * 640dp
+
+         Course Item: 200dp * 80dp
+         200dp = 198dp + 2dp
+         80dp  = 78dp  + 2dp
+
+         Total canvas:
+         (258dp + 2dp + 1400dp) * week-height * (2dp + 640dp)
+     -->
+
+    <dimen name="course_table_width">1400dp</dimen>
+    <dimen name="course_table_height">640dp</dimen>
+    <dimen name="course_table_stroke_width">2dp</dimen>
+
+    <dimen name="course_table_item_width">200dp</dimen>
+    <dimen name="course_table_item_height">80dp</dimen>
+    <dimen name="course_table_item_internal_padding">2dp</dimen>
+    <dimen name="course_table_item_stroke_width">1dp</dimen>
+    <dimen name="course_table_item_selected_stroke_width">4dp</dimen>
+    <dimen name="course_table_item_selected_radius">6dp</dimen>
+
+    <dimen name="course_table_sidebar_width">260dp</dimen>
+    <dimen name="course_table_with_sidebar_width">1660dp</dimen>
+
+    <!-- see @dimen/course_table_stroke_width: 2dp -->
+    <dimen name="course_table_divider_width">2dp</dimen>
+    <dimen name="course_table_width_with_divider">1402dp</dimen>
+    <dimen name="course_table_height_with_divider">642dp</dimen>
+
+    <!-- Time canvas: (260dp-14dp-2dp)244dp * 640dp: -->
+    <!-- Divider width: 2dp -->
+    <dimen name="course_table_time_width">244dp</dimen>
+    <dimen name="course_table_time_margin_right">14dp</dimen>
+
+    <!-- TODO: why 27dp -->
+    <dimen name="course_table_layout_margin_top_date">27dp</dimen>
+
+    <dimen name="course_table_canvas_margin_top_week">10dp</dimen>
+
+
+    <!-- course table date bar -->
+    <dimen name="course_table_date_bar_width">580dp</dimen>
+    <dimen name="course_table_date_bar_height">120dp</dimen>
+    <dimen name="course_table_date_bar_bk_radius">4dp</dimen>
+    <dimen name="course_table_date_margin_top">10dp</dimen>
+
+    <dimen name="course_table_date_line_width">1dp</dimen>
+
+    <dimen name="course_table_date_button_bk_width">500dp</dimen>
+    <dimen name="course_table_date_button_bk_height">80dp</dimen>
+    <dimen name="course_table_date_button_bk_margin_left">160dp</dimen>
+    <dimen name="course_table_date_button_bk_margin_top">50dp</dimen>
+
+    <dimen name="course_table_date_button_layer">4dp</dimen>
+
+    <dimen name="course_table_date_button_disabled_stroke_width">1dp</dimen>
+
+    <!-- course week -->
+    <dimen name="course_table_week_item_padding">5dp</dimen>
+
+
+    <!-- when set "android:layout_weight=1" -->
+    <dimen name="course_table_none_size">0dp</dimen>
+
+
+    <!-- course dialog -->
+    <dimen name="course_dialog_stroke_width">1dp</dimen>
+    <dimen name="course_dialog_radius">6dp</dimen>
+
+    <!-- course common bk  -->
+    <dimen name="course_common_bk_stroke_width">1dp</dimen>
+    <dimen name="course_common_bk_radius">6dp</dimen>
+
+
+    <!-- Text Font size -->
+    <dimen name="week_text_font_size">22sp</dimen>
+    <dimen name="table_time_text_font_size">22sp</dimen>
+
+    <dimen name="device_storage_item_magrintop">50dp</dimen>
+    <dimen name="device_test_item_height">120dp</dimen>
+
+</resources>

@@ -3,9 +3,9 @@
 
     <solid android:color="@color/course_dialog_background_color" />
     <stroke
-        android:width="0.8dp"
+        android:width="1px"
         android:color="@color/course_dialog_background_color" />
 
-    <corners android:radius="6dp" />
+    <corners android:radius="6px" />
 
 </shape>

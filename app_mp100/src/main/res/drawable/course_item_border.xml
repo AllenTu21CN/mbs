@@ -4,7 +4,7 @@
         android:color="@android:color/transparent"
         />
     <stroke
-        android:width="1px"
+        android:width="@dimen/course_table_item_stroke_width"
         android:color="@color/course_item_stroke_color"
         />
 </shape>
