@@ -83,10 +83,32 @@
     <!-- when set "android:layout_weight=1" -->
     <dimen name="course_table_none_size">0dp</dimen>
 
+    <!-- course table font size -->
+    <dimen name="course_table_date_font_size">30sp</dimen>
+    <dimen name="course_table_date_button_font_size">32sp</dimen>
+
+    <dimen name="course_name_font_size">36sp</dimen>
+    <dimen name="course_table_week_font_size">38sp</dimen>
+    <dimen name="course_table_section_font_size">38sp</dimen>
+
+
 
     <!-- course dialog -->
+    <dimen name="course_dialog_width">520dp</dimen>
+    <dimen name="course_dialog_title_view_margin">30dp</dimen>
+    <dimen name="course_dialog_info_view_margin_top">2dp</dimen>
+    <dimen name="course_dialog_view_line">2dp</dimen>
+    <dimen name="course_dialog_view_margin_top">30dp</dimen>
+    <dimen name="course_dialog_button_bk_height">80dp</dimen>
+    <dimen name="course_dialog_none_size">0dp</dimen>
+
     <dimen name="course_dialog_stroke_width">1dp</dimen>
-    <dimen name="course_dialog_radius">6dp</dimen>
+    <dimen name="course_dialog_radius">16dp</dimen>
+
+    <!-- course dialog text font size -->
+    <dimen name="course_dialog_title_font_size">32sp</dimen>
+    <dimen name="course_dialog_info_font_size">30sp</dimen>
+    <dimen name="course_dialog_button_font_size">32sp</dimen>
 
     <!-- course common bk  -->
     <dimen name="course_common_bk_stroke_width">1dp</dimen>
@@ -95,15 +117,6 @@
     <!-- course loading progress dialog -->
     <dimen name="loading_progress_bk_stroke_width">1dp</dimen>
     <dimen name="loading_progress_bk_radius">6dp</dimen>
-
-
-    <!-- course table font size -->
-    <dimen name="course_table_date_font_size">30sp</dimen>
-    <dimen name="course_table_date_button_font_size">32sp</dimen>
-
-    <dimen name="course_name_font_size">36sp</dimen>
-    <dimen name="course_table_week_font_size">38sp</dimen>
-    <dimen name="course_table_section_font_size">38sp</dimen>
 
 
 

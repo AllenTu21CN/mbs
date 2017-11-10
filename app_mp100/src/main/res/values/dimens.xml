@@ -81,19 +81,6 @@
     <!-- when set "android:layout_weight=1" -->
     <dimen name="course_table_none_size">0px</dimen>
 
-    <!-- course dialog -->
-    <dimen name="course_dialog_stroke_width">1px</dimen>
-    <dimen name="course_dialog_radius">6px</dimen>
-
-    <!-- course common bk  -->
-    <dimen name="course_common_bk_stroke_width">1px</dimen>
-    <dimen name="course_common_bk_radius">6px</dimen>
-
-    <!-- course loading process dialog -->
-    <dimen name="loading_progress_bk_stroke_width">1px</dimen>
-    <dimen name="loading_progress_bk_radius">6px</dimen>
-
-
     <!-- course table font size -->
     <dimen name="course_table_date_font_size">14sp</dimen>
     <dimen name="course_table_date_button_font_size">16sp</dimen>
@@ -101,6 +88,33 @@
     <dimen name="course_name_font_size">20sp</dimen>
     <dimen name="course_table_week_font_size">22sp</dimen>
     <dimen name="course_table_section_font_size">22sp</dimen>
+
+
+
+    <!-- course dialog -->
+    <dimen name="course_dialog_width">520px</dimen>
+    <dimen name="course_dialog_title_view_margin">30px</dimen>
+    <dimen name="course_dialog_info_view_margin_top">2px</dimen>
+    <dimen name="course_dialog_view_line">2px</dimen>
+    <dimen name="course_dialog_view_margin_top">30px</dimen>
+    <dimen name="course_dialog_button_bk_height">80px</dimen>
+    <dimen name="course_dialog_none_size">0px</dimen>
+
+    <dimen name="course_dialog_stroke_width">1px</dimen>
+    <dimen name="course_dialog_radius">16px</dimen>
+
+    <!-- course dialog text font size -->
+    <dimen name="course_dialog_title_font_size">16sp</dimen>
+    <dimen name="course_dialog_info_font_size">14sp</dimen>
+    <dimen name="course_dialog_button_font_size">16sp</dimen>
+
+    <!-- course common bk  -->
+    <dimen name="course_common_bk_stroke_width">1px</dimen>
+    <dimen name="course_common_bk_radius">6px</dimen>
+
+    <!-- course loading progress dialog -->
+    <dimen name="loading_progress_bk_stroke_width">1px</dimen>
+    <dimen name="loading_progress_bk_radius">6px</dimen>
 
 
 

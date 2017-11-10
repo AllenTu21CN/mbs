@@ -9,9 +9,12 @@
      -->
 
     <solid android:color="@color/course_dialog_background_color" />
+
+    <!-- will@1dao2.com, No stroke for course dialog
     <stroke
         android:width="@dimen/course_dialog_stroke_width"
         android:color="@color/course_dialog_background_color" />
+    -->
 
     <!-- 圆角 -->
     <corners android:radius="@dimen/course_dialog_radius" />

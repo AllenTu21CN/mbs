@@ -7,7 +7,7 @@
     <!-- see: http://blog.csdn.net/oqihaogongyuan/article/details/50958659 -->
 
     <LinearLayout
-        android:layout_width="260dp"
+        android:layout_width="@dimen/course_dialog_width"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:background="@drawable/course_dialog_background"
@@ -17,16 +17,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_margin="15dp"
+            android:layout_margin="@dimen/course_dialog_title_view_margin"
             android:gravity="center"
             android:text="课程信息"
             android:textColor="@android:color/white"
-            android:textSize="16sp" />
+            android:textSize="@dimen/course_dialog_title_font_size" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="1dp"
+            android:layout_marginTop="@dimen/course_dialog_info_view_margin_top"
             android:orientation="horizontal">
 
             <LinearLayout
@@ -40,7 +40,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="课程" />
 
                 <TextView
@@ -48,7 +48,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="老师" />
 
                 <TextView
@@ -56,7 +56,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="时间" />
 
                 <TextView
@@ -64,7 +64,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:textColor="@android:color/white"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="内容" />
             </LinearLayout>
 
@@ -79,6 +79,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="语文" />
 
                 <TextView
@@ -86,6 +87,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textColor="@android:color/white"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="方老师" />
 
                 <TextView
@@ -94,6 +96,7 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:textColor="@android:color/white"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="2017-10-29 第一节" />
 
                 <TextView
@@ -102,24 +105,25 @@
                     android:layout_height="wrap_content"
                     android:maxLines="1"
                     android:textColor="@android:color/white"
+                    android:textSize="@dimen/course_dialog_info_font_size"
                     android:text="岳阳楼记" />
             </LinearLayout>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="2px"
-            android:layout_marginTop="15dp"
+            android:layout_height="@dimen/course_dialog_view_line"
+            android:layout_marginTop="@dimen/course_dialog_view_margin_top"
             android:background="@color/course_dialog_line_color" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="@dimen/course_dialog_button_bk_height"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/course_dialog_no"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/course_dialog_none_size"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/course_dialog_left_button_selector"
@@ -127,16 +131,16 @@
                 android:singleLine="true"
                 android:text="No"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="@dimen/course_dialog_button_font_size" />
 
             <View
-                android:layout_width="2px"
+                android:layout_width="@dimen/course_dialog_view_line"
                 android:layout_height="match_parent"
                 android:background="@color/course_dialog_line_color" />
 
             <Button
                 android:id="@+id/course_dialog_yes"
-                android:layout_width="0dp"
+                android:layout_width="@dimen/course_dialog_none_size"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:background="@drawable/course_dialog_right_button_selector"
@@ -144,7 +148,7 @@
                 android:singleLine="true"
                 android:text="Yes"
                 android:textColor="@android:color/white"
-                android:textSize="16sp" />
+                android:textSize="@dimen/course_dialog_button_font_size" />
         </LinearLayout>
 
     </LinearLayout>
