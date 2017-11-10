@@ -3,6 +3,6 @@
 
     <solid android:color="@color/course_dialog_button_selected_color" />
 
-    <corners android:bottomRightRadius="6dp"/>
+    <corners android:bottomRightRadius="@dimen/course_dialog_radius"/>
 
 </shape>

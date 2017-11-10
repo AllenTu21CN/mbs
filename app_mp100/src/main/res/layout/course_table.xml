@@ -19,10 +19,10 @@
 
             <!-- Dateline -->
             <LinearLayout
-                android:layout_width="580px"
-                android:layout_height="120px"
-                android:layout_marginLeft="260px"
-                android:layout_marginTop="10px"
+                android:layout_width="@dimen/course_table_date_bar_width"
+                android:layout_height="@dimen/course_table_date_bar_height"
+                android:layout_marginLeft="@dimen/course_table_sidebar_width"
+                android:layout_marginTop="@dimen/course_table_date_margin_top"
                 android:orientation="vertical"
                 android:background="@drawable/course_table_date_bar_bk">
 
@@ -31,35 +31,35 @@
                 <TextView
                     android:id="@+id/today_date_view"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="@dimen/course_table_none_size"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="今日日期 2017/11/6 星期一"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/course_table_date_font_size"
                     android:textColor="@android:color/white"/>
 
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="1px"
+                    android:layout_height="@dimen/course_table_date_line_width"
                     android:background="@android:color/white"/>
 
                 <TextView
                     android:id="@+id/course_table_date_view"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="@dimen/course_table_none_size"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="课表日期 2017/11/6 - 2017/11/12"
-                    android:textSize="14sp"
+                    android:textSize="@dimen/course_table_date_font_size"
                     android:textColor="@android:color/white"/>
 
             </LinearLayout>
 
             <LinearLayout
-                android:layout_width="500px"
-                android:layout_height="80px"
-                android:layout_marginLeft="160px"
-                android:layout_marginTop="50px"
+                android:layout_width="@dimen/course_table_date_button_bk_width"
+                android:layout_height="@dimen/course_table_date_button_bk_height"
+                android:layout_marginLeft="@dimen/course_table_date_button_bk_margin_left"
+                android:layout_marginTop="@dimen/course_table_date_button_bk_margin_top"
                 android:orientation="horizontal"
                 android:background="@drawable/course_table_date_bar_button_bk">
                 <!-- #f9f9f9 -->
@@ -67,7 +67,7 @@
                 <!-- Prev week button -->
                 <Button
                     android:id="@+id/prev_week_btn"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/course_table_date_bar_button_selector"
@@ -76,18 +76,18 @@
                     android:nextFocusDown="@id/course_table_grid_view"
                     android:nextFocusUp="@null"
                     android:text="前一周"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/course_table_date_button_font_size"
                     android:textColor="#b8b8b8" />
 
                 <View
-                    android:layout_width="1px"
+                    android:layout_width="@dimen/course_table_date_line_width"
                     android:layout_height="match_parent"
                     android:background="#717070"/>
 
                 <!-- Refresh course table button -->
                 <Button
                     android:id="@+id/refresh_btn"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/course_table_date_bar_button_selector"
@@ -95,18 +95,18 @@
                     android:nextFocusDown="@id/course_table_grid_view"
                     android:nextFocusUp="@null"
                     android:text="刷新课表"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/course_table_date_button_font_size"
                     android:textColor="#b8b8b8" />
 
                 <View
-                    android:layout_width="1px"
+                    android:layout_width="@dimen/course_table_date_line_width"
                     android:layout_height="match_parent"
                     android:background="#717070"/>
 
                 <!-- Next week button -->
                 <Button
                     android:id="@+id/next_week_btn"
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:background="@drawable/course_table_date_bar_button_selector"
@@ -115,7 +115,7 @@
                     android:nextFocusDown="@id/course_table_grid_view"
                     android:nextFocusUp="@null"
                     android:text="后一周"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/course_table_date_button_font_size"
                     android:textColor="#b8b8b8" />
 
 
@@ -178,74 +178,74 @@
 
                 <!-- week: 1, 2, 3, 4, 5, 6, 7 -->
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="@dimen/course_table_week_item_padding"
                     android:text="星期一"
                     android:textColor="@color/week_text_color"
-                    android:textSize="@dimen/week_text_font_size" />
+                    android:textSize="@dimen/course_table_week_font_size" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="@dimen/course_table_week_item_padding"
                     android:text="星期二"
                     android:textColor="@color/week_text_color"
-                    android:textSize="@dimen/week_text_font_size" />
+                    android:textSize="@dimen/course_table_week_font_size" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="@dimen/course_table_week_item_padding"
                     android:text="星期三"
                     android:textColor="@color/week_text_color"
-                    android:textSize="@dimen/week_text_font_size" />
+                    android:textSize="@dimen/course_table_week_font_size" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="@dimen/course_table_week_item_padding"
                     android:text="星期四"
                     android:textColor="@color/week_text_color"
-                    android:textSize="@dimen/week_text_font_size" />
+                    android:textSize="@dimen/course_table_week_font_size" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="@dimen/course_table_week_item_padding"
                     android:text="星期五"
                     android:textColor="@color/week_text_color"
-                    android:textSize="@dimen/week_text_font_size" />
+                    android:textSize="@dimen/course_table_week_font_size" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="@dimen/course_table_week_item_padding"
                     android:text="星期六"
                     android:textColor="@color/week_text_color"
-                    android:textSize="@dimen/week_text_font_size" />
+                    android:textSize="@dimen/course_table_week_font_size" />
 
                 <TextView
-                    android:layout_width="0dp"
+                    android:layout_width="@dimen/course_table_none_size"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="@dimen/course_table_week_item_padding"
                     android:text="星期日"
                     android:textColor="@color/week_text_color"
-                    android:textSize="@dimen/week_text_font_size" />
+                    android:textSize="@dimen/course_table_week_font_size" />
 
             </LinearLayout>
 
@@ -295,75 +295,75 @@
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="1"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="2"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="3"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="4"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="5"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="6"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="7"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="@dimen/course_table_none_size"
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="8"
                         android:textColor="@color/table_time_text_color"
-                        android:textSize="@dimen/table_time_text_font_size" />
+                        android:textSize="@dimen/course_table_section_font_size" />
 
                 </LinearLayout>
 
@@ -404,11 +404,6 @@
                         android:background="@drawable/course_table_gridview_border"
 
                         android:stretchMode="columnWidth" />
-
-                    <!--
-                    android:layout_marginLeft="-1px"
-                    android:layout_marginRight="-1px"
-                    -->
 
                 </LinearLayout>
 

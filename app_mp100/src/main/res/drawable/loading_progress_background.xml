@@ -3,9 +3,9 @@
 
     <solid android:color="#c8ffffff" />
 
-    <stroke android:width="0.8dp"
+    <stroke android:width="@dimen/loading_progress_bk_stroke_width"
         android:color="@android:color/white"/>
 
-    <corners android:radius="6dp" />
+    <corners android:radius="@dimen/loading_progress_bk_radius" />
 
 </shape>
