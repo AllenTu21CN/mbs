@@ -2876,7 +2876,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
     static public class Tester extends CameraManager.AvailabilityCallback implements SimpleTesting.Tester, Observer {
 
         static private boolean mTestFromFile = false;
-        static private boolean mOutFromFile = true;
+        static private boolean mOutUrlFromFile = true;
         static private boolean mSourceFromFile = false;
         static private MediaEngine.VideoSinkConfig mVideoSinkConfs[] = {
                 /*0*/new MediaEngine.VideoSinkConfig(MediaEngine.VideoSinkConfig.MIME_TYPE_H264, 1920, 1088, 25, 2 * 1024 * 1024, 10),
@@ -3012,7 +3012,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             MediaEngine.AudioSinkConfig audioSinkConf;
             if (mAudioOutput)
                 audioSinkConf = mAudioSinkConf;
-            if (!mOutFromFile) {
+            if (!mOutUrlFromFile) {
                 for (String url : outputUrls.keySet()) {
                     int index = outputUrls.get(url);
                     MediaEngine.VideoSinkConfig cfg = mVideoSinkConfs[index];
@@ -3027,15 +3027,16 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             MediaEngine.AudioSinkConfig audioSinkConf;
             if (mAudioOutput)
                 audioSinkConf = mAudioSinkConf;
-            if (mOutFromFile) {
+            if (mOutUrlFromFile) {
                 try {
                     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File(Environment.getExternalStorageDirectory() + "/out.txt"))));
                     String out_url = br.readLine();
                     while(out_url != null) {
                         out_url = out_url.trim();
                         if(!out_url.equals("")) {
-                            out_url = Environment.getExternalStorageDirectory() + "/" + out_url;
-                            int id = mMediaController.addOutput(out_url, mVideoSinkConfs[0], audioSinkConf, RECOMMENDED_REOPEN_CNT);
+                            if(!out_url.startsWith("rtmp://"))
+                                out_url = Environment.getExternalStorageDirectory() + "/" + out_url;
+                            int id = mMediaController.addOutput(out_url, mVideoSinkConfs[1], audioSinkConf, RECOMMENDED_REOPEN_CNT);
                             mOutputIds.add(id);
                         }
                         out_url = br.readLine();
@@ -3131,7 +3132,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             } else {
                 if (true) {
                     if (mTestingStep == 4) {
-                        if(mOutFromFile)
+                        if(mOutUrlFromFile)
                             startOutputFromFile();
                         else
                             startOutputFromCode();

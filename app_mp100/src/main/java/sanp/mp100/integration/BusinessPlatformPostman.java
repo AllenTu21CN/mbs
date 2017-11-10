@@ -238,17 +238,21 @@ public class BusinessPlatformPostman implements Runnable {
 
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args, kwargs, (Class<CallResult>) null);
             f.whenComplete((callResult, throwable) -> {
-                synchronized (lock) {
-                    if (throwable == null) {
-                        result.results = callResult.results;
-                        result.kwresults = callResult.kwresults;
-                        rets.add(BPError.ACTION_SUCCESS);
-                    } else {
-                        LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) fail: %s", procedureName, args, kwargs, throwable.getMessage()));
-                        rets.add(BPError.ERROR_IMPORTANT_ACTION_FAIL);
-                        rets.add(throwable.getMessage());
+                try {
+                    synchronized (lock) {
+                        if (throwable == null) {
+                            result.results = callResult.results;
+                            result.kwresults = callResult.kwresults;
+                            rets.add(BPError.ACTION_SUCCESS);
+                        } else {
+                            LogManager.e(String.format("invoke procedure(%s) with args(%s) kwargs(%s) fail: %s", procedureName, args, kwargs, throwable.getMessage()));
+                            rets.add(BPError.ERROR_IMPORTANT_ACTION_FAIL);
+                            rets.add(throwable.getMessage());
+                        }
+                        lock.notify();
                     }
-                    lock.notify();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -285,10 +289,16 @@ public class BusinessPlatformPostman implements Runnable {
 
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args, kwargs, (Class<CallResult>) null);
             f.whenComplete((callResult, throwable) -> {
-                if (throwable == null) {
-                    resultCallback.done(0, callResult.results, callResult.kwresults);
-                } else {
-                    resultCallback.done(-2, null, new HashMap<String, Object>(){{put("message", throwable.getMessage());}});
+                try {
+                    if (throwable == null) {
+                        resultCallback.done(0, callResult.results, callResult.kwresults);
+                    } else {
+                        resultCallback.done(-2, null, new HashMap<String, Object>() {{
+                            put("message", throwable.getMessage());
+                        }});
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
             return BPError.ACTION_SUCCESS;
@@ -310,21 +320,26 @@ public class BusinessPlatformPostman implements Runnable {
 
             CompletableFuture<CallResult> f = mWAMPSession.call(procedureName, args);
             f.whenComplete((callResult, throwable) -> {
-                synchronized (lock) {
-                    if (throwable == null) {
-                        if(callResult.results != null) {
-                            Gson gson = new Gson();
-                            for (Object item : callResult.results) {
-                                result.add(gson.fromJson(item.toString(), classof));
+                try {
+                    synchronized (lock) {
+                        if (throwable == null) {
+                            if (callResult.results != null) {
+                                Gson gson1 = new Gson();
+                                Gson gson2 = new Gson();
+                                for (Object item : callResult.results) {
+                                    result.add(gson1.fromJson(gson2.toJson(item), classof));
+                                }
                             }
+                            rets.add(BPError.ACTION_SUCCESS);
+                        } else {
+                            LogManager.e(String.format("procedure(%s) error: %s", procedureName, throwable.getMessage()));
+                            rets.add(BPError.ERROR_IMPORTANT_ACTION_FAIL);
+                            rets.add(throwable.getMessage());
                         }
-                        rets.add(BPError.ACTION_SUCCESS);
-                    } else {
-                        LogManager.e(String.format("procedure(%s) error: %s", procedureName, throwable.getMessage()));
-                        rets.add(BPError.ERROR_IMPORTANT_ACTION_FAIL);
-                        rets.add(throwable.getMessage());
+                        lock.notify();
                     }
-                    lock.notify();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -431,17 +446,24 @@ public class BusinessPlatformPostman implements Runnable {
     }
 
     private void onCallCompleted(CallResult callResult, Throwable throwable, Class classof, Callback resultCallback) {
-        if (throwable == null) {
-            List<Object> objs = new ArrayList<>();
-            if(callResult.results != null) {
-                Gson gson = new Gson();
-                for (Object item : callResult.results) {
-                    objs.add(gson.fromJson(item.toString(), classof));
+        try {
+            if (throwable == null) {
+                List<Object> objs = new ArrayList<>();
+                if (callResult.results != null) {
+                    Gson gson1 = new Gson();
+                    Gson gson2 = new Gson();
+                    for (Object item : callResult.results) {
+                        objs.add(gson1.fromJson(gson2.toJson(item), classof));
+                    }
                 }
+                resultCallback.done(0, objs, null);
+            } else {
+                resultCallback.done(-2, null, new HashMap<String, Object>() {{
+                    put("message", throwable.getMessage());
+                }});
             }
-            resultCallback.done(0, objs, null);
-        } else {
-            resultCallback.done(-2, null, new HashMap<String, Object>(){{put("message", throwable.getMessage());}});
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
