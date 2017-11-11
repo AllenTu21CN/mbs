@@ -34,6 +34,7 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import sanp.javalon.media.audio.AudioCapturer;
 import sanp.tools.utils.LogManager;
 import sanp.tools.utils.Tuple;
 import sanp.tools.utils.Tuple3;
@@ -3137,8 +3138,11 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                         else
                             startOutputFromCode();
                     } else if (mTestingStep == 3) {
+                        AudioCapturer.getInstance().setDummyDelay(100);
                     } else if (mTestingStep == 2) {
+                        AudioCapturer.getInstance().setDummyDelay(300);
                     } else if (mTestingStep == 1) {
+                        AudioCapturer.getInstance().setDummyDelay(500);
                     }
                 } else {
                     if (mTestingStep == 4) {

@@ -202,6 +202,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
             return;
         if (mEncoder != null)
             mEncoder.encode(pcmFrame, ptsUs);
+        // LogManager.d("Push into encoder, pts(ms)-" + (ptsUs/1000));
     }
 
     private void outputThreadLoop() {
@@ -218,6 +219,7 @@ public class AudioEncoder implements AudioCapturer.Callback {
             MediaCodec.BufferInfo bufferInfo = mEncoder.getEncodedInfo();
             long pts = bufferInfo.presentationTimeUs;
 
+            // LogManager.d("Get output from encoder, pts(ms)-" + (pts/1000));
             if(last_pts != -1) {
                 if(pts <= last_pts) {
                     LogManager.w(String.format("!!!!! audio encoder: last-%d cur-%d, fix it", last_pts, pts));
