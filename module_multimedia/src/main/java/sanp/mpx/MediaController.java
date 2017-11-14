@@ -36,6 +36,7 @@ import android.view.SurfaceHolder;
 
 import sanp.javalon.media.audio.AudioCapturer;
 import sanp.tools.utils.LogManager;
+import sanp.tools.utils.PlatformUtils;
 import sanp.tools.utils.Tuple;
 import sanp.tools.utils.Tuple3;
 import sanp.test.SimpleTesting;
@@ -2388,10 +2389,18 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         LogManager.i(String.format("start output(%d) successfully: %s", outputId, url));
 
         mOutputs.put(outputId, output);
-        if(struct.newVideoSink)
-            scene.startVideoSink(struct.videoSinkId);
-        if(struct.newAudioSink)
+        if(struct.newAudioSink) {
+            /*
+            if(PlatformUtils.isRKs()) {
+                AudioCapturer.getInstance().resume();
+                try { Thread.sleep(1500); } catch (InterruptedException e) {LogManager.e(e);}
+            }
+            */
             scene.startAudioSink(struct.audioSinkId);
+        }
+        if(struct.newVideoSink) {
+            scene.startVideoSink(struct.videoSinkId);
+        }
         synchronized(mObservers) {
             for (Observer ob : mObservers)
                 ob.onOutputAdded(outputId, url, 0);

@@ -1,6 +1,7 @@
 package sanp.tools.utils;
 
 import android.app.Activity;
+import android.os.Looper;
 
 /**
  * Created by Tom on 2017/5/3.

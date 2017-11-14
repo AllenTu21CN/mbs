@@ -309,7 +309,7 @@ public class RTMPSink implements Runnable, RTMPPushClient.Callback {
                     }
                     int stream_id = m_track2stream_IDs.get(track_id);
                     m_rtmp_client.write(stream_id, payload.array(), payload.position(), payload.remaining(), pts, flag);
-                    //LogManager.i("id-" + stream_id + " pts-" + pts);
+                    //LogManager.i("id-" + stream_id + " pts-" + pts + " flag-"+flag);
                 }
                 resetPkt(pkt);
             }
