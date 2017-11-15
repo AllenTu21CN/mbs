@@ -373,6 +373,8 @@ public class AudioCapturer {
     private void callbackData(ByteBuffer frame) {
         int pos = frame.position();
         long ptsUs = System.nanoTime() / 1000;
+
+        // LogManager.d("audio capture: pts-" + ptsUs + " size-" + frame.remaining());
         synchronized(mCallbacks) {
             for(Callback cb: mCallbacks) {
                 cb.onData(frame, PCMFormat, ptsUs);

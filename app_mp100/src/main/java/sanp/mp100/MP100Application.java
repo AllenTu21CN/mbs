@@ -63,6 +63,28 @@ public class MP100Application extends Application {
         TMP_FILE_PATH = EXTERNAL_STORAGE_DIRECTORY  + TMP_FILE_PREFIX;      // "/sdcard/MP100/tmp"
     }
 
+    private void saveResBgPicturesToStorage() {
+        LogManager.i("save bg pictures to storage: " + HOME_EXTERNAL_PATH);
+        for(String filename: RES_BG_FILES.keySet()) {
+            try {
+                FileSaveUtils.saveToSDCard(this, HOME_EXTERNAL_PATH, filename, RES_BG_FILES.get(filename));
+            } catch (Throwable e) {
+                LogManager.e("saveResBgPicturesToStorage error " + e);
+            }
+        }
+    }
+
+    private void saveTmpSettingsFilesToStorage() {
+        LogManager.i("save temp files to storage: " + TMP_FILE_PATH);
+        for(String filename: TMP_SETTINGS_FILES.keySet()) {
+            try {
+                FileSaveUtils.saveToSDCard(this, TMP_FILE_PATH, filename, TMP_SETTINGS_FILES.get(filename));
+            } catch (Throwable e) {
+                LogManager.e("saveTmpSettingsFilesToStorage error " + e);
+            }
+        }
+    }
+
     public static <T> T loadSettingsFromTmpFile(String filename, Class<T> classOf) {
         String tmpFile = TMP_FILE_PATH + "/" + filename;
         LogManager.w(String.format("TODO: will read tmp file[%s] which is copy from Monica\\app_mp100\\src\\main\\res\\raw", tmpFile));
@@ -84,28 +106,6 @@ public class MP100Application extends Application {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             throw new RuntimeException("not found " + tmpFile);
-        }
-    }
-
-    private void saveResBgPicturesToStorage() {
-        LogManager.i("save bg pictures to storage: " + HOME_EXTERNAL_PATH);
-        for(String filename: RES_BG_FILES.keySet()) {
-            try {
-                FileSaveUtils.saveToSDCard(this, HOME_EXTERNAL_PATH, filename, RES_BG_FILES.get(filename));
-            } catch (Throwable e) {
-                LogManager.e("saveResBgPicturesToStorage error " + e);
-            }
-        }
-    }
-
-    private void saveTmpSettingsFilesToStorage() {
-        LogManager.i("save temp files to storage: " + TMP_FILE_PATH);
-        for(String filename: TMP_SETTINGS_FILES.keySet()) {
-            try {
-                FileSaveUtils.saveToSDCard(this, TMP_FILE_PATH, filename, TMP_SETTINGS_FILES.get(filename));
-            } catch (Throwable e) {
-                LogManager.e("saveTmpSettingsFilesToStorage error " + e);
-            }
         }
     }
 }

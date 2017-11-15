@@ -2390,12 +2390,12 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
 
         mOutputs.put(outputId, output);
         if(struct.newAudioSink) {
-            /*
+            ///*
             if(PlatformUtils.isRKs()) {
                 AudioCapturer.getInstance().resume();
                 try { Thread.sleep(1500); } catch (InterruptedException e) {LogManager.e(e);}
             }
-            */
+            //*/
             scene.startAudioSink(struct.audioSinkId);
         }
         if(struct.newVideoSink) {
