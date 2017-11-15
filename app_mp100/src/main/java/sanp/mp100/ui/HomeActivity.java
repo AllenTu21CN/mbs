@@ -13,7 +13,7 @@ import android.view.SurfaceView;
 
 import java.util.List;
 
-import sanp.mp100.MP100MediaUtil;
+import sanp.mp100.MP100RBUtil;
 import sanp.test.SimpleTesting;
 import sanp.tools.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
@@ -69,7 +69,7 @@ public class HomeActivity extends FragmentActivity {
         LogManager.w("!!!HomeActivity onDestroy!!!");
         if(!inTestMode)
             BusinessPlatform.getInstance().release();
-        MP100MediaUtil.getInstance().release();
+        MP100RBUtil.getInstance().release();
         super.onDestroy();
     }
 
@@ -108,11 +108,11 @@ public class HomeActivity extends FragmentActivity {
     class SurfaceHolderCallback implements SurfaceHolder.Callback {
         @Override
         public void surfaceCreated(SurfaceHolder holder) {
-            MP100MediaUtil rb = MP100MediaUtil.getInstance();
+            MP100RBUtil rb = MP100RBUtil.getInstance();
             rb.init(mContext, holder);
             if(!inTestMode) {
                 rb.addSources();
-                rb.setScene(MP100MediaUtil.Scene.Home);
+                rb.setScene(MP100RBUtil.Scene.Home);
                 BusinessPlatform.getInstance().init(mContext);
             }
 
@@ -123,7 +123,7 @@ public class HomeActivity extends FragmentActivity {
 
         @Override
         public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-            MP100MediaUtil.getInstance().changeSurface(holder, format, width, height);
+            MP100RBUtil.getInstance().changeSurface(holder, format, width, height);
         }
 
         @Override

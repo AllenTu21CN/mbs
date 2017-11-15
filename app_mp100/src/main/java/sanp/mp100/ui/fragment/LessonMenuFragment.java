@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import sanp.mp100.MP100MediaUtil;
+import sanp.mp100.MP100RBUtil;
 import sanp.tools.utils.ToastManager;
 import sanp.mp100.R;
 
@@ -130,8 +130,8 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
         DynamicMenuFragment.ItemGroup itemGroup = new DynamicMenuFragment.ItemGroup();
         itemGroup.name = null; // has no title name
 
-        MP100MediaUtil rb = MP100MediaUtil.getInstance();
-        MP100MediaUtil.Scene scene = rb.currentScene();
+        MP100RBUtil rb = MP100RBUtil.getInstance();
+        MP100RBUtil.Scene scene = rb.currentScene();
         List<String> names = rb.getSceneContentNames();
         for(String name: names) {
             itemGroup.items.add(new DynamicMenuFragment.Item(name, ((v) -> {
@@ -148,15 +148,15 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
     private void showSubScreenMenu() {
         List<DynamicMenuFragment.ItemGroup> itemGroups = new ArrayList<>();
 
-        MP100MediaUtil rb = MP100MediaUtil.getInstance();
-        MP100MediaUtil.Content content = rb.currentContent();
+        MP100RBUtil rb = MP100RBUtil.getInstance();
+        MP100RBUtil.Content content = rb.currentContent();
 
         int subscreenCnt = content.roleCandidates.size();
         Integer[] idxs = content.roleCandidates.keySet().toArray(new Integer[subscreenCnt]);
         List<Integer> indexs = java.util.Arrays.asList(idxs);
         Collections.sort(indexs);
         for(int index: indexs) {
-            List<MP100MediaUtil.Role> roles = content.roleCandidates.get(index);
+            List<MP100RBUtil.Role> roles = content.roleCandidates.get(index);
             DynamicMenuFragment.ItemGroup itemGroup = new DynamicMenuFragment.ItemGroup();
             if(index == 0) {
                 itemGroup.name = "主分屏";
@@ -167,7 +167,7 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
                     itemGroup.name = "第" + index + "子分屏";
                 }
             }
-            for(MP100MediaUtil.Role role: roles) {
+            for(MP100RBUtil.Role role: roles) {
                 itemGroup.items.add(new DynamicMenuFragment.Item(role.toString(), ((v) -> {
                     int ret = rb.selectSubScreenRole(index, role);
                     if(ret != 0) {

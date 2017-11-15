@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import sanp.mp100.MP100MediaUtil;
+import sanp.mp100.MP100RBUtil;
 import sanp.tools.utils.LogManager;
 import sanp.mp100.MP100Application;
 import sanp.mp100.R;
@@ -825,7 +825,7 @@ public class BusinessPlatform {
 
     private void startRtmpOutput(LessonInfo info, long timetable_id) throws InternalError {
         String url = mRtmpPrefix + info.program_uuid + "?s=" + info.stream_name;
-        int id = MP100MediaUtil.getInstance().addOutput(url);
+        int id = MP100RBUtil.getInstance().addOutput(url);
         if(id < 0)
             throw new InternalError(String.format("create rtmp[%s] output failed with %d", url, id));
         mRtmpOutputs.put(timetable_id, id);
@@ -835,6 +835,6 @@ public class BusinessPlatform {
         Integer id = mRtmpOutputs.remove(timetable_id);
         if(id == null)
             return;
-        MP100MediaUtil.getInstance().removeOutput(id);
+        MP100RBUtil.getInstance().removeOutput(id);
     }
 }

@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import sanp.mp100.MP100MediaUtil;
+import sanp.mp100.MP100RBUtil;
 import sanp.tools.utils.LogManager;
 import sanp.tools.utils.ToastManager;
 import sanp.mp100.R;
@@ -95,7 +95,7 @@ public class LessonHomeFragment extends BaseFragment implements View.OnClickList
 
     @Override
     public void onDestroyView() {
-        MP100MediaUtil.getInstance().setScene(MP100MediaUtil.Scene.ShowTimeTable);
+        MP100RBUtil.getInstance().setScene(MP100RBUtil.Scene.ShowTimeTable);
         super.onDestroyView();
     }
 
@@ -147,7 +147,7 @@ public class LessonHomeFragment extends BaseFragment implements View.OnClickList
             mState = State.Stopping;
         }
 
-        MP100MediaUtil.getInstance().setScene(MP100MediaUtil.Scene.InClass);
+        MP100RBUtil.getInstance().setScene(MP100RBUtil.Scene.InClass);
     }
 
     private void initView() {
