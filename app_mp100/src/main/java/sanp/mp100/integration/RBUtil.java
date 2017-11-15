@@ -240,7 +240,6 @@ public class RBUtil implements MediaController.Observer {
     private RBUtil() {
         MediaEngine.enableAttachSPSPPPS2IFrame(false);
         mMediaController = MediaController.getInstance();
-        mMediaController.RES_PATH = MP100Application.HOME_EXTERNAL_PATH;
         mMediaController.addObserver(this);
         reset();
     }

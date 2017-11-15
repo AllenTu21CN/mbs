@@ -34,12 +34,14 @@ import android.util.Size;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import sanp.javalon.media.audio.AudioCapturer;
 import sanp.tools.utils.LogManager;
 import sanp.tools.utils.PlatformUtils;
 import sanp.tools.utils.Tuple;
 import sanp.tools.utils.Tuple3;
+
 import sanp.test.SimpleTesting;
+
+import sanp.javalon.media.audio.AudioCapturer;
 import sanp.javalon.media.audio.AudioEncoder;
 import sanp.javalon.media.base.AVChannel;
 import sanp.javalon.media.base.AVDefines.DataType;
@@ -47,8 +49,6 @@ import sanp.javalon.media.base.AVDefines.DataType;
 
 public class MediaController implements MediaEngine.Callback, IOEngine.IOSession.Observer, Runnable {
     private static final String TAG = "MediaController";
-
-    public static String RES_PATH = System.getenv("EXTERNAL_STORAGE") + "/MPX";
 
     public static final boolean DEBUG = true;
     public static final String BACKGROUND_DEFAULT_COLOR = "#121212";
@@ -926,7 +926,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             mCurrentSubScreenCnt = subScreenCnt;
             String bgName = ScreenLayout.getBackground(mCurrentMode, mCurrentSubScreenCnt);
             if (bgName != null)
-                setBackgroundImage("file:///" + RES_PATH + "/" + bgName, true);
+                setBackgroundImage("file:///" + ScreenLayout.getBackgroundPicturePath() + "/" + bgName, true);
             else
                 clearBackgroundImage(true);
         }
@@ -2917,7 +2917,6 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             // mMediaController.enableDisplayTestingItems(true);
             /*
              mMediaController.displayName(false);
-             mMediaController.setBackgroundImage("file:///" + MyApplication.RES_PATH + "/" + MyApplication.VIDEO_BG);
              mMediaController.clearBackgroundImage();
             //*/
             // testCameraManager(obj);

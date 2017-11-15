@@ -2,10 +2,6 @@ package sanp.tools.utils;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 
 import java.io.BufferedReader;
 import java.io.File;

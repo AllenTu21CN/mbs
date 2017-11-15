@@ -1,15 +1,11 @@
 package sanp.tools.utils;
 
 import android.content.Context;
-import android.os.Environment;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by Tom on 2017/4/25.
