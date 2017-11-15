@@ -1,28 +1,20 @@
 package sanp.mp100.ui.fragment;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import sanp.mp100.MP100MediaUtil;
 import sanp.tools.utils.LogManager;
 import sanp.tools.utils.ToastManager;
 import sanp.mp100.R;
 import sanp.mp100.integration.BusinessPlatform;
-import sanp.mp100.integration.RBUtil;
 import sanp.mp100.ui.adapter.CourseThread;
 
 public class LessonHomeFragment extends BaseFragment implements View.OnClickListener, CourseThread.ClassNotify {
@@ -103,7 +95,7 @@ public class LessonHomeFragment extends BaseFragment implements View.OnClickList
 
     @Override
     public void onDestroyView() {
-        RBUtil.getInstance().setScene(RBUtil.Scene.ShowTimeTable);
+        MP100MediaUtil.getInstance().setScene(MP100MediaUtil.Scene.ShowTimeTable);
         super.onDestroyView();
     }
 
@@ -155,7 +147,7 @@ public class LessonHomeFragment extends BaseFragment implements View.OnClickList
             mState = State.Stopping;
         }
 
-        RBUtil.getInstance().setScene(RBUtil.Scene.InClass);
+        MP100MediaUtil.getInstance().setScene(MP100MediaUtil.Scene.InClass);
     }
 
     private void initView() {

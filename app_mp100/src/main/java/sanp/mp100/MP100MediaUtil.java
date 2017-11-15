@@ -1,4 +1,4 @@
-package sanp.mp100.integration;
+package sanp.mp100;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -16,8 +16,6 @@ import java.util.Map;
 
 import sanp.tools.utils.LogManager;
 import sanp.javalon.media.base.AVDefines;
-import sanp.mp100.MP100Application;
-import sanp.mp100.R;
 import sanp.mpx.MediaController;
 import sanp.mpx.MediaEngine;
 import sanp.mpx.ScreenLayout;
@@ -28,7 +26,7 @@ import sanp.mpx.ScreenLayout.LayoutMode;
  * Created by Tuyj on 2017/10/28.
  */
 
-public class RBUtil implements MediaController.Observer {
+public class MP100MediaUtil implements MediaController.Observer {
 
     public interface StateObserver {
         void onSourceAdding(int id, String url, List<Role> roles, int result);
@@ -44,16 +42,16 @@ public class RBUtil implements MediaController.Observer {
         void onVideoRendererStatistics(float fps, long droppedFrame);
     }
 
-    private static RBUtil gRBUtil = null;
-    public static RBUtil getInstance() {
-        if (gRBUtil == null) {
-            synchronized (RBUtil.class) {
-                if (gRBUtil == null) {
-                    gRBUtil = new RBUtil();
+    private static MP100MediaUtil gMP100MediaUtil = null;
+    public static MP100MediaUtil getInstance() {
+        if (gMP100MediaUtil == null) {
+            synchronized (MP100MediaUtil.class) {
+                if (gMP100MediaUtil == null) {
+                    gMP100MediaUtil = new MP100MediaUtil();
                 }
             }
         }
-        return gRBUtil;
+        return gMP100MediaUtil;
     }
 
     private enum State {
@@ -237,7 +235,7 @@ public class RBUtil implements MediaController.Observer {
     private List<StateObserver> mStateObservers = new ArrayList<>();
     private List<StatisObserver> mStatisObservers = new ArrayList<>();
 
-    private RBUtil() {
+    private MP100MediaUtil() {
         MediaEngine.enableAttachSPSPPPS2IFrame(false);
         mMediaController = MediaController.getInstance();
         mMediaController.addObserver(this);
@@ -319,7 +317,7 @@ public class RBUtil implements MediaController.Observer {
     public void addSources() {
         synchronized (mLock) {
             for (Source source : mSources) {
-                LogManager.i(String.format("RBUtil initialize source: url-%s", source.url));
+                LogManager.i(String.format("MP100MediaUtil initialize source: url-%s", source.url));
                 int id = mMediaController.addSource(source.url, Arrays.asList(AVDefines.DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
                 if (id >= 0) {
                     source.id = id;
@@ -419,12 +417,12 @@ public class RBUtil implements MediaController.Observer {
     public int selectSubScreenRole(int subScreenIndex, Role role) {
         synchronized (mLock) {
             if(mCurrentContent == null)
-                throw new RuntimeException("RBUtil logical error: has no content in current scene");
+                throw new RuntimeException("MP100MediaUtil logical error: has no content in current scene");
             List<Role> roles = mCurrentContent.roleCandidates.get(subScreenIndex);
             if(roles == null)
-                throw new RuntimeException("RBUtil logical error: current content has no this sub-screen-" + subScreenIndex);
+                throw new RuntimeException("MP100MediaUtil logical error: current content has no this sub-screen-" + subScreenIndex);
             if(!roles.contains(role))
-                throw new RuntimeException("RBUtil logical error: current content sub-screen-" + subScreenIndex + " has no this role-" + role.toString());
+                throw new RuntimeException("MP100MediaUtil logical error: current content sub-screen-" + subScreenIndex + " has no this role-" + role.toString());
 
             Source source = getSourceByRole(role);
             if(source == null) // this role has not been bound with any source
@@ -447,7 +445,7 @@ public class RBUtil implements MediaController.Observer {
     }
 
     public int addSource(String url) {
-        LogManager.d(String.format("RBUtil add source: url-%s", url));
+        LogManager.d(String.format("MP100MediaUtil add source: url-%s", url));
         synchronized (mLock) {
             int id = mMediaController.addSource(url, Arrays.asList(AVDefines.DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
             if(id >= 0) {
@@ -462,7 +460,7 @@ public class RBUtil implements MediaController.Observer {
     }
 
     public int addSource(String url, List<Role> roles) {
-        LogManager.d(String.format("RBUtil add source: url-%s, with roles-%s", url, roles));
+        LogManager.d(String.format("MP100MediaUtil add source: url-%s, with roles-%s", url, roles));
         synchronized (mLock) {
             int id = mMediaController.addSource(url, Arrays.asList(AVDefines.DataType.VIDEO), MediaController.RECOMMENDED_REOPEN_CNT);
             if(id >= 0) {
@@ -485,7 +483,7 @@ public class RBUtil implements MediaController.Observer {
                 return -1;
             }
 
-            LogManager.i(String.format("RBUtil remove source: id-%d url-%s roles-%s", source.id, source.url, source.roles));
+            LogManager.i(String.format("MP100MediaUtil remove source: id-%d url-%s roles-%s", source.id, source.url, source.roles));
             mSources.remove(source);
             if (source.state == State.Done)
                 mMediaController.removeSource(source.id);
@@ -502,7 +500,7 @@ public class RBUtil implements MediaController.Observer {
                 return -1;
             }
 
-            LogManager.i(String.format("RBUtil remove source: id-%d url-%s roles-%s", source.id, source.url, source.roles));
+            LogManager.i(String.format("MP100MediaUtil remove source: id-%d url-%s roles-%s", source.id, source.url, source.roles));
             mSources.remove(source);
             if (source.state == State.Done)
                 mMediaController.removeSource(source.id);
@@ -527,7 +525,7 @@ public class RBUtil implements MediaController.Observer {
                 }
             }
 
-            LogManager.i(String.format("RBUtil remove source: id-%d url-%s roles-%s", source.id, source.url, source.roles));
+            LogManager.i(String.format("MP100MediaUtil remove source: id-%d url-%s roles-%s", source.id, source.url, source.roles));
             mSources.remove(source);
             if (source.state == State.Done)
                 mMediaController.removeSource(source.id);
@@ -570,7 +568,7 @@ public class RBUtil implements MediaController.Observer {
                 return -1;
             }
 
-            LogManager.i(String.format("RBUtil remove output: id-%d url-%s", id, url));
+            LogManager.i(String.format("MP100MediaUtil remove output: id-%d url-%s", id, url));
             mMediaController.removeOutput(id);
             return 0;
         }

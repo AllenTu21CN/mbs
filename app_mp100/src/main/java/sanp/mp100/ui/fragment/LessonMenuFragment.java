@@ -1,9 +1,7 @@
 package sanp.mp100.ui.fragment;
 
-import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,10 +11,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import sanp.tools.utils.LogManager;
+import sanp.mp100.MP100MediaUtil;
 import sanp.tools.utils.ToastManager;
 import sanp.mp100.R;
-import sanp.mp100.integration.RBUtil;
 
 /**
  * Created by Tuyj on 2017/11/3.
@@ -133,8 +130,8 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
         DynamicMenuFragment.ItemGroup itemGroup = new DynamicMenuFragment.ItemGroup();
         itemGroup.name = null; // has no title name
 
-        RBUtil rb = RBUtil.getInstance();
-        RBUtil.Scene scene = rb.currentScene();
+        MP100MediaUtil rb = MP100MediaUtil.getInstance();
+        MP100MediaUtil.Scene scene = rb.currentScene();
         List<String> names = rb.getSceneContentNames();
         for(String name: names) {
             itemGroup.items.add(new DynamicMenuFragment.Item(name, ((v) -> {
@@ -151,15 +148,15 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
     private void showSubScreenMenu() {
         List<DynamicMenuFragment.ItemGroup> itemGroups = new ArrayList<>();
 
-        RBUtil rb = RBUtil.getInstance();
-        RBUtil.Content content = rb.currentContent();
+        MP100MediaUtil rb = MP100MediaUtil.getInstance();
+        MP100MediaUtil.Content content = rb.currentContent();
 
         int subscreenCnt = content.roleCandidates.size();
         Integer[] idxs = content.roleCandidates.keySet().toArray(new Integer[subscreenCnt]);
         List<Integer> indexs = java.util.Arrays.asList(idxs);
         Collections.sort(indexs);
         for(int index: indexs) {
-            List<RBUtil.Role> roles = content.roleCandidates.get(index);
+            List<MP100MediaUtil.Role> roles = content.roleCandidates.get(index);
             DynamicMenuFragment.ItemGroup itemGroup = new DynamicMenuFragment.ItemGroup();
             if(index == 0) {
                 itemGroup.name = "主分屏";
@@ -170,7 +167,7 @@ public class LessonMenuFragment extends BaseFragment implements View.OnClickList
                     itemGroup.name = "第" + index + "子分屏";
                 }
             }
-            for(RBUtil.Role role: roles) {
+            for(MP100MediaUtil.Role role: roles) {
                 itemGroup.items.add(new DynamicMenuFragment.Item(role.toString(), ((v) -> {
                     int ret = rb.selectSubScreenRole(index, role);
                     if(ret != 0) {
