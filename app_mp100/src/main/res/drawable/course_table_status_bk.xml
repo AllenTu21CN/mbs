@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <corners android:radius="@dimen/course_table_status_canvas_bk_radius"/>
+
+    <gradient android:startColor="#4478aff2"
+	android:endColor="#7d6c8391"/>
+</shape>

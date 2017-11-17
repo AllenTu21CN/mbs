@@ -3,15 +3,16 @@
 
     <!-- values-sw1032dp, DPI:160dp, 1920 * 1032, 1dp = 1px -->
 
-    <!-- author: will@1dao2.com
-         date:   2017/11/09
+    <!-- author:   will@1dao2.com
+         date:     2017/11/09
+	 modified: 2017/11/16
 
          course table canvas:
          1920 x 1080
 
          sidebar      table         sidebar
          + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
-    week |258dp|      1400dp        |260dp|
+    week |100dp|      1400dp        |420dp|
          + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
          |     |                    |     |
          |Time |    Course Table    |EMPTY|
@@ -40,44 +41,62 @@
     <dimen name="course_table_item_selected_stroke_width">4dp</dimen>
     <dimen name="course_table_item_selected_radius">6dp</dimen>
 
-    <dimen name="course_table_sidebar_width">260dp</dimen>
-    <dimen name="course_table_with_sidebar_width">1660dp</dimen>
+    <dimen name="course_table_sidebar_width">100dp</dimen>
+    <dimen name="course_table_with_sidebar_width">1500dp</dimen>
 
     <!-- see @dimen/course_table_stroke_width: 2dp -->
     <dimen name="course_table_divider_width">2dp</dimen>
     <dimen name="course_table_width_with_divider">1402dp</dimen>
     <dimen name="course_table_height_with_divider">642dp</dimen>
 
-    <!-- Time canvas: (260dp-14dp-2dp)244dp * 640dp: -->
-    <!-- Divider width: 2dp -->
-    <dimen name="course_table_time_width">244dp</dimen>
-    <dimen name="course_table_time_margin_right">14dp</dimen>
+    <!-- course table week canvas: margin-left: 100dp; (200dp*7) * wrap_content  -->
+    <!-- course table week day: Monday, Tuesday, Wednesday, Thursday, ... -->
+    <dimen name="course_table_week_item_padding">5dp</dimen>
 
-    <!-- TODO: why 27dp -->
-    <dimen name="course_table_layout_margin_top_date">27dp</dimen>
+    <!-- course table section canvas: (100x-14dp-2px)84dp * 640dp: -->
+    <!-- Divider width: 2dp -->
+    <dimen name="course_table_section_width">84dp</dimen>
+    <dimen name="course_table_section_margin_right">14dp</dimen>
+
+    <!-- course table margin -->
+    <dimen name="course_table_layout_margin_top_date">10dp</dimen>
 
     <dimen name="course_table_canvas_margin_top_week">10dp</dimen>
 
 
-    <!-- course table date bar -->
-    <dimen name="course_table_date_bar_width">580dp</dimen>
-    <dimen name="course_table_date_bar_height">120dp</dimen>
-    <dimen name="course_table_date_bar_bk_radius">4dp</dimen>
+    <!-- 2. course table date canvas: match_parent * 60dp; center_horizontal -->
+    <dimen name="course_table_date_canvas_height">60dp</dimen>
     <dimen name="course_table_date_margin_top">10dp</dimen>
+
+    <!-- 2.1 course table date bar -->
+
+    <dimen name="course_table_date_bar_width">580dp</dimen>
+    <!-- dimen name="course_table_date_bar_height">120dp</dimen -->
+    <dimen name="course_table_date_bar_padding">10dp</dimen>
+    <dimen name="course_table_date_bar_bk_radius">4dp</dimen>
 
     <dimen name="course_table_date_line_width">1dp</dimen>
 
-    <dimen name="course_table_date_button_bk_width">500dp</dimen>
-    <dimen name="course_table_date_button_bk_height">80dp</dimen>
-    <dimen name="course_table_date_button_bk_margin_left">160dp</dimen>
-    <dimen name="course_table_date_button_bk_margin_top">50dp</dimen>
+    <!-- 2.2 course table date button -->
+    <dimen name="course_table_date_button_bk_width">400dp</dimen>
+    <!-- dimen name="course_table_date_button_bk_height">60dp</dimen -->
+    <dimen name="course_table_date_button_bk_margin_left">60dp</dimen>
 
     <dimen name="course_table_date_button_layer">4dp</dimen>
 
     <dimen name="course_table_date_button_disabled_stroke_width">1dp</dimen>
 
-    <!-- course week -->
-    <dimen name="course_table_week_item_padding">5dp</dimen>
+
+    <!-- The right layout of course table -->
+    <!-- 3. course table status canvas: 420dp * 500dp -->
+    <dimen name="course_table_status_canvas_width">400dp</dimen>
+    <dimen name="course_table_status_canvas_height">500dp</dimen>
+    <dimen name="course_table_status_canvas_margin">10dp</dimen>
+
+    <!-- The date bar: 10dp(top) + 60dp(height) + 10dp(top) -->
+    <dimen name="course_table_status_canvas_margin_top">50dp</dimen>
+
+    <dimen name="course_table_status_canvas_bk_radius">18dp</dimen>
 
 
     <!-- when set "android:layout_weight=1" -->
@@ -85,11 +104,11 @@
 
     <!-- course table font size -->
     <dimen name="course_table_date_font_size">30sp</dimen>
-    <dimen name="course_table_date_button_font_size">32sp</dimen>
+    <dimen name="course_table_date_button_font_size">30sp</dimen>
 
-    <dimen name="course_name_font_size">36sp</dimen>
-    <dimen name="course_table_week_font_size">38sp</dimen>
-    <dimen name="course_table_section_font_size">38sp</dimen>
+    <dimen name="course_name_font_size">34sp</dimen>
+    <dimen name="course_table_week_font_size">34sp</dimen>
+    <dimen name="course_table_section_font_size">36sp</dimen>
 
 
 

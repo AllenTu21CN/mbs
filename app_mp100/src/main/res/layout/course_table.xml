@@ -1,53 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/course_table"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="@drawable/bk_cyan_1440_900"
+    android:orientation="horizontal">
 
     <LinearLayout
         android:id="@+id/course_table_layout"
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:background="@drawable/bk_cyan_1440_900"
+        android:layout_width="@dimen/course_table_with_sidebar_width"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/course_table_date_canvas"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/course_table_date_canvas_height"
+            android:layout_marginTop="@dimen/course_table_date_margin_top"
+            android:layout_gravity="center_horizontal"
             android:orientation="horizontal">
 
             <!-- Dateline -->
             <LinearLayout
                 android:layout_width="@dimen/course_table_date_bar_width"
-                android:layout_height="@dimen/course_table_date_bar_height"
-                android:layout_marginLeft="@dimen/course_table_sidebar_width"
-                android:layout_marginTop="@dimen/course_table_date_margin_top"
-                android:orientation="vertical"
+                android:layout_height="match_parent"
                 android:background="@drawable/course_table_date_bar_bk">
 
-
-                <!-- Today's date -->
-                <TextView
-                    android:id="@+id/today_date_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/course_table_none_size"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="今日日期 2017/11/6 星期一"
-                    android:textSize="@dimen/course_table_date_font_size"
-                    android:textColor="@android:color/white"/>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/course_table_date_line_width"
-                    android:background="@android:color/white"/>
-
+                <!-- course table's date -->
                 <TextView
                     android:id="@+id/course_table_date_view"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/course_table_none_size"
-                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:padding="@dimen/course_table_date_bar_padding"
                     android:gravity="center"
                     android:text="课表日期 2017/11/6 - 2017/11/12"
                     android:textSize="@dimen/course_table_date_font_size"
@@ -57,9 +41,8 @@
 
             <LinearLayout
                 android:layout_width="@dimen/course_table_date_button_bk_width"
-                android:layout_height="@dimen/course_table_date_button_bk_height"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="@dimen/course_table_date_button_bk_margin_left"
-                android:layout_marginTop="@dimen/course_table_date_button_bk_margin_top"
                 android:orientation="horizontal"
                 android:background="@drawable/course_table_date_bar_button_bk">
                 <!-- #f9f9f9 -->
@@ -124,15 +107,16 @@
         </LinearLayout>
 
 
-        <!-- author: will@1dao2.com
-             date:   2017/10/22
+        <!-- author:   will@1dao2.com
+             date:     2017/10/22
+             modified: 2017/11/16
 
              course table canvas:
              1920 x 1080
 
              sidebar      table         sidebar
              + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
-        week |258px|      1400px        |260px|
+        week |100px|      1400px        |420px|
              + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
              |     |                    |     |
              |Time |    Course Table    |EMPTY|
@@ -143,9 +127,9 @@
          Table: 7 x 8 => 1400px * 640px
 
          Total canvas:
-         (258px + 2px + 1400px) * week-height * (2px + 640px)
+         (100px + 2px + 1400px) * week-height * (2px + 640px)
 
-         width: 258px + 2px(divider) + (199px + 1px) * 7
+         width: 100px + 2px(divider) + (199px + 1px) * 7
          height: 2px(divider) + (79px + 1px) * 8
 
          -->
@@ -161,12 +145,12 @@
 
                  week, 1920x1080:
 
-                 left margin: 260px
+                 left margin: 100px
                  canvas(bar): 1400px * content
 
                       sidebar      table         sidebar
                       + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
-                 week |260px|      1400px        |260px|
+                 week |100px|      1400px        |420px|
                       + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
             -->
             <LinearLayout
@@ -253,12 +237,12 @@
             <!-- author: will@1dao2.com
                  date:   2017/10/22
 
-             course time and table canvas:
+             course section and table canvas:
              1920 x 1080
 
                   sidebar      table         sidebar
                   + ~~~ + ~~~~~~~~~~~~~~~~~~ + ~~~ +
-             week |258px|      1400px        |260px|
+             week |100px|      1400px        |420px|
                   + ~~~ + ~~~~~~~~~~~~~~~~~~ +     +
                   |     |                    |     |
                   |Time |    Course Table    |EMPTY|
@@ -279,17 +263,17 @@
                 android:layout_marginTop="@dimen/course_table_canvas_margin_top_week"
                 android:orientation="horizontal">
 
-                <!-- course table time canvas
+                <!-- course table section canvas
 
-                     canvas: (260px - 14px - 2px) * 640px = 244px * 640px
+                     canvas: (100px - 14px - 2px) * 640px = 84px * 640px
                      Time Text: align right
 
                  -->
                 <LinearLayout
-                    android:id="@+id/course_table_time_canvas"
-                    android:layout_width="@dimen/course_table_time_width"
+                    android:id="@+id/course_table_section_canvas"
+                    android:layout_width="@dimen/course_table_section_width"
                     android:layout_height="@dimen/course_table_height"
-                    android:layout_marginRight="@dimen/course_table_time_margin_right"
+                    android:layout_marginRight="@dimen/course_table_section_margin_right"
                     android:layout_marginTop="@dimen/course_table_divider_width"
                     android:orientation="vertical">
 
@@ -299,7 +283,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="1"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
@@ -308,7 +292,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="2"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
@@ -317,7 +301,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="3"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
@@ -326,7 +310,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="4"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
@@ -335,7 +319,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="5"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
@@ -344,7 +328,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="6"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
@@ -353,7 +337,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="7"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                     <TextView
@@ -362,7 +346,7 @@
                         android:layout_weight="1"
                         android:gravity="right|center_vertical"
                         android:text="8"
-                        android:textColor="@color/table_time_text_color"
+                        android:textColor="@color/table_section_text_color"
                         android:textSize="@dimen/course_table_section_font_size" />
 
                 </LinearLayout>
@@ -407,10 +391,43 @@
 
                 </LinearLayout>
 
-            </LinearLayout>
+            </LinearLayout> <!-- course table with section -->
+
+        </LinearLayout> <!-- course table with week, section -->
+
+    </LinearLayout> <!-- course table layout with data bar, button -->
+
+
+    <!-- The right layout of course table -->
+    <!-- course table status canvas(view): 420px * wrap_content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Dateline -->
+        <LinearLayout
+            android:layout_width="@dimen/course_table_status_canvas_width"
+            android:layout_height="@dimen/course_table_status_canvas_height"
+            android:layout_marginTop="@dimen/course_table_status_canvas_margin_top"
+            android:layout_marginRight="@dimen/course_table_status_canvas_margin"
+            android:layout_marginLeft="@dimen/course_table_status_canvas_margin"
+            android:orientation="vertical"
+            android:background="@drawable/course_table_status_bk">
+
+            <!-- Today's date -->
+            <TextView
+                android:id="@+id/today_date_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/course_table_date_bar_padding"
+                android:gravity="center"
+                android:text="今日日期 2017/11/6 星期一"
+                android:textSize="@dimen/course_table_date_font_size"
+                android:textColor="@android:color/white"/>
 
         </LinearLayout>
 
     </LinearLayout>
 
-</FrameLayout>
+</LinearLayout>
