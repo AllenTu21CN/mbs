@@ -193,7 +193,7 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.4.0'
     testCompile 'junit:junit:4.12'
-    compile project(path: ':module_tools')
+    compile project(':module_tools')
 }
 
 task checkScripts(type: Exec) {

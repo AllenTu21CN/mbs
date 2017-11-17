@@ -14,7 +14,6 @@ import sanp.tools.utils.LogManager;
 import sanp.mp100.integration.BusinessPlatform;
 import sanp.mp100.integration.BusinessPlatform.TimeTable;
 import sanp.mp100.integration.BusinessPlatformPostman;
-import sanp.mp100.integration.RBUtil;
 
 /**
  * @file  CourseThread.java

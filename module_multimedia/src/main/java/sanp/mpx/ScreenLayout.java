@@ -77,6 +77,16 @@ public class ScreenLayout {
         return bgs.get(subScreenCnt);
     }
 
+    static private String gBackgroundPicturePath;
+    static public void setBackgroundPicturePath(String path) {
+        gBackgroundPicturePath = path;
+    }
+    static public String getBackgroundPicturePath() {
+        if(gBackgroundPicturePath == null)
+            throw new RuntimeException("ScreenLayout logical error: setBackgroundPicturePath first");
+        return gBackgroundPicturePath;
+    }
+
     static private Map<LayoutMode, Map<Integer, String>> mBackgrounds = new HashMap<LayoutMode, Map<Integer, String>>() {{
         put(LayoutMode.SYMMETRICAL,
                 new HashMap<Integer, String>() {{

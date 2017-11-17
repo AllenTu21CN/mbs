@@ -85,7 +85,7 @@ public class G711
    public static int linear2alaw(int pcm_val) // 2's complement (16-bit range)
    {  int mask;
   	   int seg;
-  	   //unsigned char javalon;
+  	   //unsigned char aval;
       int aval;
   
      	if (pcm_val>=0)
@@ -218,7 +218,7 @@ public class G711
   
    /** A-law to u-law conversion.
      */
-   //public static int alaw2ulaw(unsigned char javalon)
+   //public static int alaw2ulaw(unsigned char aval)
    public static int alaw2ulaw(int aval)
    {  aval&=0xff;
   	   return ((aval & 0x80)!=0)? (0xFF^_a2u[aval^0xD5]) : (0x7F^_a2u[aval^0x55]);

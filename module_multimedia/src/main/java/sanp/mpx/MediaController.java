@@ -35,9 +35,13 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import sanp.tools.utils.LogManager;
+import sanp.tools.utils.PlatformUtils;
 import sanp.tools.utils.Tuple;
 import sanp.tools.utils.Tuple3;
+
 import sanp.test.SimpleTesting;
+
+import sanp.javalon.media.audio.AudioCapturer;
 import sanp.javalon.media.audio.AudioEncoder;
 import sanp.javalon.media.base.AVChannel;
 import sanp.javalon.media.base.AVDefines.DataType;
@@ -45,8 +49,6 @@ import sanp.javalon.media.base.AVDefines.DataType;
 
 public class MediaController implements MediaEngine.Callback, IOEngine.IOSession.Observer, Runnable {
     private static final String TAG = "MediaController";
-
-    public static String RES_PATH = System.getenv("EXTERNAL_STORAGE") + "/MPX";
 
     public static final boolean DEBUG = true;
     public static final String BACKGROUND_DEFAULT_COLOR = "#121212";
@@ -924,7 +926,7 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             mCurrentSubScreenCnt = subScreenCnt;
             String bgName = ScreenLayout.getBackground(mCurrentMode, mCurrentSubScreenCnt);
             if (bgName != null)
-                setBackgroundImage("file:///" + RES_PATH + "/" + bgName, true);
+                setBackgroundImage("file:///" + ScreenLayout.getBackgroundPicturePath() + "/" + bgName, true);
             else
                 clearBackgroundImage(true);
         }
@@ -2387,10 +2389,18 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
         LogManager.i(String.format("start output(%d) successfully: %s", outputId, url));
 
         mOutputs.put(outputId, output);
-        if(struct.newVideoSink)
-            scene.startVideoSink(struct.videoSinkId);
-        if(struct.newAudioSink)
+        if(struct.newAudioSink) {
+            ///*
+            if(PlatformUtils.isRKs()) {
+                AudioCapturer.getInstance().resume();
+                try { Thread.sleep(1500); } catch (InterruptedException e) {LogManager.e(e);}
+            }
+            //*/
             scene.startAudioSink(struct.audioSinkId);
+        }
+        if(struct.newVideoSink) {
+            scene.startVideoSink(struct.videoSinkId);
+        }
         synchronized(mObservers) {
             for (Observer ob : mObservers)
                 ob.onOutputAdded(outputId, url, 0);
@@ -2907,7 +2917,6 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
             // mMediaController.enableDisplayTestingItems(true);
             /*
              mMediaController.displayName(false);
-             mMediaController.setBackgroundImage("file:///" + MyApplication.RES_PATH + "/" + MyApplication.VIDEO_BG);
              mMediaController.clearBackgroundImage();
             //*/
             // testCameraManager(obj);
@@ -3137,8 +3146,11 @@ public class MediaController implements MediaEngine.Callback, IOEngine.IOSession
                         else
                             startOutputFromCode();
                     } else if (mTestingStep == 3) {
+                        AudioCapturer.getInstance().setDummyDelay(100);
                     } else if (mTestingStep == 2) {
+                        AudioCapturer.getInstance().setDummyDelay(300);
                     } else if (mTestingStep == 1) {
+                        AudioCapturer.getInstance().setDummyDelay(500);
                     }
                 } else {
                     if (mTestingStep == 4) {

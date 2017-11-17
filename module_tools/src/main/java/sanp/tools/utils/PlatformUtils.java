@@ -26,6 +26,11 @@ public class PlatformUtils {
         }
     }
 
+    static public boolean isRKs() {
+        String model = Build.MODEL;
+        return (model.startsWith("firefly") || model.startsWith("rk3399") || model.startsWith("rk3288"));
+    }
+
     static public boolean isProductNativeSupported() {
         return type() == Type.PLATFORM_IS_TV;
     }

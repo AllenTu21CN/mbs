@@ -5,6 +5,7 @@ import android.content.Context;
 import java.util.HashMap;
 import java.util.Map;
 
+import sanp.mpx.ScreenLayout;
 import sanp.multimedia.R;
 import sanp.tools.utils.FileSaveUtils;
 import sanp.tools.utils.LogManager;
@@ -37,6 +38,7 @@ public class InitMultimedia {
         ModuleHomePath = AppHomePath + "/mm";
         saveVideoSamplesToStorage(context);
         saveSpeedSamplesToStorage(context);
+        ScreenLayout.setBackgroundPicturePath(AppHomePath);
     }
 
     private static void saveVideoSamplesToStorage(Context context) {

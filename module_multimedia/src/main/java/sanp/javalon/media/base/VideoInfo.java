@@ -14,8 +14,12 @@ public class VideoInfo extends MediaInfo {
         String mime = CodecId2Mime.get(values[0]);
         int width = values[1];
         int height = values[2];
-        int fps = 25; // TODO: can't get framerate from values[3]
-        int bitrate = 2048;// TODO: can't get bitrate from values[4]
+        int fps = 25;
+        int bitrate = 1 * 1024 * 1024;
+        if(values.length >= 4 && values[3] > 0)
+            fps = values[3];
+        if(values.length >= 5 && values[4] > 0)
+            bitrate = values[4];
         init0(id, mime, width, height, fps, bitrate);
     }
 

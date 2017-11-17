@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import sanp.test.SimpleTesting;
@@ -94,7 +95,10 @@ public class AudioCapturer {
     private int mSampleCntOfFrame = -1;
     private int mFrameSizeInByte = -1;
 
-    private ByteBuffer mPcmFrame = null;
+    private int mDummyDelayCnt = 0;
+
+    private List<ByteBuffer> mIdleFrames = new LinkedList<>();
+    private List<ByteBuffer> mUsingFrames = new LinkedList<>();
     private boolean mRecording = false;
     private AudioRecord mAudioRecord = null;
     private Thread mRecordingThread = null;
@@ -106,6 +110,7 @@ public class AudioCapturer {
 
     private PCMWave.AmplitudeCallback mAmplitudeCallback = null;
     private int mAmplitudeCallbackIntervalMS = DefaultVolumeDebugDurationMs;
+    private int mCurrentVolumeDebugDurationMs = 0;
 
     private AudioCapturer() {
     }
@@ -134,8 +139,6 @@ public class AudioCapturer {
         mSampleWidthInBytes = SampleFormat2Bytes(mSampleFormat);
         mSampleCntOfFrame = mSampleRate * mFrameDurationMs / 1000 * mChannelsCnt;
         mFrameSizeInByte = mSampleCntOfFrame * mSampleWidthInBytes;
-        mPcmFrame = ByteBuffer.allocateDirect(mFrameSizeInByte);
-        mPcmFrame.order(DefaultOrder);
         PCMFormat = new Format(mSampleRate, mChannelsCnt, mSampleWidthInBytes, mFrameDurationMs);
 
         int minRecSizeInByte = AudioRecord.getMinBufferSize(mSampleRate, mChannelMode, mSampleFormat);
@@ -206,6 +209,10 @@ public class AudioCapturer {
             mRecordingThread = null;
         }
         return 0;
+    }
+
+    public void setDummyDelay(int delayMs) {
+        mDummyDelayCnt = delayMs / mFrameDurationMs;
     }
 
     public boolean setNSEnabled(boolean enabled) {
@@ -327,39 +334,68 @@ public class AudioCapturer {
         mAudioRecord.startRecording();
         mRecording = true;
         LogManager.i("Start to record voice");
-        int volumeDebugDurationMs = 0;
+        mCurrentVolumeDebugDurationMs = 0;
         while (mRecording) {
-            mPcmFrame.clear();
-            int ret = mAudioRecord.read(mPcmFrame, mFrameSizeInByte);
+            ByteBuffer pcmFrame;
+            if(mIdleFrames.size() == 0)
+                pcmFrame = allocPcmFrame();
+            else
+                pcmFrame = mIdleFrames.remove(0);
+
+            pcmFrame.clear();
+            int ret = mAudioRecord.read(pcmFrame, mFrameSizeInByte);
             if(ret < 0) {
                 LogManager.e("AudioRecord read error: " + ret);
+                mIdleFrames.add(pcmFrame);
                 break;
             } else if(ret != mFrameSizeInByte) {
                 LogManager.w(String.format("Capturing data is not enough: %d(%d)", ret, mFrameSizeInByte));
+                mIdleFrames.add(pcmFrame);
                 continue;
             }
+            mUsingFrames.add(pcmFrame);
 
-            int pos = mPcmFrame.position();
-            long ptsUs = System.nanoTime() / 1000;
-            synchronized(mCallbacks) {
-                for(Callback cb: mCallbacks) {
-                    cb.onData(mPcmFrame, PCMFormat, ptsUs);
-                    mPcmFrame.position(pos);
+            while (mUsingFrames.size() > mDummyDelayCnt) {
+                ByteBuffer frame = mUsingFrames.remove(0);
+                if(mUsingFrames.size() == mDummyDelayCnt) {
+                    callbackData(frame);
+                } else {
+                    LogManager.d("drop needless pcm");
                 }
-            }
-            if(mAmplitudeCallback != null) {
-                volumeDebugDurationMs += mFrameDurationMs;
-                if(volumeDebugDurationMs >= mAmplitudeCallbackIntervalMS) {
-                    short amplitude = (short) (PCMWave.getMaxAmplitude(mPcmFrame.array(), mPcmFrame.position(), mFrameSizeInByte, mChannelsCnt) / 256);
-                    if(mAmplitudeCallback != null)
-                        mAmplitudeCallback.onAmplitude(amplitude, (short) 128);
-                    volumeDebugDurationMs = 0;
-                }
+                mIdleFrames.add(frame);
             }
         }
         mRecording = false;
         mAudioRecord.stop();
         LogManager.i("Exit to audio capture loop");
+    }
+
+    private void callbackData(ByteBuffer frame) {
+        int pos = frame.position();
+        long ptsUs = System.nanoTime() / 1000;
+
+        // LogManager.d("audio capture: pts-" + ptsUs + " size-" + frame.remaining());
+        synchronized(mCallbacks) {
+            for(Callback cb: mCallbacks) {
+                cb.onData(frame, PCMFormat, ptsUs);
+                frame.position(pos);
+            }
+        }
+        if(mAmplitudeCallback != null) {
+            mCurrentVolumeDebugDurationMs += mFrameDurationMs;
+            if(mCurrentVolumeDebugDurationMs >= mAmplitudeCallbackIntervalMS) {
+                short amplitude = (short) (PCMWave.getMaxAmplitude(frame.array(), pos, mFrameSizeInByte, mChannelsCnt) / 256);
+                if(mAmplitudeCallback != null)
+                    mAmplitudeCallback.onAmplitude(amplitude, (short) 128);
+                mCurrentVolumeDebugDurationMs = 0;
+            }
+        }
+    }
+
+    private ByteBuffer allocPcmFrame() {
+        ByteBuffer PcmFrame = ByteBuffer.allocateDirect(mFrameSizeInByte);
+        PcmFrame.order(DefaultOrder);
+        return PcmFrame;
     }
 
     static public int ChannelMode2Cnt(int mode) {
@@ -507,7 +543,7 @@ public class AudioCapturer {
     }
 
     static public class Tester implements SimpleTesting.Tester, PCMWave.AmplitudeCallback {
-        static private final int testingMethod = AudioCapturer.Supporting.TESTING_METHOD_TOFILE;
+        static private final int testingMethod = AudioCapturer.Supporting.TESTING_METHOD_PLAYBACK;
         static private final int playbackMode = AudioCapturer.Supporting.TESTING_PLAYBACK_MODE_MEDIA;
         private int mTestingStep = 5;
         private AudioCapturer mCapturer = null;
@@ -525,11 +561,13 @@ public class AudioCapturer {
                 return;
             }
             if(mTestingStep == 4) {
-                mCapturer.setAmplitudeCallback(this);
+                mCapturer.setDummyDelay(1000);
             } else if (mTestingStep == 3) {
-                mCapturer.clearAmplitudeCallback();
+                mCapturer.setDummyDelay(0);
             } else if (mTestingStep == 2) {
+                mCapturer.setAmplitudeCallback(this);
             } else if (mTestingStep == 1) {
+                mCapturer.clearAmplitudeCallback();
             }
             --mTestingStep;
         }

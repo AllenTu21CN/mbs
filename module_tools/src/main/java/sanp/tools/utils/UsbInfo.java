@@ -1,7 +1,5 @@
 package sanp.tools.utils;
 
-import java.util.HashMap;
-
 /**
  * Created by Vald on 2017/3/16.
  * USB EventBus信息类

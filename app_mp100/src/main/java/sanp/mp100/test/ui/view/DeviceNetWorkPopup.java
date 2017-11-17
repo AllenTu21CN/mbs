@@ -18,7 +18,7 @@ import sanp.tools.utils.LogManager;
 import sanp.tools.utils.ScreenUtils;
 
 import sanp.mp100.R;
-import sanp.mp100.utils.PingNetUtil;
+import sanp.mp100.test.ui.utils.PingNetUtil;
 import sanp.mp100.test.ui.utils.WifiManagerUtil;
 import sanp.tools.utils.net.EthernetManager;
 import sanp.tools.utils.net.IpCfg;

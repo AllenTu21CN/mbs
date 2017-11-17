@@ -1,4 +1,4 @@
-package sanp.mp100.utils;
+package sanp.mp100.test.ui.utils;
 
 import java.io.IOException;
 
