@@ -1,0 +1,644 @@
+{
+  "tableName": "通用本地显示导播表",
+  "tableType": "Local",
+  "description": "适用于单点、多点互动课的通用自动导播逻辑,支持扩展屏模式",
+  "content": {
+    "layout": {
+      "desc": "显示布局",
+      "logicId": "s_p_map",
+      "recvEvents": [
+        {
+          "name": "ReFlush",
+          "id": 64
+        }
+      ],
+      "tokenPattern": [
+        "speak",
+        "resource",
+        "ext-dsp"
+      ],
+      "enum": {
+        "speak=false&resource=false&ext-dsp=false": [
+          {
+            "required": [
+              "remote"
+            ],
+            "optional": [
+              "#LocalExt",
+              "local_source"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ],
+        "speak=false&resource=true&ext-dsp=false": [
+          {
+            "required": [
+              "resource", "remote"
+            ],
+            "optional": [
+              "local_source"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ],
+        "speak=true&resource=false&ext-dsp=false": [
+          {
+            "required": [
+              "speak"
+            ],
+            "optional": [
+              "remote",
+              "local_source"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ],
+        "speak=true&resource=true&ext-dsp=false": [
+          {
+            "required": [
+              "resource", "speak"
+            ],
+            "optional": [
+              "remote",
+              "local_source"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ],
+
+        "speak=false&resource=false&ext-dsp=true": [
+          {
+            "required": [
+              "local_source"
+            ],
+            "optional": [
+              "remote",
+              "resource"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          },
+          {
+            "required": [
+              "resource"
+            ],
+            "optional": [],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ],
+        "speak=false&resource=true&ext-dsp=true": [
+          {
+            "required": [
+              "speak"
+            ],
+            "optional": [
+              "remote",
+              "resource"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          },
+          {
+            "required": [
+              "resource"
+            ],
+            "optional": [],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ],
+        "speak=true&resource=false&ext-dsp=true": [
+          {
+            "required": [
+              "speak"
+            ],
+            "optional": [
+              "remote",
+              "resource"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          },
+          {
+            "required": [
+              "resource"
+            ],
+            "optional": [],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ],
+        "speak=true&resource=true&ext-dsp=true": [
+          {
+            "required": [
+              "speak"
+            ],
+            "optional": [
+              "remote",
+              "resource"
+            ],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          },
+          {
+            "required": [
+              "resource"
+            ],
+            "optional": [],
+            "layoutName": {
+              "similar": {
+                "1": "A",
+                "2": "AB",
+                "3": "ABC",
+                "4": "ABCD",
+                "5": "ABCD",
+                "6": "ABCD"
+              },
+              "multiple": {
+                "1": "A",
+                "2": "AB_IN_RT",
+                "3": "ABC_OUT",
+                "4": "ABC_OUT",
+                "5": "A4F_OUT",
+                "6": "A4F_OUT"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "subStates": [
+      {
+        "desc": "本地信号列表",
+        "logicId": "BI_PRIORITY",
+        "tokenType": "NOT_EMPTY",
+        "tokenName": "local_source",
+        "defaultValue": [
+          "Teacher",
+          "Student",
+          "Blackboard",
+          "Courseware",
+          "TeacherCloseUp",
+          "StudentCloseUp"
+        ],
+        "valueType": "ROLE",
+        "recvEvents": [
+          {
+            "name": "TeacherTargetAppear",
+            "id": 1,
+            "value": "Teacher",
+            "top": "true"
+          },
+          {
+            "name": "TeacherTargetLoss",
+            "id": 2,
+            "value": "Teacher",
+            "top": "false"
+          },
+          {
+            "name": "TeacherOnPodium",
+            "id": 3,
+            "value": "Teacher",
+            "top": "true"
+          },
+          {
+            "name": "TeacherDownPodium",
+            "id": 4,
+            "value": "Teacher",
+            "top": "false"
+          },
+          {
+            "name": "TeacherPTZMovement",
+            "id": 5,
+            "value": "Teacher",
+            "top": "false"
+          },
+          {
+            "name": "TeacherPTZStill",
+            "id": 6,
+            "value": "TeacherCloseUp",
+            "top": "true"
+          },
+          {
+            "name": "TeacherWritingBegin",
+            "id": 7,
+            "value": "TeacherCloseUp",
+            "top": "true"
+          },
+          {
+            "name": "TeacherWritingEnd",
+            "id": 8,
+            "value": "TeacherCloseUp",
+            "top": "false"
+          },
+          {
+            "name": "StudentStandUp",
+            "id": 9,
+            "value": "StudentCloseUp",
+            "top": "true"
+          },
+          {
+            "name": "StudentCloseUp",
+            "id": 10,
+            "value": "StudentCloseUp",
+            "top": "true"
+          },
+          {
+            "name": "StudentMultiObjects",
+            "id": 11,
+            "value": "Student",
+            "top": "true"
+          },
+          {
+            "name": "StudentSitDown",
+            "id": 12,
+            "value": "StudentCloseUp",
+            "top": "false"
+          },
+          {
+            "name": "TeacherSingleObject",
+            "id": 13,
+            "value": "Teacher",
+            "top": "true"
+          },
+          {
+            "name": "TeacherMultiObjects",
+            "id": 14,
+            "value": "Teacher",
+            "top": "true"
+          },
+          {
+            "name": "BlackboardCloseUpInner",
+            "id": 15,
+            "value": "Blackboard",
+            "top": "true"
+          },
+          {
+            "name": "StudentCloseUpInner",
+            "id": 16,
+            "value": "StudentCloseUp",
+            "top": "true"
+          },
+          {
+            "name": "TeacherCloseUpInner",
+            "id": 17,
+            "value": "TeacherCloseUp",
+            "top": "true"
+          },
+          {
+            "name": "StudentFullViewInner",
+            "id": 18,
+            "value": "Student",
+            "top": "true"
+          },
+          {
+            "name": "TeacherFullViewInner",
+            "id": 19,
+            "value": "Teacher",
+            "top": "true"
+          },
+          {
+            "name": "CoursewareActive",
+            "id": 20,
+            "value": "Courseware",
+            "top": "true"
+          },
+          {
+            "name": "CoursewareTimeout",
+            "id": 21,
+            "value": "Courseware",
+            "top": "false"
+          },
+          {
+            "name": "CoursewareLock",
+            "id": 22,
+            "value": "Courseware",
+            "top": "true"
+          },
+          {
+            "name": "CoursewareUnlock",
+            "id": 23,
+            "value": "Courseware",
+            "top": "false"
+          }
+        ],
+        "sendEvents": [
+          {
+            "name": "ReFlush",
+            "id": 64
+          }
+        ]
+      },
+      {
+        "desc": "远程列表",
+        "logicId": "BI_FIXED_ROLE_LIST",
+        "role": "Caller",
+        "tokenType": "NOT_EMPTY",
+        "tokenName": "remote",
+        "valueType": "ROLE",
+        "recvEvents": [
+          {
+            "name": "RemoteReady",
+            "id": 58,
+            "value": "+"
+          },
+          {
+            "name": "RemoteDisconnected",
+            "id": 59,
+            "value": "-"
+          }
+        ],
+        "sendEvents": [
+          {
+            "name": "ReFlush",
+            "id": 64
+          }
+        ]
+      },
+      {
+        "desc": "远程发言列表",
+        "logicId": "BI_FIXED_ROLE_LIST",
+        "role": "Caller",
+        "tokenType": "NOT_EMPTY",
+        "tokenName": "speak",
+        "valueType": "ROLE",
+        "recvEvents": [
+          {
+            "name": "RemoteDisconnected",
+            "id": 59,
+            "value": "-"
+          },
+          {
+            "name": "RemoteSpeaking",
+            "id": 60,
+            "value": "+"
+          },
+          {
+            "name": "RemoteUnSpeaking",
+            "id": 61,
+            "value": "-"
+          }
+        ],
+        "sendEvents": [
+          {
+            "name": "ReFlush",
+            "id": 64
+          }
+        ]
+      },
+      {
+        "desc": "课程资源状态",
+        "logicId": "BI_SIMPLE",
+        "tokenType": "NOT_NULL",
+        "tokenName": "resource",
+        "defaultValue": "None",
+        "valueType": "ROLE",
+        "recvEvents": [
+          {
+            "name": "LocalVideoExtOpened",
+            "id": 54,
+            "value": "LocalExt"
+          },
+          {
+            "name": "LocalVideoExtClosed",
+            "id": 55,
+            "value": "None"
+          },
+          {
+            "name": "RemoteVideoExtOpened",
+            "id": 56,
+            "value": "CallerPlus"
+          },
+          {
+            "name": "RemoteVideoExtClosed",
+            "id": 57,
+            "value": "None"
+          },
+          {
+            "name": "LockTarget",
+            "id": 62,
+            "value": "LocalExt"
+          },
+          {
+            "name": "UnLockTarget",
+            "id": 63,
+            "value": "None"
+          }
+        ],
+        "sendEvents": [
+          {
+            "name": "ReFlush",
+            "id": 64
+          }
+        ]
+      },
+      {
+        "desc": "扩展屏状态",
+        "logicId": "BI_SIMPLE",
+        "tokenType": "EVT_VALUE",
+        "tokenName": "ext-dsp",
+        "defaultValue": "false",
+        "valueType": "BOOLEAN",
+        "recvEvents": [
+          {
+            "name": "SecondDisplayReady",
+            "id": 52,
+            "value": "true"
+          },
+          {
+            "name": "SecondDisplayUnable",
+            "id": 53,
+            "value": "false"
+          }
+        ],
+        "sendEvents": [
+          {
+            "name": "ReFlush",
+            "id": 64
+          }
+        ]
+      }
+    ]
+  }
+}

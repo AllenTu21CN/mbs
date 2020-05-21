@@ -1,1 +1,0 @@
-* Android base libraries and applications

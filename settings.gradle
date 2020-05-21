@@ -1,1 +1,7 @@
-include ':app_mp100', ':module_multimedia', 'module_wamp', 'module_tools'
+/*
+注意: 除了第一行为公共的基础module,其他每个app都单独一行,并带上其依赖的module(':module_xxxx'),
+以':'开头的引用gradle会自动排重,所以不要担心module被多次引用
+* */
+
+include ':module_base', ':module_ep'
+
