@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="1px"
+        android:background="@drawable/audio_mixer_item_bg">
+
+        <View android:id="@+id/selected_border"
+            android:background="@color/colorPrimaryOrange"
+            android:layout_width = "166px"
+            android:layout_height="96px"
+            android:layout_marginTop="5px"
+            android:layout_marginLeft="5px"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:visibility="invisible"/>
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="160px"
+            android:layout_height="90px"
+            android:layout_marginTop="8px"
+            android:layout_marginBottom="8px"
+            android:layout_marginLeft="8px"
+            android:scaleType="fitXY"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <ImageView
+            android:id="@+id/type_icon"
+            android:layout_width="24px"
+            android:layout_height="24px"
+            android:layout_marginTop="8px"
+            android:layout_marginRight="12px"
+            android:scaleType="fitXY"
+            android:tint="@color/secondaryTextColor"
+            android:tintMode="src_in"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <ImageView
+            android:id="@+id/visibility_icon"
+            android:layout_width="24px"
+            android:layout_height="24px"
+            android:layout_marginTop="9px"
+            android:scaleType="fitXY"
+            android:tint="@color/secondaryTextColor"
+            android:tintMode="src_in"
+            app:layout_constraintTop_toBottomOf="@id/type_icon"
+            app:layout_constraintRight_toRightOf="@id/type_icon" />
+
+        <ImageView
+            android:id="@+id/lock_icon"
+            android:layout_width="24px"
+            android:layout_height="24px"
+            android:layout_marginTop="9px"
+            android:scaleType="fitXY"
+            android:tint="@color/secondaryTextColor"
+            android:tintMode="src_in"
+            app:layout_constraintTop_toBottomOf="@id/visibility_icon"
+            app:layout_constraintRight_toRightOf="@id/type_icon" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="18px"
+            android:textSize="28px"
+            app:layout_constraintLeft_toRightOf="@id/thumbnail"
+            app:layout_constraintTop_toTopOf="@id/thumbnail" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

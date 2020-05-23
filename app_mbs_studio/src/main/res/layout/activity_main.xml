@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/wrapperBackgroundColor"
+    tools:context="mbs.studio.MainActivity">
+
+    <!-- Guide lines -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_left_guideline"
+        app:layout_constraintGuide_percent="0.00703125"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_right_guideline"
+        app:layout_constraintGuide_percent="0.99296875"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_top_guideline"
+        app:layout_constraintGuide_percent="0.01125"
+        android:orientation="horizontal"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_bottom_guideline"
+        app:layout_constraintGuide_percent="0.98875"
+        android:orientation="horizontal"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/half_top_guideline"
+        app:layout_constraintGuide_percent="0.458125"
+        android:orientation="horizontal"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/half_bottom_guideline"
+        app:layout_constraintGuide_percent="0.469375"
+        android:orientation="horizontal"/>
+
+    <!-- Area: Preview -->
+    <include layout="@layout/area_preview"
+        android:id="@+id/area_preview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1.393006993006993"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintTop_toTopOf="@id/wrapper_top_guideline"
+        app:layout_constraintBottom_toBottomOf="@+id/half_top_guideline"/>
+
+    <!-- Area: Layout and Overlay -->
+    <include layout="@layout/area_overlay"
+        android:id="@+id/area_overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/area_preview"
+        app:layout_constraintTop_toTopOf="@id/half_bottom_guideline"
+        app:layout_constraintBottom_toBottomOf="@id/wrapper_bottom_guideline"/>
+
+    <!-- Area: Program -->
+    <include layout="@layout/area_program"
+        android:id="@+id/area_program"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1.393006993006993"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toTopOf="@id/wrapper_top_guideline"
+        app:layout_constraintBottom_toBottomOf="@+id/half_top_guideline"/>
+
+    <!-- Area: Video Source -->
+    <include layout="@layout/area_video_sources"
+        android:id="@+id/area_video_source"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="@id/area_program"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toTopOf="@id/half_bottom_guideline"
+        app:layout_constraintBottom_toBottomOf="@id/wrapper_bottom_guideline"/>
+
+    <!-- Area: Control -->
+    <include
+        android:id="@+id/area_control"
+        layout="@layout/area_control"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="18px"
+        android:layout_marginRight="18px"
+        app:layout_constraintBottom_toBottomOf="@+id/half_top_guideline"
+        app:layout_constraintLeft_toRightOf="@id/area_preview"
+        app:layout_constraintRight_toLeftOf="@id/area_program"
+        app:layout_constraintTop_toTopOf="@id/wrapper_top_guideline" />
+
+    <!-- Area: Audio Mixer -->
+    <include
+        android:id="@+id/area_audio_mixer"
+        layout="@layout/area_audio_mixer"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="18px"
+        android:layout_marginRight="18px"
+        app:layout_constraintBottom_toBottomOf="@+id/wrapper_bottom_guideline"
+        app:layout_constraintLeft_toRightOf="@id/area_preview"
+        app:layout_constraintRight_toLeftOf="@id/area_program"
+        app:layout_constraintTop_toTopOf="@id/half_bottom_guideline" />
+
+    <FrameLayout
+        android:id="@+id/settings_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="200px"
+        android:layout_marginBottom="200px"
+        android:layout_marginLeft="400px"
+        android:layout_marginRight="400px"
+        android:background="@drawable/common_area_bg"
+        android:visibility="invisible"/>
+
+    <!--TextView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="Column Center"
+        android:background="#252525"
+        app:layout_constraintLeft_toLeftOf="@id/control_area_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/control_area_right_guideline"
+        app:layout_constraintTop_toTopOf="@id/wrapper_top_guideline"
+        app:layout_constraintBottom_toBottomOf="@id/wrapper_bottom_guideline" /-->
+
+    <!--TextView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:text="Column Right"
+        android:background="#252525"
+        app:layout_constraintLeft_toLeftOf="@id/program_area_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toTopOf="@id/wrapper_top_guideline"
+        app:layout_constraintBottom_toBottomOf="@id/wrapper_bottom_guideline" /-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <!--color name="colorAccent">#D81B60</color-->
+    <color name="colorAccent">#F74A00</color>
+
+    <color name="primaryTextColor">#D9D9D9</color>
+    <color name="secondaryTextColor">#666666</color>
+    <color name="colorPrimaryOrange">#F74A00</color>
+
+    <!-- Wrapper -->
+    <color name="wrapperBackgroundColor">#222222</color>
+
+    <!-- Area -->
+    <color name="areaBackgroundColor">#2D2D2D</color>
+    <color name="areaBorderColor">#000000</color>
+
+    <!-- Button -->
+    <color name="commonButtonNormalBackgroundColor">#3B3434</color>
+    <color name="commonButtonNormalBorderColor">#000000</color>
+    <color name="commonButtonNormalTextColor">#D9D9D9</color>
+
+    <color name="commonButtonHoveredBackgroundColor">#242424</color>
+    <color name="commonButtonHoveredBorderColor">#000000</color>
+    <color name="commonButtonHoveredTextColor">#D9D9D9</color>
+
+    <color name="commonButtonPressedBackgroundColor">#F74A00</color>
+    <color name="commonButtonPressedBorderColor">#FFFFFF</color>
+    <color name="commonButtonPressedTextColor">#FFFFFF</color>
+
+    <color name="glowButtonOffLightColor">#1B1B1B</color>
+    <color name="glowButtonOnLightColor">#F74A00</color>
+
+    <color name="audioMixerItemBackgroundColor">#242424</color>
+
+    <!-- Dialog -->
+    <color name="dialogTitleBarBackgroundColor">#1F1F1F</color>
+    <color name="dialogContentBackgroundColor">#2D2D2D</color>
+</resources>

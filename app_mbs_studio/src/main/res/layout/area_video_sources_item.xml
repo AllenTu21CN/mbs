@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/item_no"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginLeft="2px"
+        android:text="IN-X"
+        android:textSize="24px"
+        android:textColor="@color/areaBackgroundColor"
+        android:background="@drawable/video_source_item_no_bg"
+        android:paddingLeft="6px"
+        android:paddingRight="6px" />
+
+    <TextView
+        android:id="@+id/source_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/item_no"
+        app:layout_constraintRight_toLeftOf="@id/source_format"
+        android:layout_marginRight="5px"
+        android:layout_marginTop="3px"
+        android:paddingLeft="4px"
+        android:paddingRight="4px"
+        android:text="RTSP"
+        android:textColor="@color/areaBackgroundColor"
+        android:textSize="18px"
+        android:background="@drawable/video_source_type_bg" />
+
+    <TextView
+        android:id="@+id/source_format"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/item_no"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="1920x1080@30fps"
+        android:textColor="#666666"
+        android:textSize="22px"/>
+
+    <SurfaceView
+        android:id="@+id/source_surface_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8px"
+        app:layout_constraintDimensionRatio="1.777777777777778"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/item_no"/>
+
+    <ImageButton
+        android:id="@+id/add_source_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/source_surface_view"
+        app:layout_constraintTop_toTopOf="@id/source_surface_view"
+        app:layout_constraintRight_toRightOf="@id/source_surface_view"
+        app:layout_constraintBottom_toBottomOf="@id/source_surface_view"
+        android:background="#00000000"
+        android:src="@drawable/ic_add_circle_outline_black_24dp"
+        android:scaleType="fitXY"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

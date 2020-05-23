@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:background="@drawable/common_area_bg">
+
+    <!-- Guide lines -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_left_guideline"
+        app:layout_constraintGuide_percent="0.0180722891566265"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_right_guideline"
+        app:layout_constraintGuide_percent="0.9819277108433735"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_top_guideline"
+        app:layout_constraintGuide_percent="0.0125874125874126"
+        android:orientation="horizontal"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_bottom_guideline"
+        app:layout_constraintGuide_percent="0.9874125874125874"
+        android:orientation="horizontal"/>
+
+    <TextView
+        android:id="@+id/program_area_label"
+        android:text="Program / Output"
+        android:textColor="#C8C8C8"
+        android:textSize="28px"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toTopOf="@id/wrapper_top_guideline" />
+
+    <SurfaceView
+        android:id="@+id/program_surface_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="4dp"
+        app:layout_constraintDimensionRatio="1.777777777777778"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toBottomOf="@id/program_area_label" />
+
+    <TextView
+        android:id="@+id/production_clock_label"
+        android:text="00:00:00:000"
+        android:textColor="#F74A00"
+        android:textSize="72px"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintTop_toBottomOf="@id/program_surface_view"
+        app:layout_constraintBottom_toBottomOf="@id/wrapper_bottom_guideline"/>
+
+    <TextView
+        android:id="@+id/video_info_label"
+        android:text="1920x1080@30fps / H.264 / 2Mbps"
+        android:textColor="#666666"
+        android:textSize="24px"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10px"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toTopOf="@id/production_clock_label" />
+
+    <TextView
+        android:id="@+id/audio_info_label"
+        android:text="2CH / 44.1kHz / AAC / 128K"
+        android:textColor="#666666"
+        android:textSize="24px"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10px"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintBottom_toBottomOf="@id/production_clock_label"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

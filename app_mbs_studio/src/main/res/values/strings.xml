@@ -1,0 +1,37 @@
+<resources>
+    <string name="app_name">Mobile Broadcaster Studio</string>
+
+    <string-array name="transition_duration_array">
+        <item>50ms</item>
+        <item>100ms</item>
+        <item>150ms</item>
+        <item>200ms</item>
+        <item>250ms</item>
+        <item>300ms</item>
+        <item>350ms</item>
+        <item>400ms</item>
+        <item>450ms</item>
+        <item>500ms</item>
+    </string-array>
+
+    <string-array name="recording_file_format">
+        <item>MP4</item>
+        <item>FLV</item>
+    </string-array>
+    <string-array name="recording_file_format_values">
+        <item>mp4</item>
+        <item>flv</item>
+    </string-array>
+
+    <string-array name="recording_file_segmentation_type">
+        <item>Single File - no segmentation</item>
+        <item>Multi file - fixed length</item>
+        <item>Multi file - fixed file size</item>
+    </string-array>
+    <string-array name="recording_file_segmentation_type_values">
+        <item>single</item>
+        <item>by-length</item>
+        <item>by-file-size</item>
+    </string-array>
+
+</resources>

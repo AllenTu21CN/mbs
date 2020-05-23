@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:background="@drawable/common_area_bg">
+
+    <!-- Guide lines -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/hcenter_guideline"
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/vcenter_guideline"
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="horizontal"/>
+
+    <view class="mbs.studio.view.ControlArea$TransitionButton"
+        android:id="@+id/cut_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32px"
+        android:layout_marginRight="18px"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/wipe_button"
+        app:layout_constraintRight_toRightOf="@id/hcenter_guideline"
+        android:text="CUT"
+        android:textAlignment="center"
+        android:textColor="@color/commonButtonNormalTextColor" />
+
+        <view class="mbs.studio.view.ControlArea$TransitionButton"
+            android:id="@+id/fade_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="18px"
+            app:layout_constraintTop_toTopOf="@id/cut_button"
+            app:layout_constraintLeft_toLeftOf="@id/hcenter_guideline"
+            android:text="FADE"
+            android:textAlignment="center"
+            android:textColor="@color/commonButtonNormalTextColor" />
+
+    <view class="mbs.studio.view.ControlArea$TransitionButton"
+        android:id="@+id/wipe_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="18px"
+        app:layout_constraintTop_toBottomOf="@id/cut_button"
+        app:layout_constraintBottom_toTopOf="@id/transition_duration_seekbar"
+        app:layout_constraintRight_toRightOf="@id/hcenter_guideline"
+        android:text="WIPE"
+        android:textAlignment="center"
+        android:textColor="@color/commonButtonNormalTextColor" />
+
+        <view class="mbs.studio.view.ControlArea$TransitionButton"
+            android:id="@+id/ftb_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="18px"
+            app:layout_constraintTop_toTopOf="@id/wipe_button"
+            app:layout_constraintLeft_toLeftOf="@id/hcenter_guideline"
+            android:text="FTB"
+            android:textAlignment="center"
+            android:textColor="@color/commonButtonNormalTextColor" />
+
+    <view class="mbs.studio.view.SeekBar"
+        android:id="@+id/transition_duration_seekbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="24px"
+        app:layout_constraintTop_toBottomOf="@id/wipe_button"
+        app:layout_constraintBottom_toTopOf="@id/vcenter_guideline"
+        app:layout_constraintLeft_toLeftOf="@id/wipe_button"
+        app:layout_constraintRight_toRightOf="@id/ftb_button" />
+
+        <TextView
+            android:id="@+id/transition_duration_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="0px"
+            app:layout_constraintTop_toTopOf="@id/transition_duration_seekbar"
+            app:layout_constraintLeft_toRightOf="@id/transition_duration_seekbar"
+            android:text="0.1s"
+            android:textSize="24px"
+            android:padding="0px" />
+
+    <View android:id="@+id/separator"
+        android:background="#000000"
+        android:layout_width = "fill_parent"
+        android:layout_height="1px"
+        android:layout_marginLeft="18px"
+        android:layout_marginRight="18px"
+        app:layout_constraintTop_toBottomOf="@id/vcenter_guideline"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <view class="mbs.studio.view.ControlArea$RecordingButton"
+        android:id="@+id/recording_button"
+        android:layout_width="100px"
+        android:layout_height="100px"
+        android:layout_marginTop="32px"
+        app:layout_constraintTop_toBottomOf="@id/separator"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <view class="mbs.studio.view.SwitchButton"
+        android:id="@+id/enable_streaming"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32px"
+        app:layout_constraintTop_toBottomOf="@id/recording_button"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="Streaming"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="28px"
+        android:switchPadding="18px" />
+
+    <view class="mbs.studio.view.SwitchButton"
+        android:id="@+id/enable_recording"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24px"
+        app:layout_constraintTop_toBottomOf="@id/enable_streaming"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="Recording"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="28px"
+        android:switchPadding="18px" />
+
+    <ImageButton
+        android:id="@+id/info_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        android:src="@drawable/ic_info_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginLeft="18px"
+        android:layout_marginBottom="18px"
+        android:scaleType="fitXY" />
+
+    <ImageButton
+        android:id="@+id/settings_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#00000000"
+        android:src="@drawable/ic_settings_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginRight="18px"
+        android:layout_marginBottom="18px"
+        android:scaleType="fitXY" />
+
+    <!--LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/transition_group_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <view class="mbs.studio.view.ControlArea$TransitionButton"
+                android:id="@+id/cut_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="0dp"
+                android:layout_weight="1"
+                android:text="CUT"
+                android:textColor="@color/commonButtonNormalTextColor" />
+
+            <view class="mbs.studio.view.ControlArea$TransitionButton"
+                android:id="@+id/fade_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="0dp"
+                android:layout_weight="1"
+                android:text="FADE"
+                android:textColor="@color/commonButtonNormalTextColor" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/wipe_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="0dp"
+                android:layout_weight="1"
+                android:text="WIPE"
+                android:textColor="@color/commonButtonNormalTextColor" />
+
+            <Button
+                android:id="@+id/ftb_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="0dp"
+                android:layout_weight="1"
+                android:text="FTB"
+                android:textColor="@color/commonButtonNormalTextColor" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:text="Duration: "
+                android:textSize="28px" />
+
+            <Spinner
+                android:id="@+id/transition_duration"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <view class="mbs.studio.view.ControlArea$RecordingButton"
+            android:id="@+id/recording_button"
+            android:layout_width="100px"
+            android:layout_height="100px"
+            android:layout_weight="1"
+            android:layout_gravity="center"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="Streaming"/>
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="Recording"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/info_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="#00000000"
+                android:src="@drawable/ic_info_black_24dp"
+                android:tint="@color/commonButtonNormalTextColor"
+                android:tintMode="src_in" />
+
+            <ImageButton
+                android:id="@+id/settings_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="#00000000"
+                android:src="@drawable/ic_settings_black_24dp"
+                android:tint="@color/commonButtonNormalTextColor"
+                android:tintMode="src_in" />
+
+        </LinearLayout>
+
+    </LinearLayout-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

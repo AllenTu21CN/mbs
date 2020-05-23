@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:key="notifications_category"
+        app:title="Notifications">
+
+        <SwitchPreferenceCompat
+            app:key="notifications"
+            app:title="Enable message notifications"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="encoding_category"
+        app:title="Encoding">
+
+        <ListPreference
+            app:key="encoding_video_codec"
+            app:title="Video codec"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+        <ListPreference
+            app:key="encoding_video_bitrate"
+            app:title="Video bitrate"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+        <ListPreference
+            app:key="encoding_video_resolution"
+            app:title="Video resolution"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+        <ListPreference
+            app:key="encoding_video_frame_rate"
+            app:title="Video frame rate"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+        <ListPreference
+            app:key="encoding_video_gop"
+            app:title="Video GOP"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+        <ListPreference
+            app:key="encoding_audio_codec"
+            app:title="Audio Codec"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+        <ListPreference
+            app:key="encoding_audio_bitrate"
+            app:title="Audio bitrate"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="streaming_category"
+        app:title="Streaming">
+
+        <SwitchPreferenceCompat
+            app:key="enable_streaming"
+            app:title="Enable streaming"/>
+
+        <EditTextPreference
+            app:key="streaming_url_1"
+            app:title="URL #1" />
+
+        <EditTextPreference
+            app:key="streaming_url_2"
+            app:title="URL #2" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="recording_category"
+        app:title="Recording">
+
+        <SwitchPreferenceCompat
+            app:key="enable_recording"
+            app:title="Enable local recording"/>
+
+        <ListPreference
+            app:key="recording_file_format"
+            app:title="File format"
+            app:entries="@array/recording_file_format"
+            app:entryValues="@array/recording_file_format_values" />
+
+        <ListPreference
+            app:key="recording_file_segmentation"
+            app:title="File segmentation"
+            app:entries="@array/recording_file_segmentation_type"
+            app:entryValues="@array/recording_file_segmentation_type_values" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key="help_category"
+        app:title="Help">
+
+        <Preference
+            app:key="feedback"
+            app:summary="Report technical issues or suggest new features"
+            app:title="Send feedback"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

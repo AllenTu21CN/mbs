@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp">
+
+    <!-- Guide lines -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/v_guideline"
+        app:layout_constraintGuide_percent="0.3"
+        android:orientation="vertical"/>
+
+    <!-- Left Column -->
+    <ListView
+        android:id="@+id/sources_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="@drawable/common_area_bg"
+        android:choiceMode="singleChoice"
+        android:dividerHeight="1px"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/v_guideline"
+        app:layout_constraintBottom_toTopOf="@id/add_pip_button"/>
+
+    <Button
+        android:id="@+id/add_pip_button"
+        android:layout_width="0dp"
+        android:layout_height="60px"
+        android:layout_marginBottom="18px"
+        app:layout_constraintLeft_toLeftOf="@id/sources_list"
+        app:layout_constraintTop_toBottomOf="@id/sources_list"
+        app:layout_constraintRight_toLeftOf="@id/del_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@drawable/common_button_bg"
+        android:text="Add"
+        android:textSize="24px" />
+
+    <Button
+        android:id="@+id/del_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toRightOf="@id/add_pip_button"
+        app:layout_constraintTop_toTopOf="@id/add_pip_button"
+        app:layout_constraintRight_toRightOf="@id/sources_list"
+        app:layout_constraintBottom_toBottomOf="@id/add_pip_button"
+        android:background="@drawable/common_button_bg"
+        android:text="Delete"
+        android:textSize="24px" />
+
+    <!-- Right Column -->
+    <TableLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="18px"
+        android:layout_marginBottom="18px"
+        android:layout_marginLeft="30px"
+        android:layout_marginRight="18px"
+        app:layout_constraintLeft_toRightOf="@id/sources_list"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Alias -->
+        <TableRow>
+            <TextView
+                android:id="@+id/alias_label"
+                android:layout_width="200px"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Alias: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <EditText
+                android:id="@+id/alias"
+                android:layout_width="500px"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:text=""
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+        </TableRow>
+
+        <!-- Type -->
+        <TableRow android:layout_width="match_parent">
+            <TextView
+                android:id="@+id/type_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Type: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <TextView
+                android:id="@+id/type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10px"
+                android:text="Local Camera"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <!-- Separator -->
+        <TableRow>
+            <View
+                android:layout_span="2"
+                android:background="#000000"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="18px"
+                android:layout_marginBottom="18px" />
+        </TableRow>
+
+        <!-- Local camera -->
+        <TableRow android:tag="local_camera">
+            <TextView
+                android:id="@+id/local_camera_id_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Camera Id: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <Spinner
+                android:id="@+id/local_camera_id"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <TableRow android:tag="local_camera">
+            <TextView
+                android:id="@+id/local_camera_capture_size_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Resolution: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <Spinner
+                android:id="@+id/local_camera_capture_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <!-- Remote camera -->
+        <TableRow android:tag="remote_camera">
+            <TextView
+                android:id="@+id/remote_camera_host_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Remote Host: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <EditText
+                android:id="@+id/remote_camera_host"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <TableRow android:tag="remote_camera">
+            <TextView
+                android:id="@+id/remote_camera_port_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Remote Port: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <EditText
+                android:id="@+id/remote_camera_port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <!-- RTSP -->
+        <TableRow android:tag="rtsp">
+            <TextView
+                android:id="@+id/rtsp_url_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="RTSP URL: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <EditText
+                android:id="@+id/rtsp_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <TableRow android:tag="rtsp">
+            <TextView
+                android:id="@+id/rtsp_use_tcp_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Use TCP: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <view class="mbs.studio.view.SwitchButton"
+                android:id="@+id/rtsp_use_tcp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:layout_marginLeft="10px"/>
+        </TableRow>
+
+        <TableRow android:tag="rtsp">
+            <TextView
+                android:id="@+id/rtsp_extra_options_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Extra options: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <EditText
+                android:id="@+id/rtsp_extra_options"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <!-- RTMP -->
+        <TableRow android:tag="rtmp">
+            <TextView
+                android:id="@+id/rtmp_url_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="RTMP URL: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <EditText
+                android:id="@+id/rtmp_url"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <!-- File -->
+        <TableRow android:tag="file">
+            <TextView
+                android:id="@+id/file_path_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="File path: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <EditText
+                android:id="@+id/file_path"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+        </TableRow>
+
+        <TableRow android:tag="file">
+            <TextView
+                android:id="@+id/file_loop_label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:text="Loop: "
+                android:textColor="@color/primaryTextColor"
+                android:textSize="28px" />
+
+            <view class="mbs.studio.view.SwitchButton"
+                android:id="@+id/file_loop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:layout_marginLeft="10px"/>
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/save"
+        android:text="Save"
+        android:textSize="24px"
+        android:background="@drawable/common_button_bg"
+        android:layout_width="180px"
+        android:layout_height="0dp"
+        android:layout_marginBottom="18px"
+        android:layout_marginRight="18px"
+        app:layout_constraintTop_toTopOf="@id/add_pip_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

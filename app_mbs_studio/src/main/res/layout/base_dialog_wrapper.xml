@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:padding="1px">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="60px"
+        android:background="@color/dialogTitleBarBackgroundColor"
+        android:gravity="left|center_vertical"
+        android:text="This is title bar"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="32px"
+        android:paddingLeft="20px"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/close_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:background="#00000000"
+        android:src="@drawable/ic_close_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/title"
+        app:layout_constraintBottom_toBottomOf="@id/title"
+        android:layout_marginRight="12px"
+        android:scaleType="fitXY" />
+
+    <FrameLayout
+        android:id="@+id/content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/dialogContentBackgroundColor"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="This is content"
+            android:textColor="@color/primaryTextColor"/>
+
+    </FrameLayout>
+
+    <!--LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:paddingRight="20px">
+
+        <Button
+            android:layout_width="200px"
+            android:layout_height="40px"
+            android:layout_gravity="right"
+            android:text="Save"
+            android:background="@drawable/common_button_bg" />
+
+        <Button
+            android:layout_width="200px"
+            android:layout_height="40px"
+            android:layout_gravity="right"
+            android:text="Cancel"
+            android:background="@drawable/common_button_bg" />
+
+    </LinearLayout-->
+
+</androidx.constraintlayout.widget.ConstraintLayout>

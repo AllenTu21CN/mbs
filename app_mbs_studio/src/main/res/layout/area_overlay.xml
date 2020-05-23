@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:background="@drawable/common_area_bg">
+
+    <ImageButton
+        android:id="@+id/toggle_visibility_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_visibility_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/toggle_lock_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_lock_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/toggle_visibility_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <!-- Separator -->
+    <View
+        android:id="@+id/separator_0"
+        android:background="@color/secondaryTextColor"
+        android:layout_width = "48px"
+        android:layout_height="1px"
+        android:layout_marginTop="12px"
+        android:layout_marginBottom="12px"
+        app:layout_constraintTop_toBottomOf="@id/toggle_lock_button"
+        app:layout_constraintLeft_toLeftOf="@id/toggle_visibility_button" />
+
+    <ImageButton
+        android:id="@+id/add_pip_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_picture_in_picture_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/separator_0"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/add_image_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_image_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/add_pip_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/add_text_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_title_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/add_image_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/create_group_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_create_new_folder_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/add_text_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <!-- Separator -->
+    <View
+        android:id="@+id/separator_1"
+        android:background="@color/secondaryTextColor"
+        android:layout_width = "48px"
+        android:layout_height="1px"
+        android:layout_marginTop="12px"
+        android:layout_marginBottom="12px"
+        app:layout_constraintTop_toBottomOf="@id/create_group_button"
+        app:layout_constraintLeft_toLeftOf="@id/add_pip_button"
+        app:layout_constraintRight_toRightOf="@id/add_pip_button" />
+
+    <ImageButton
+        android:id="@+id/copy_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_content_copy_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/separator_1"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/edit_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_edit_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/copy_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/delete_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginBottom="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_delete_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="18px"
+        android:background="@drawable/common_area_bg"
+        android:padding="1px"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toRightOf="@id/add_pip_button"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/overlay_list"
+            android:choiceMode="singleChoice"
+            android:dividerHeight="1px"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </FrameLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

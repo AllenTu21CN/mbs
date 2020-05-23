@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:background="@drawable/common_area_bg">
+
+    <!-- Guide lines -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_left_guideline"
+        app:layout_constraintGuide_percent="0.0180722891566265"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_right_guideline"
+        app:layout_constraintGuide_percent="0.9819277108433735"
+        android:orientation="vertical"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_top_guideline"
+        app:layout_constraintGuide_percent="0.0125874125874126"
+        android:orientation="horizontal"/>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/wrapper_bottom_guideline"
+        app:layout_constraintGuide_percent="0.9748251748251748"
+        android:orientation="horizontal"/>
+
+    <TextView
+        android:id="@+id/preview_area_label"
+        android:text="Preview"
+        android:textColor="#C8C8C8"
+        android:textSize="28px"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toTopOf="@id/wrapper_top_guideline" />
+
+    <SurfaceView
+        android:id="@+id/preview_surface_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="18px"
+        app:layout_constraintDimensionRatio="1.777777777777778"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toBottomOf="@id/preview_area_label" />
+
+    <LinearLayout
+        android:id="@+id/scene_button_group"
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12px"
+        android:layout_marginLeft="-4dp"
+        android:layout_marginRight="-4dp"
+        app:layout_constraintLeft_toLeftOf="@id/wrapper_left_guideline"
+        app:layout_constraintRight_toRightOf="@id/wrapper_right_guideline"
+        app:layout_constraintTop_toBottomOf="@id/preview_surface_view"
+        app:layout_constraintBottom_toBottomOf="@id/wrapper_bottom_guideline">
+
+        <!--Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="1"
+            android:textColor="@color/commonButtonNormalTextColor"
+            android:textSize="36px"
+            android:layout_marginTop="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginBottom="0px"
+            android:layout_marginLeft="0px" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="2"
+            android:textColor="@color/commonButtonNormalTextColor"
+            android:textSize="36px"
+            android:layout_marginTop="4px"
+            android:layout_marginRight="10px"
+            android:layout_marginBottom="0px"
+            android:layout_marginLeft="10px" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="3" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="4" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="5" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="6" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="7" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="8" />
+
+        <Button
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/common_button_bg"
+            android:text="9" /-->
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

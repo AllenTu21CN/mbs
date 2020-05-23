@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Disabled state -->
+    <item android:state_enabled="false" >
+        <shape android:shape="rectangle">
+            <!-- background color -->
+            <solid android:color="#00000000" />
+            <!-- border color and width -->
+            <stroke android:width="1px" android:color="@color/commonButtonNormalBorderColor" />
+            <!-- border radius -->
+            <corners android:radius="0px" />
+        </shape>
+    </item>
+
+    <!-- Normal state -->
+    <item>
+        <shape android:shape="rectangle">
+            <!-- background color -->
+            <solid android:color="@color/commonButtonNormalBackgroundColor" />
+            <!-- border color and width -->
+            <stroke android:width="1px" android:color="@color/commonButtonNormalBorderColor" />
+            <!-- border radius -->
+            <corners android:radius="0px" />
+        </shape>
+    </item>
+</selector>
+

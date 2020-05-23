@@ -3,5 +3,4 @@
 以':'开头的引用gradle会自动排重,所以不要担心module被多次引用
 * */
 
-include ':module_base', ':module_ep'
-
+include ':app_mbs_studio', ':module_base', ':module_ep'

@@ -85,8 +85,6 @@ public class VideoEngine {
 
     public static volatile boolean gRenderFrozen = false;
 
-    public static boolean gMagicalFlag = false;
-
     public static void init(BoardSupportClient client) {
         HdmiInputDevice.init(client);
     }
@@ -1907,6 +1905,7 @@ public class VideoEngine {
             mLoopCount = 0;
         }
 
+        @Deprecated
         private boolean reconfig(String config) {
             // Clone current configurations and overlays as previous for transition
             try {
@@ -2060,7 +2059,7 @@ public class VideoEngine {
             return true;
         }
 
-        private boolean reconfig4TSX200(String config) {
+        private boolean reconfig2(String config) {
             boolean updateTrans = false;
 
             // Clone current configurations and overlays as previous for transition
@@ -3975,14 +3974,7 @@ public class VideoEngine {
             }
             //LogUtil.i(TAG, "Reconfig video scene#" + sceneId + ", config: " + config);
 
-            if (false) {
-                if (gMagicalFlag)
-                    return mScenes.get(sceneId).reconfig4TSX200(config);
-                else
-                    return mScenes.get(sceneId).reconfig(config);
-            } else {
-                return mScenes.get(sceneId).reconfig4TSX200(config);
-            }
+            return mScenes.get(sceneId).reconfig2(config);
         }
 
         private void queryScene(int sceneId) {
