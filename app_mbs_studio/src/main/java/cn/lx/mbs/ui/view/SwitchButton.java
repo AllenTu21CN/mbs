@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.graphics.Paint;

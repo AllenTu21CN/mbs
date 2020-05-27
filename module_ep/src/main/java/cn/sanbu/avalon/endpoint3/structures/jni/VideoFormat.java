@@ -16,7 +16,7 @@ public class VideoFormat {
     public Resolution resolution;
     public int framerate;
     public Bandwidth bandwidth;
-    public int key_interval_in_frames;
+    private int key_interval_in_frames;
 
     public VideoFormat(CodecType codec, H264Profile profile, Resolution resolution,
                        int framerate, Bandwidth bandwidth, int keyIntervalInFrames) {
@@ -45,5 +45,27 @@ public class VideoFormat {
         return codec != null && codec != CodecType.UNKNOWN &&
                 resolution != null && resolution != Resolution.RES_UNKNOWN &&
                 framerate > 0 && bandwidth != null;
+    }
+
+    public int getKeyIntervalInFrames() {
+        return key_interval_in_frames;
+    }
+
+    public void setKeyIntervalInFrames(int interval) {
+        key_interval_in_frames = interval;
+    }
+
+    public int getKeyIntervalInSeconds() {
+        if (key_interval_in_frames < framerate || framerate < 0)
+            throw new RuntimeException("invalid key interval: " + key_interval_in_frames + "/" + framerate);
+
+        return Math.round((float) key_interval_in_frames / (float) framerate);
+    }
+
+    public void setKeyIntervalInSeconds(int interval) {
+        if (interval < 0 || framerate < 0)
+            throw new RuntimeException("invalid framerate: " + interval + "*" + framerate);
+
+        key_interval_in_frames = interval * framerate;
     }
 }

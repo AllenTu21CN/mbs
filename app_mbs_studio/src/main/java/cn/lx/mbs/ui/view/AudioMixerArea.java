@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.app.Activity;
 import android.content.Context;
@@ -18,8 +18,7 @@ import android.widget.Checkable;
 import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
-
-import com.example.studio.R;
+import cn.lx.mbs.R;
 
 public class AudioMixerArea {
     private Activity mActivity;

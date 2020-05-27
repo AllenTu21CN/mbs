@@ -3,6 +3,7 @@ package cn.sanbu.avalon.endpoint3.structures;
 import java.util.Arrays;
 import java.util.List;
 
+@Deprecated
 public enum LayoutId {
     _1x1("1x1", Arrays.asList(new Region(0.0f, 0.0f, 1.0f, 1.0f)), true),
 

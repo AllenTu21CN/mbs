@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.view.View;
@@ -6,7 +6,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import com.example.studio.R;
+import cn.lx.mbs.R;
 import mbs.studio.model.VideoSourcesDataModel;
 
 public class VideoSourceAddDialog extends BaseDialog {

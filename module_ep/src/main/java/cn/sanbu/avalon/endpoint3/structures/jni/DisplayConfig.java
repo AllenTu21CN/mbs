@@ -3,12 +3,12 @@ package cn.sanbu.avalon.endpoint3.structures.jni;
 import com.sanbu.tools.CompareHelper;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 import cn.sanbu.avalon.endpoint3.structures.Alignment;
 import cn.sanbu.avalon.endpoint3.structures.DisplayCell;
-import cn.sanbu.avalon.endpoint3.structures.LayoutId;
 import cn.sanbu.avalon.endpoint3.structures.Logo;
 import cn.sanbu.avalon.endpoint3.structures.Region;
 import cn.sanbu.avalon.endpoint3.structures.TextStyle;
@@ -136,14 +136,6 @@ public class DisplayConfig {
     public boolean isValid() {
         return (overlays != null || background_color != null ||
                 display_name_visible != null || transition != null);
-    }
-
-    public static DisplayConfig buildOverlays(LayoutId id, List<DisplayCell> cells) {
-        return buildOverlays(id, cells, null);
-    }
-
-    public static DisplayConfig buildOverlays(LayoutId id, List<DisplayCell> cells, Logo logo) {
-        return buildOverlays(id.layout, cells, logo);
     }
 
     public static DisplayConfig buildOverlays(List<Region> layout, List<DisplayCell> cells) {

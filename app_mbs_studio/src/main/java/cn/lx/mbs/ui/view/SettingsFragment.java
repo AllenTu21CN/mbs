@@ -1,10 +1,10 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
 
-import com.example.studio.R;
+import cn.lx.mbs.R;
 
 public class SettingsFragment extends PreferenceFragmentCompat {
     @Override

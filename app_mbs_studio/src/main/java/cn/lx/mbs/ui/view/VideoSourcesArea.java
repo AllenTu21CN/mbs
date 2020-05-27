@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import mbs.studio.MainActivity;
-import com.example.studio.R;
+import cn.lx.mbs.R;
 
 public class VideoSourcesArea {
     final static int VIDEO_SOURCE_COUNT = 4;

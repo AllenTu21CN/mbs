@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -19,7 +19,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import mbs.studio.MainActivity;
-import com.example.studio.R;
+import cn.lx.mbs.R;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;

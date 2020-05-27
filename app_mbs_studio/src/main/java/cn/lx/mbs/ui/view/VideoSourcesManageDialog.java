@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
@@ -17,7 +17,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import mbs.studio.MainActivity;
-import com.example.studio.R;
+import cn.lx.mbs.R;
 import mbs.studio.model.VideoSourcesDataModel;
 
 import java.util.List;

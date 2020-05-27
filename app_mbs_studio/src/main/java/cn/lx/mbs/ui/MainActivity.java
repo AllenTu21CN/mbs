@@ -1,4 +1,4 @@
-package mbs.studio;
+package cn.lx.mbs.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,8 +17,6 @@ import android.view.View;
 import android.view.WindowManager;
 
 
-import com.example.studio.R;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,8 +33,6 @@ import mbs.studio.view.SettingsFragment;
 import mbs.studio.view.Utils;
 import mbs.studio.view.VideoSourcesArea;
 import mbs.studio.view.VideoSourcesManageDialog;
-
-import media.VideoEngine;
 
 public class MainActivity extends AppCompatActivity {
 

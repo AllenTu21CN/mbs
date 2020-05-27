@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.app.Activity;
 import android.os.Handler;
@@ -9,7 +9,7 @@ import android.view.SurfaceView;
 import android.widget.TextView;
 
 import mbs.studio.Event;
-import com.example.studio.R;
+import cn.lx.mbs.R;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

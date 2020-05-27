@@ -1,4 +1,4 @@
-package mbs.studio.model;
+package cn.lx.mbs.ui.model;
 
 import com.google.gson.Gson;
 

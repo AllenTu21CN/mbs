@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,7 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.studio.R;
+import cn.lx.mbs.R;
 import mbs.studio.model.VideoSourcesDataModel;
 
 public class VideoSourcesListViewAdapter extends BaseAdapter {

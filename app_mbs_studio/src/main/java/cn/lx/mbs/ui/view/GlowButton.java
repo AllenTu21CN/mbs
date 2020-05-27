@@ -1,4 +1,4 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -6,7 +6,7 @@ import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.widget.Button;
 
-import com.example.studio.R;
+import cn.lx.mbs.R;
 
 public class GlowButton extends Button {
     public static final int COLOR_OFF = 0xFF1B1B1B;

@@ -4,8 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 
-import cn.lx.mbs.impl.Const;
-import cn.lx.mbs.impl.MBS;
+import cn.lx.mbs.support.Const;
+import cn.lx.mbs.support.MBS;
 import cn.lx.mbs.ui.service.NetworkReceiver;
 import com.sanbu.base.BaseEvents;
 import com.sanbu.base.NetType;

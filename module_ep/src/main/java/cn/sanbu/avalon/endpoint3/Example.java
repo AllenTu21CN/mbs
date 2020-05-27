@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import cn.sanbu.avalon.endpoint3.structures.AACProfile;
+import cn.sanbu.avalon.endpoint3.structures.Region;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
 import cn.sanbu.avalon.endpoint3.structures.AudioInputDevice;
 import cn.sanbu.avalon.endpoint3.structures.AudioSamplerate;
@@ -24,7 +25,6 @@ import cn.sanbu.avalon.endpoint3.structures.jni.EPDir;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
 import cn.sanbu.avalon.endpoint3.structures.EPObjectType;
 import cn.sanbu.avalon.endpoint3.structures.H264Profile;
-import cn.sanbu.avalon.endpoint3.structures.LayoutId;
 import cn.sanbu.avalon.endpoint3.structures.jni.MixerTracks;
 import cn.sanbu.avalon.endpoint3.structures.jni.Reconnecting;
 import cn.sanbu.avalon.endpoint3.structures.Resolution;
@@ -36,6 +36,8 @@ import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 import cn.sanbu.avalon.media.MediaJni;
 
 public class Example implements Endpoint3.Callback {
+
+    private static final Region SINGLE_SCREEN_REGION = new Region(0.0f, 0.0f, 1.0f, 1.0f);
 
     public static void firstOfAll(Context context) {
         // init endpoint jni environment
@@ -230,7 +232,7 @@ public class Example implements Endpoint3.Callback {
                 int decId = endpoint3.epStartSrcStreamDecoding(parent_id, stream_id);
 
                 DisplayCell cell = DisplayCell.buildStream(0, decId);
-                DisplayConfig config = DisplayConfig.buildOverlays(LayoutId._1x1, Arrays.asList(cell));
+                DisplayConfig config = DisplayConfig.buildOverlays(Arrays.asList(SINGLE_SCREEN_REGION), Arrays.asList(cell));
                 endpoint3.epConfigureDisplay(txDisplayExt, config);
                 endpoint3.epConfigureDisplay(lrDisplay, config);
             } else if (parent_id == ipcSource) {
@@ -238,7 +240,7 @@ public class Example implements Endpoint3.Callback {
                 int decId = endpoint3.epStartSrcStreamDecoding(parent_id, stream_id);
 
                 DisplayCell cell = DisplayCell.buildStream(0, decId);
-                DisplayConfig config = DisplayConfig.buildOverlays(LayoutId._1x1, Arrays.asList(cell));
+                DisplayConfig config = DisplayConfig.buildOverlays(Arrays.asList(SINGLE_SCREEN_REGION), Arrays.asList(cell));
                 endpoint3.epConfigureDisplay(txDisplay, config);
                 endpoint3.epConfigureDisplay(lrDisplay, config);
             }
@@ -270,7 +272,7 @@ public class Example implements Endpoint3.Callback {
                     int decId = endpoint3.epStartRxStreamDecoding(caller.id, stream_id);
 
                     DisplayCell cell = DisplayCell.buildStream(0, decId);
-                    DisplayConfig config = DisplayConfig.buildOverlays(LayoutId._1x1, Arrays.asList(cell));
+                    DisplayConfig config = DisplayConfig.buildOverlays(Arrays.asList(SINGLE_SCREEN_REGION), Arrays.asList(cell));
                     if (desc.type == DataType.VIDEO_EXT)
                         endpoint3.epConfigureDisplay(localDisplayExt, config);
                     else

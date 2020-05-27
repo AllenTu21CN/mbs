@@ -1,8 +1,16 @@
 package cn.sanbu.avalon.endpoint3.structures;
 
 public enum SourceType {
-    Capture("device://"),
-    RTSP("rtsp://");
+    VideoCapture("device://video/"),
+    AudioCapture("device://audio/"),
+
+    RTSP("rtsp://"),
+    RMSP("rmsp://"),
+    RTMP("rtmp://"),
+
+    File("file://"),
+
+    Caller("h323|sip|sbs:");
 
     public final String prefix;
 

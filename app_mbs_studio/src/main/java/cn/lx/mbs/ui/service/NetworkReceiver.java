@@ -6,8 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 
-import cn.lx.mbs.impl.Const;
-import cn.lx.mbs.impl.MBS;
+import cn.lx.mbs.support.Const;
+import cn.lx.mbs.support.MBS;
 import com.sanbu.tools.LogUtil;
 
 /**

@@ -1,11 +1,11 @@
-package mbs.studio.view;
+package cn.lx.mbs.ui.view;
 
 import android.content.Context;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.studio.R;
+import cn.lx.mbs.R;
 
 public class VideoSourceDeleteDialog extends BaseDialog {
 
