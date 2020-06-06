@@ -9,16 +9,14 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureFailure;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
-import android.nfc.Tag;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 
 import com.sanbu.board.HDMIFormat;
 
-import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
