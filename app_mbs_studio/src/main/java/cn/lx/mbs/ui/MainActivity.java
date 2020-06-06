@@ -20,19 +20,21 @@ import android.view.WindowManager;
 import java.util.LinkedList;
 import java.util.List;
 
-import mbs.studio.model.SceneOverlayDataModel;
-import mbs.studio.model.VideoSourcesDataModel;
-import mbs.studio.view.AudioMixerArea;
-import mbs.studio.view.ControlArea;
-import mbs.studio.view.BaseDialog;
-import mbs.studio.view.OverlayArea;
-import mbs.studio.view.PreviewArea;
-import mbs.studio.view.ProgramArea;
-import mbs.studio.view.SettingsDialog;
-import mbs.studio.view.SettingsFragment;
-import mbs.studio.view.Utils;
-import mbs.studio.view.VideoSourcesArea;
-import mbs.studio.view.VideoSourcesManageDialog;
+import cn.lx.mbs.R;
+import cn.lx.mbs.ui.model.SceneOverlayDataModel;
+import cn.lx.mbs.ui.model.VideoSourcesDataModel;
+import cn.lx.mbs.ui.view.AudioMixerArea;
+import cn.lx.mbs.ui.view.ControlArea;
+import cn.lx.mbs.ui.view.BaseDialog;
+import cn.lx.mbs.ui.view.OverlayArea;
+import cn.lx.mbs.ui.view.PreviewArea;
+import cn.lx.mbs.ui.view.ProgramArea;
+import cn.lx.mbs.ui.view.SettingsDialog;
+import cn.lx.mbs.ui.view.SettingsFragment;
+import cn.lx.mbs.ui.view.Utils;
+import cn.lx.mbs.ui.view.VideoSourcesArea;
+import cn.lx.mbs.ui.view.VideoSourcesManageDialog;
+import cn.lx.media.VideoEngine;
 
 public class MainActivity extends AppCompatActivity {
 

@@ -11,7 +11,7 @@ import android.widget.ListView;
 
 import cn.lx.mbs.R;
 
-import mbs.studio.MainActivity;
+import cn.lx.mbs.ui.MainActivity;
 
 public class OverlayArea {
     private static final String TAG = OverlayArea.class.getSimpleName();

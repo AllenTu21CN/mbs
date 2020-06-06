@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import cn.lx.mbs.R;
 
-import mbs.studio.MainActivity;
+import cn.lx.mbs.ui.MainActivity;
 
 public class OverlayAddImageDialog extends BaseDialog {
 

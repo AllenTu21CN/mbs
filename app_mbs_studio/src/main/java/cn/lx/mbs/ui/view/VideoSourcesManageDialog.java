@@ -16,13 +16,12 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import mbs.studio.MainActivity;
+import cn.lx.mbs.ui.MainActivity;
 import cn.lx.mbs.R;
-import mbs.studio.model.VideoSourcesDataModel;
+import cn.lx.mbs.ui.model.VideoSourcesDataModel;
+import cn.lx.media.VideoEngine;
 
 import java.util.List;
-
-import media.VideoEngine;
 
 public class VideoSourcesManageDialog extends BaseDialog {
 
@@ -76,7 +75,7 @@ public class VideoSourcesManageDialog extends BaseDialog {
         mSourcesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("VideoSourcesManageDialog", "Item index " + i + " clicked!");
+                Log.i("VideoSourcesManageDialo", "Item index " + i + " clicked!");
                 // Clear and set highlight
                 for (int n = 0; n < adapterView.getChildCount(); n++) {
                     adapterView.getChildAt(n).findViewById(R.id.layout).setBackground(

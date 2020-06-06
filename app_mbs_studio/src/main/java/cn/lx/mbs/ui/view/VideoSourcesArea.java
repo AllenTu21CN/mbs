@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import mbs.studio.MainActivity;
+import cn.lx.mbs.ui.MainActivity;
 import cn.lx.mbs.R;
 
 public class VideoSourcesArea {

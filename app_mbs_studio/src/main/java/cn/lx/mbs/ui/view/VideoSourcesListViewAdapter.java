@@ -9,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import cn.lx.mbs.R;
-import mbs.studio.model.VideoSourcesDataModel;
+import cn.lx.mbs.ui.model.VideoSourcesDataModel;
 
 public class VideoSourcesListViewAdapter extends BaseAdapter {
 

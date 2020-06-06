@@ -13,7 +13,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import cn.lx.mbs.R;
 
-import mbs.studio.model.SceneOverlayDataModel;
+import cn.lx.mbs.ui.model.SceneOverlayDataModel;
 
 public class OverlayListViewAdapter extends BaseAdapter {
 

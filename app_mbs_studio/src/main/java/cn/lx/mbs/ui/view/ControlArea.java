@@ -17,8 +17,9 @@ import android.widget.TextView;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import mbs.studio.Event;
+import cn.lx.mbs.ui.Event;
 import cn.lx.mbs.R;
+import cn.lx.mbs.ui.MainActivity;
 
 import org.greenrobot.eventbus.EventBus;
 

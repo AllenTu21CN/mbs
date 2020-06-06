@@ -8,7 +8,7 @@ import android.util.TypedValue;
 import android.view.SurfaceView;
 import android.widget.TextView;
 
-import mbs.studio.Event;
+import cn.lx.mbs.ui.Event;
 import cn.lx.mbs.R;
 
 import org.greenrobot.eventbus.EventBus;

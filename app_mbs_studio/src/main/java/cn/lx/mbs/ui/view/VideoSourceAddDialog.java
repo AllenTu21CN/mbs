@@ -7,7 +7,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import cn.lx.mbs.R;
-import mbs.studio.model.VideoSourcesDataModel;
+import cn.lx.mbs.ui.model.VideoSourcesDataModel;
 
 public class VideoSourceAddDialog extends BaseDialog {
 

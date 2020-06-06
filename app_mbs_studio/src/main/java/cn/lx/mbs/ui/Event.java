@@ -1,4 +1,4 @@
-package mbs.studio;
+package cn.lx.mbs.ui;
 
 public class Event {
     public static class RecordingStartEvent {}
