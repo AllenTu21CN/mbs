@@ -7,10 +7,10 @@ public class EmptyBoardSupportClient implements BoardSupportClient {
     private static final String TAG = EmptyBoardSupportClient.class.getSimpleName();
 
     @Override
-    public int cameraIdToHdmiDeviceId(int cameraId) {
-        if (0 == cameraId) {
+    public int cameraIdToHdmiDeviceId(String cameraId) {
+        if ("0" == cameraId) {
             return HDMI_IN_PORT_1;
-        } else if (1 == cameraId) {
+        } else if ("1" == cameraId) {
             return HDMI_IN_PORT_2;
         } else {
             LogUtil.e(TAG, "Invalid camera id. " + cameraId);
@@ -19,14 +19,14 @@ public class EmptyBoardSupportClient implements BoardSupportClient {
     }
 
     @Override
-    public int hdmiDeviceIdToCameraId(int port) {
+    public String hdmiDeviceIdToCameraId(int port) {
         if (HDMI_IN_PORT_1 == port) {
-            return 0;
+            return "0";
         } else if (HDMI_IN_PORT_2 == port) {
-            return 1;
+            return "1";
         } else {
             LogUtil.e(TAG, "Invalid port id. " + port);
-            return -1;
+            return null;
         }
     }
 

@@ -19,7 +19,7 @@ import android.widget.TextView;
 import cn.lx.mbs.ui.MainActivity;
 import cn.lx.mbs.R;
 import cn.lx.mbs.ui.model.VideoSourcesDataModel;
-import cn.lx.media.VideoEngine;
+import cn.sanbu.avalon.media.CameraHelper;
 
 import java.util.List;
 
@@ -166,7 +166,7 @@ public class VideoSourcesManageDialog extends BaseDialog {
         });
 
         // Initialize local camera id spinner
-        mLocalCameraIdList = VideoEngine.getInstance().getCameraIdList();
+        mLocalCameraIdList = CameraHelper.getInstance().getCameraIdList();
         SimpleArrayAdapter<String> localCameraIdAdapter = new SimpleArrayAdapter<>(
                 mContext,
                 mLocalCameraIdList);
@@ -224,7 +224,7 @@ public class VideoSourcesManageDialog extends BaseDialog {
             return;
         }
 
-        CameraCharacteristics characteristics = VideoEngine.getInstance().getCameraCharacteristics(selectedCameraId);
+        CameraCharacteristics characteristics = CameraHelper.getInstance().getCameraCharacteristics(selectedCameraId);
         StreamConfigurationMap configs = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
         //Log.d(TAG, configs.toString());
         mLocalCameraCaptureSizeList = configs.getOutputSizes(SurfaceTexture.class);

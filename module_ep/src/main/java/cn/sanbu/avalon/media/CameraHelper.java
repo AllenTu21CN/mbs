@@ -2,6 +2,7 @@ package cn.sanbu.avalon.media;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
@@ -41,14 +42,17 @@ public class CameraHelper {
     }
 
     private final boolean mIsNormative;
-    private volatile Map<Integer, Boolean/*availability*/> mCameras;
-    private volatile Map<Integer, List<Size>> mCamerasPreviewSizes;
+
+    private final CameraManager mCameraManager;
+
+    private volatile Map<String, Boolean/*availability*/> mCameras;
+    private volatile Map<String, List<Size>> mCamerasPreviewSizes;
     private BoardSupportClient mBoardSupportClient;
 
     private CameraHelper(Context context, BoardSupportClient client) {
         mBoardSupportClient = client;
 
-        mIsNormative = (!Qualcomm.isVT6105() && !Rockchip.is3BUEdition());
+        mIsNormative = (!Qualcomm.isVT6105() && !Rockchip.is3BUVersion());
 
         final boolean waitAvailability = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Looper.myLooper() != null;
         if (!waitAvailability)
@@ -56,17 +60,16 @@ public class CameraHelper {
 
         mCameras = new HashMap<>(5);
         mCamerasPreviewSizes = new HashMap<>(5);
+        mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
 
         try {
-            CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
-            String[] ids = manager.getCameraIdList();
-            for (String i: ids) {
+            String[] ids = mCameraManager.getCameraIdList();
+            for (String id: ids) {
                 try {
-                    int id = Integer.valueOf(i);
                     mCameras.put(id, !waitAvailability);
 
                     if (isNormative(id)) {
-                        CameraCharacteristics camCaps = manager.getCameraCharacteristics(String.valueOf(id));
+                        CameraCharacteristics camCaps = mCameraManager.getCameraCharacteristics(String.valueOf(id));
                         StreamConfigurationMap configMap = camCaps.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                         Size outSizes[] = configMap.getOutputSizes(SurfaceTexture.class);
                         List<Size> sizes = new ArrayList<>(outSizes.length);
@@ -75,34 +78,52 @@ public class CameraHelper {
                         mCamerasPreviewSizes.put(id, sizes);
                     }
                 } catch (Exception e) {
-                    LogUtil.w(TAG, "ignore removable camera: " + i);
+                    LogUtil.w(TAG, "ignore removable camera: " + id);
                 }
             }
 
             if (waitAvailability)
-                manager.registerAvailabilityCallback(mAvailabilityCallback, null);
+                mCameraManager.registerAvailabilityCallback(mAvailabilityCallback, null);
         } catch (Exception e) {
             LogUtil.w(TAG, "getCameraIdList failed", e);
         }
     }
 
-    public boolean isNormative(int cameraId) {
+    public String[] getCameraIdList() {
+        try {
+            return mCameraManager.getCameraIdList();
+        } catch (CameraAccessException e) {
+            LogUtil.w(TAG, "getCameraIdList error", e);
+            return null;
+        }
+    }
+
+    public CameraCharacteristics getCameraCharacteristics(String cameraId) {
+        try {
+            return mCameraManager.getCameraCharacteristics(cameraId);
+        } catch (CameraAccessException e) {
+            LogUtil.w(TAG, "getCameraCharacteristics error", e);
+            return null;
+        }
+    }
+
+    public boolean isNormative(String cameraId) {
         // camera is normative with SDK
         return mIsNormative;
     }
 
-    public List<Integer> getConnectedCameras() {
+    public List<String> getConnectedCameras() {
         return new ArrayList<>(mCameras.keySet());
     }
 
-    public void flush(int cameraId) {
+    public void flush(String cameraId) {
         if (!isNormative(cameraId)) {
             int port = cameraId2HDMIPort(cameraId);
             mBoardSupportClient.startQueryingHDMIIn(port);
         }
     }
 
-    public boolean isConnected(int cameraId) {
+    public boolean isConnected(String cameraId) {
         // 1. is connected with camera manager
         if (!mCameras.containsKey(cameraId))
             return false;
@@ -115,7 +136,7 @@ public class CameraHelper {
         return mBoardSupportClient.isHDMIInPlugged(port);
     }
 
-    public boolean isAvailable(int cameraId) {
+    public boolean isAvailable(String cameraId) {
         // 1. is connected
         if (!isConnected(cameraId))
             return false;
@@ -143,7 +164,7 @@ public class CameraHelper {
         return true;
     }
 
-    public Size getDefaultSize(int cameraId) {
+    public Size getDefaultSize(String cameraId) {
         if (!isConnected(cameraId))
             return null;
 
@@ -162,33 +183,23 @@ public class CameraHelper {
         }
     }
 
-    public int cameraId2HDMIPort(int cameraId) {
+    public int cameraId2HDMIPort(String cameraId) {
         return mBoardSupportClient.cameraIdToHdmiDeviceId(cameraId);
     }
 
-    public int HDMIPort2CameraId(int port) {
+    public String HDMIPort2CameraId(int port) {
         return mBoardSupportClient.hdmiDeviceIdToCameraId(port);
     }
 
     private CameraManager.AvailabilityCallback mAvailabilityCallback = new CameraManager.AvailabilityCallback() {
         @Override
         public void onCameraAvailable(@NonNull String cameraId) {
-            try {
-                int id = Integer.valueOf(cameraId);
-                mCameras.put(id, true);
-            } catch (NumberFormatException e) {
-                LogUtil.v(TAG, "onCameraAvailable: " + cameraId);
-            }
+            mCameras.put(cameraId, true);
         }
 
         @Override
         public void onCameraUnavailable(@NonNull String cameraId) {
-            try {
-                int id = Integer.valueOf(cameraId);
-                mCameras.put(id, false);
-            } catch (NumberFormatException e) {
-                LogUtil.v(TAG, "onCameraUnavailable: " + cameraId);
-            }
+            mCameras.put(cameraId, false);
         }
     };
 }

@@ -113,14 +113,6 @@ public class Source {
                 false, null, loop, null);
     }
 
-    public static Source buildCaller(int id, String name, CallingUrl url, VideoFormat vFormat) {
-        if (!url.isValid())
-            throw new RuntimeException("invalid params: " + url.toString());
-
-        return new Source(id, name, SourceType.Caller, url.toString(),
-                null, false, null, false, vFormat);
-    }
-
     public static Source copy(int id, Source other) {
         return new Source(id, other.name, other.type,
                 other.url, other.capRes, other.rtspOverTCP,

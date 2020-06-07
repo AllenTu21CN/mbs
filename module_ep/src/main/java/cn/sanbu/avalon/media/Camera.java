@@ -25,7 +25,7 @@ public class Camera {
     private static String TAG = "avalon_" + Camera.class.getSimpleName();
     private Context mContext = null;
 
-    int mCameraID = 0;
+    private String mCameraID = "0";
     private CameraManager mCameraMgr;
     private CameraDevice mCameraDevice;
     private int mCaptureWidth = -1;
@@ -129,7 +129,7 @@ public class Camera {
 
         Log.i(TAG, "Reopening camera: " + cameraID + "...");
         mCameraReopening    = true;
-        mCameraID           = cameraID;
+        mCameraID           = String.valueOf(cameraID);
         mContext            = context;
 
         close();
@@ -189,7 +189,7 @@ public class Camera {
             mCameraBackgroundThread.start();
             mCameraBackgroundHandler = new Handler(mCameraBackgroundThread.getLooper());
 
-            mCameraMgr.openCamera(String.valueOf(mCameraID), mCameraStateCallback, mCameraBackgroundHandler);
+            mCameraMgr.openCamera(mCameraID, mCameraStateCallback, mCameraBackgroundHandler);
 
             // Waiting for camera ready
             synchronized (mCameraCaptureSessionLock) {
@@ -223,6 +223,7 @@ public class Camera {
             if (null != mCameraDevice) {
                 mCameraDevice.close();
                 mCameraDevice = null;
+                mCameraHelper.flush(mCameraID);
             }
         } catch (InterruptedException e) {
             Log.e(TAG, "Interrupted while trying to lock camera closing :" + e.toString());
@@ -240,8 +241,6 @@ public class Camera {
                 Log.e(TAG, e.toString());
             }
         }
-
-        mCameraHelper.flush(mCameraID);
     }
 
     private void createCameraPreviewSession() {

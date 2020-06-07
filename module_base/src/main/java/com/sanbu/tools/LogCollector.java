@@ -513,7 +513,7 @@ public class LogCollector {
     }
 
     private static Result killAllLogcat4CurrentUser() {
-        String cmd = Rockchip.isProduct() ? "ps" : "ps -ef";
+        String cmd = Rockchip.is3BUVersion() ? "ps" : "ps -ef";
         cmd += "| egrep logcat | grep -v grep | busybox awk '{print $2}'";
         LocalLinuxUtil.Result result = LocalLinuxUtil.doShellWithResult(cmd);
         LogCmd("killAllLogcat4CurrentUser", cmd, result);

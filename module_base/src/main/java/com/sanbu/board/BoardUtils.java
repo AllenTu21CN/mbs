@@ -18,7 +18,7 @@ public class BoardUtils {
 
     static public Type type() {
         String model = Build.MODEL;
-        if(Rockchip.isProduct()) {
+        if(Rockchip.is3BUVersion()) {
             return Type.PLATFORM_IS_TV;
         } else if (model.contains("PAD") || model.contains("pad")) {
             return Type.PLATFORM_IS_PAD;

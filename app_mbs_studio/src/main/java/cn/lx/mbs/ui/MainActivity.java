@@ -34,7 +34,7 @@ import cn.lx.mbs.ui.view.SettingsFragment;
 import cn.lx.mbs.ui.view.Utils;
 import cn.lx.mbs.ui.view.VideoSourcesArea;
 import cn.lx.mbs.ui.view.VideoSourcesManageDialog;
-import cn.lx.media.VideoEngine;
+import cn.sanbu.avalon.media.CameraHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,8 +54,6 @@ public class MainActivity extends AppCompatActivity {
     private VideoSourcesDataModel mVideoSourcesDataModel = new VideoSourcesDataModel();
     private SceneOverlayDataModel[] mSceneOverlayDataModel = new SceneOverlayDataModel[10];
 
-    private VideoEngine mVideoEngine;
-
     public VideoSourcesDataModel getVideoSourcesDataModel() {
         return mVideoSourcesDataModel;
     }
@@ -72,10 +70,9 @@ public class MainActivity extends AppCompatActivity {
 
         generateTestData();
 
-        mVideoEngine = VideoEngine.allocateInstance(this);
-        String[] cameraIdList = mVideoEngine.getCameraIdList();
+        String[] cameraIdList = CameraHelper.getInstance().getCameraIdList();
         for (String id : cameraIdList) {
-            CameraCharacteristics info = mVideoEngine.getCameraCharacteristics(id);
+            CameraCharacteristics info = CameraHelper.getInstance().getCameraCharacteristics(id);
             Log.i(TAG, "Camera ID=" + id + ", Characteristics=" + info.toString());
         }
 

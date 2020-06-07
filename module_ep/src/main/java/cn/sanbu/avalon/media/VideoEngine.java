@@ -51,6 +51,7 @@ import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -121,7 +122,7 @@ public class VideoEngine {
     private Map<Integer, Source> mSources   = new TreeMap<>();
     private Map<Integer, Scene> mScenes     = new TreeMap<>();
     private Map<Integer, Sink> mSinks       = new TreeMap<>();
-    private Map<Integer, Source> mCameras   = new TreeMap<>();
+    private Map<String, Source> mCameras    = new TreeMap<>();
 
     private MixerThread mMixerThread;
     private MixerHandler mMixerHandler;
@@ -135,9 +136,7 @@ public class VideoEngine {
     private Context mContext = null;
 
     private CameraManager mCameraMgr;
-    private volatile boolean[] mCameraReopeningFlag;
-    private long[] mCameraReopenAttempts;
-    private long[] mCameraAttemptThreshold;
+    private volatile Map<String, CameraReopenFlag> mCameraReopeningFlags;
     private final Object mCameraReopeningLock = new Object();
 
     private Point mDisplaySize = new Point();
@@ -171,7 +170,7 @@ public class VideoEngine {
         private MediaCodec mMediaCodec = null;
         private LinkedBlockingQueue<byte[]> mPacketQueue = null;
 
-        private int mCameraId = -1;
+        private String mCameraId = null;
         private boolean mCaptureSizeAutoFit = true;
         private int mCaptureWidth = -1;
         private int mCaptureHeight = -1;
@@ -196,7 +195,7 @@ public class VideoEngine {
                 cameraDevice.close();
                 mCameraHelper.flush(mCameraId);
                 mCameraDevice = null;
-                mCameraReopeningFlag[mCameraId] = false;
+                mCameraReopeningFlags.get(mCameraId).trying = false;
             }
 
             @Override
@@ -206,7 +205,7 @@ public class VideoEngine {
                 cameraDevice.close();
                 mCameraHelper.flush(mCameraId);
                 mCameraDevice = null;
-                mCameraReopeningFlag[mCameraId] = false;
+                mCameraReopeningFlags.get(mCameraId).trying = false;
             }
         };
 
@@ -252,7 +251,7 @@ public class VideoEngine {
 
         private class Stats {
             private String  type;
-            private int     device_id;
+            private String  device_id;
             private String  codec;
             private long    bitrate;
             private float   frame_rate;
@@ -270,7 +269,7 @@ public class VideoEngine {
                     config      = mConfig;
                 } else if (mType == SOURCE_TYPE_DECODER) {
                     type        = "decoder";
-                    device_id   = -1;
+                    device_id   = "-1";
                     codec       = mCodecName;
                     bitrate     = mBitrateStatist.averageBitrate();
                     frame_rate  = mFrameRateStatist.averageFrameRate();
@@ -330,14 +329,23 @@ public class VideoEngine {
 
                 case SOURCE_TYPE_CAPTURE:
                     // Get device id and capture parameters
-                    mCameraId = configObject.get("device_id").getAsInt();
+                    final String DEVICE_ID_KEY = "device_id";
+                    final String CAPTURE_WIDTH_KEY = "capture_width";
+                    final String CAPTURE_HEIGHT_KEY = "capture_height";
 
-                    if (configObject.has("capture_width")
-                            && configObject.has("capture_height")) {
+                    if (configObject.has(DEVICE_ID_KEY)) {
+                        mCameraId = configObject.get(DEVICE_ID_KEY).getAsString();
+                    } else {
+                        LogUtil.e(TAG, "invalid source config, has no device_id: " + mConfig);
+                        return false;
+                    }
+
+                    if (configObject.has(CAPTURE_WIDTH_KEY)
+                            && configObject.has(CAPTURE_HEIGHT_KEY)) {
                         try {
                             mCaptureSizeAutoFit = false;
-                            mCaptureWidth = configObject.get("capture_width").getAsInt();
-                            mCaptureHeight = configObject.get("capture_height").getAsInt();
+                            mCaptureWidth = configObject.get(CAPTURE_WIDTH_KEY).getAsInt();
+                            mCaptureHeight = configObject.get(CAPTURE_HEIGHT_KEY).getAsInt();
                         } catch (ClassCastException e) {
                             LogUtil.w(TAG, "Parse capture size parameters failed!");
                         }
@@ -463,7 +471,7 @@ public class VideoEngine {
                 mCameraBackgroundHandler = new Handler(mCameraBackgroundThread.getLooper());
 
                 // Open camera
-                mCameraMgr.openCamera(String.valueOf(mCameraId),
+                mCameraMgr.openCamera(mCameraId,
                         mCameraStateCallback, mCameraBackgroundHandler);
 
                 // Waiting for camera ready
@@ -521,34 +529,39 @@ public class VideoEngine {
                     LogUtil.e(TAG, e.toString());
                 }
             }
-
-            mCameraHelper.flush(mCameraId);
         }
 
         private void reopenCamera() {
+            if (mCameraId == null)
+                return;
+
+            CameraReopenFlag flag = mCameraReopeningFlags.get(mCameraId);
+
             synchronized (mCameraReopeningLock) {
-                ++mCameraReopenAttempts[mCameraId];
-                if (mCameraReopenAttempts[mCameraId] < mCameraAttemptThreshold[mCameraId])
+                ++flag.attempts;
+
+                if (flag.attempts < flag.threshold)
                     return; // to avoid reopen camera too frequently
 
-                for (int i = 0; i < mCameraReopeningFlag.length; i++) {
-                    if (mCameraReopeningFlag[i]) {
+                for (CameraReopenFlag f: mCameraReopeningFlags.values()) {
+                    if (f.trying) {
                         //LogUtil.v(TAG, "Camera id=" + i + " is reopening, wait for next turn.");
                         return;
                     }
                 }
-                mCameraReopeningFlag[mCameraId] = true;
+
+                flag.trying = true;
+                flag.attempts = 0;
             }
-            mCameraReopenAttempts[mCameraId] = 0;
 
             if (!checkCamera()) {
-                mCameraReopeningFlag[mCameraId] = false;
-                mCameraAttemptThreshold[mCameraId] += 1000;
-                if (mCameraAttemptThreshold[mCameraId] > CAMERA_REOPEN_MAX_THRESHOLD)
-                    mCameraAttemptThreshold[mCameraId] = CAMERA_REOPEN_MAX_THRESHOLD;
+                flag.trying = false;
+                flag.threshold += 1000;
+                if (flag.threshold > CAMERA_REOPEN_MAX_THRESHOLD)
+                    flag.threshold = CAMERA_REOPEN_MAX_THRESHOLD;
                 return;
             }
-            mCameraAttemptThreshold[mCameraId] = CAMERA_REOPEN_MIN_THRESHOLD;
+            flag.threshold = CAMERA_REOPEN_MIN_THRESHOLD;
 
             LogUtil.d(TAG, "Reopen camera#" + mCameraId + " with " + mCaptureWidth + "x" + mCaptureHeight);
 
@@ -708,7 +721,7 @@ public class VideoEngine {
                                 new Thread(() -> {
                                         try {
                                             Thread.sleep(1000);
-                                            mCameraReopeningFlag[mCameraId] = false;
+                                            mCameraReopeningFlags.get(mCameraId).trying = false;
                                         } catch (InterruptedException e) {
                                             LogUtil.d(TAG, e.toString());
                                         }
@@ -723,7 +736,7 @@ public class VideoEngine {
                                     mCameraCaptureSessionConfigured = false;
                                     mCameraCaptureSessionLock.notify();
                                 }
-                                mCameraReopeningFlag[mCameraId] = false;
+                                mCameraReopeningFlags.get(mCameraId).trying = false;
                                 mCameraHasSignal = false;
                             }
 
@@ -3261,13 +3274,13 @@ public class VideoEngine {
                     }
                 }
                 if (profile != -1) {
-                    if (!Rockchip.isProduct())
+                    if (!Rockchip.is3BUVersion())
                         format.setInteger(MediaFormat.KEY_PROFILE, profile);
                 }
 
                 // Level
                 if (level != AVCLevel.UNSPECIFIED) {
-                    if (!Rockchip.isProduct())
+                    if (!Rockchip.is3BUVersion())
                         format.setInteger(MediaFormat.KEY_LEVEL, level.android);
                 }
 
@@ -4363,13 +4376,10 @@ public class VideoEngine {
         if (!mEnableNDK) {
             mCameraMgr = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
 
-            int cameraCount = getCameraIdList().size();
-            mCameraReopeningFlag = new boolean[cameraCount];
-            mCameraReopenAttempts = new long[cameraCount];
-            mCameraAttemptThreshold = new long[cameraCount];
-            for (int i = 0 ; i < cameraCount ; ++i) {
-                mCameraReopenAttempts[i] = CAMERA_REOPEN_MIN_THRESHOLD;
-                mCameraAttemptThreshold[i] = CAMERA_REOPEN_MIN_THRESHOLD;
+            List<String> ids = getCameraIdList();
+            mCameraReopeningFlags = new HashMap<>(ids.size());
+            for (String id: ids) {
+                mCameraReopeningFlags.put(id, new CameraReopenFlag(false, CAMERA_REOPEN_MIN_THRESHOLD, CAMERA_REOPEN_MIN_THRESHOLD));
             }
         }
 
@@ -4425,21 +4435,13 @@ public class VideoEngine {
 		}
     }
 
-    public List<Integer> getCameraIdList() {
+    public List<String> getCameraIdList() {
         return mCameraHelper.getConnectedCameras();
     }
 
     public float getDisplayRefreshRate() {
         return mDisplayRefreshRate;
     }
-
-    /*public CameraCharacteristics getCameraCharacteristics(String cameraId) {
-        try {
-            return mCameraMgr.getCameraCharacteristics(cameraId);
-        } catch (CameraAccessException e) {
-            return null;
-        }
-    }*/
 
     public int registerDisplaySurface(Surface surface) {
         if (surface == null) {
@@ -4554,7 +4556,7 @@ public class VideoEngine {
         return source == null ? false : source.hasSignal();
     }
 
-    public boolean hasCameraSignal(int cameraId) {
+    public boolean hasCameraSignal(String cameraId) {
         Source source = mCameras.get(cameraId);
         return source == null ? false : source.hasSignal();
     }
@@ -4898,6 +4900,18 @@ public class VideoEngine {
             return BitmapFactory.decodeFile(path);
         } else {
             throw new RuntimeException("genHintBitmap, invalid hint: " + hint);
+        }
+    }
+
+    private static class CameraReopenFlag {
+        public volatile boolean trying;
+        public volatile long attempts;
+        public volatile long threshold;
+
+        public CameraReopenFlag(boolean trying, long attempts, long threshold) {
+            this.trying = trying;
+            this.attempts = attempts;
+            this.threshold = threshold;
         }
     }
 

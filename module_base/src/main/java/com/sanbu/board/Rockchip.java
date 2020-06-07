@@ -12,12 +12,7 @@ public class Rockchip {
     private static String gHWVersion;
     private static final String g3BuVersion = SystemProperties.get("ro.sanbu.product.ver", "");
 
-    public static boolean isProduct() {
-        String model = Build.MODEL;
-        return (model.startsWith("firefly") || model.startsWith("rk3399") || model.startsWith("rk3288") || model.endsWith("3399J") || model.startsWith("AIO"));
-    }
-
-    public static boolean isRk3288() {
+    public static boolean isRK3288() {
         String model = Build.MODEL;
         return (model.startsWith("rk3288") || model.startsWith("firefly"));
     }
@@ -27,7 +22,7 @@ public class Rockchip {
         return (model.endsWith("3399J") || model.startsWith("AIO") || model.equals("rk3399-all"));
     }
 
-    public static boolean is3BUEdition() {
+    public static boolean is3BUVersion() {
         return Build.MODEL.contains("3399") && !g3BuVersion.isEmpty();
     }
 

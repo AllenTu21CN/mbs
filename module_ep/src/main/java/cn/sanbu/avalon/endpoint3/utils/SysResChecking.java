@@ -35,7 +35,7 @@ public class SysResChecking {
     }
 
     public static void check(Context context, Handler handler, Callback callback,
-                                      final List<Port> ports, final List<Integer> cameras) {
+                                      final List<Port> ports, final List<String> cameras) {
         checkLocalPortsUsing(ports, handler, result -> {
             if (!result.isSuccessful()) {
                 Result error = genError("checkResource", result.code,
@@ -63,11 +63,11 @@ public class SysResChecking {
                     return;
                 }
 
-                List<Integer> usingCameras = (List<Integer>) result1.data;
+                List<String> usingCameras = (List<String>) result1.data;
                 if (usingCameras.size() > 0) {
                     CameraHelper helper = CameraHelper.getInstance();
                     String hint = "硬件资源被占用: ";
-                    for (int id: usingCameras) {
+                    for (String id: usingCameras) {
                         if (helper.isNormative(id)) {
                             int hdmi = CameraHelper.getInstance().cameraId2HDMIPort(id) + 1;
                             hint += "HDMI-IN#" + hdmi + ", ";
@@ -131,20 +131,20 @@ public class SysResChecking {
         });
     }
 
-    public static void checkCameraUsing(List<Integer> cameras, Context context, Handler handler,
-                                        Callback/*List<Integer>*/ callback) {
+    public static void checkCameraUsing(List<String> cameras, Context context, Handler handler,
+                                        Callback/*List<String>*/ callback) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             checkCameraUsingV23(cameras, context, handler, callback);
         else
             checkCameraUsingV21(cameras, handler, callback);
     }
 
-    private static void checkCameraUsingV21(final List<Integer> cameras, Handler handler,
+    private static void checkCameraUsingV21(final List<String> cameras, Handler handler,
                                             final Callback callback) {
         handler.post(() -> {
-            List<Integer> result = new LinkedList<>();
+            List<String> result = new LinkedList<>();
             if (cameras != null) {
-                for (int id : cameras) {
+                for (String id : cameras) {
                     boolean using = isCameraUsingV21(id);
                     if (using)
                         result.add(id);
@@ -155,7 +155,7 @@ public class SysResChecking {
         });
     }
 
-    private static void checkCameraUsingV23(final List<Integer> cameras, Context context,
+    private static void checkCameraUsingV23(final List<String> cameras, Context context,
                                             Handler handler, final Callback callback) {
 
         if (cameras == null || cameras.size() == 0) {
@@ -166,7 +166,7 @@ public class SysResChecking {
             return;
         }
 
-        final Map<Integer, Boolean> using = new HashMap<>(cameras.size());
+        final Map<String, Boolean> using = new HashMap<>(cameras.size());
         final boolean ret[] = {false};
 
         final CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
@@ -180,9 +180,8 @@ public class SysResChecking {
 
                 LogUtil.i(TAG, "camera#" + cameraId + " is available");
                 try {
-                    int id = Integer.valueOf(cameraId);
-                    if (cameras.contains(id)) {
-                        using.put(id, false);
+                    if (cameras.contains(cameraId)) {
+                        using.put(cameraId, false);
                         if (using.size() == cameras.size()) {
                             ret[0] = true;
                             manager.unregisterAvailabilityCallback(this);
@@ -203,9 +202,8 @@ public class SysResChecking {
 
                 LogUtil.i(TAG, "camera#" + cameraId + " is unavailable");
                 try {
-                    int id = Integer.valueOf(cameraId);
-                    if (cameras.contains(id)) {
-                        using.put(id, true);
+                    if (cameras.contains(cameraId)) {
+                        using.put(cameraId, true);
                         if (using.size() == cameras.size()) {
                             ret[0] = true;
                             manager.unregisterAvailabilityCallback(this);
@@ -226,12 +224,12 @@ public class SysResChecking {
             manager.unregisterAvailabilityCallback(availabilityCallback);
             if (callback != null)
                 callback.done(new Result(BaseError.ACTION_TIMEOUT, "CameraManager.AvailabilityCallback timeout"));
-        }, 1000);
+        }, 2000);
     }
 
-    private static void callbackCameraUsing(final Map<Integer, Boolean> using, Callback callback) {
-        List<Integer> ret = new LinkedList<>();
-        for (Map.Entry<Integer, Boolean> status: using.entrySet()) {
+    private static void callbackCameraUsing(final Map<String, Boolean> using, Callback callback) {
+        List<String> ret = new LinkedList<>();
+        for (Map.Entry<String, Boolean> status: using.entrySet()) {
             if (status.getValue())
                 ret.add(status.getKey());
         }
@@ -239,12 +237,20 @@ public class SysResChecking {
             callback.done(Result.buildSuccess(ret));
     }
 
-    private static boolean isCameraUsingV21(int id) {
+    private static boolean isCameraUsingV21(String id) {
+        int cameraId;
+        try {
+            cameraId = Integer.valueOf(id);
+        } catch (Exception e) {
+            LogUtil.w(TAG, "isCameraUsingV21, camera id is not Integer: " + id, e);
+            return true;
+        }
+
         Camera camera = null;
         try {
-            camera = Camera.open(id);
+            camera = Camera.open(cameraId);
             return false;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             return true;
         } finally {
             if (camera != null) camera.release();
