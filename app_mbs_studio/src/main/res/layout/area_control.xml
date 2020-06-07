@@ -20,7 +20,7 @@
         app:layout_constraintGuide_percent="0.5"
         android:orientation="horizontal"/>
 
-    <view class="mbs.studio.view.ControlArea$TransitionButton"
+    <view class="cn.lx.mbs.ui.view.ControlArea$TransitionButton"
         android:id="@+id/cut_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -33,7 +33,7 @@
         android:textAlignment="center"
         android:textColor="@color/commonButtonNormalTextColor" />
 
-        <view class="mbs.studio.view.ControlArea$TransitionButton"
+        <view class="cn.lx.mbs.ui.view.ControlArea$TransitionButton"
             android:id="@+id/fade_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             android:textAlignment="center"
             android:textColor="@color/commonButtonNormalTextColor" />
 
-    <view class="mbs.studio.view.ControlArea$TransitionButton"
+    <view class="cn.lx.mbs.ui.view.ControlArea$TransitionButton"
         android:id="@+id/wipe_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
         android:textAlignment="center"
         android:textColor="@color/commonButtonNormalTextColor" />
 
-        <view class="mbs.studio.view.ControlArea$TransitionButton"
+        <view class="cn.lx.mbs.ui.view.ControlArea$TransitionButton"
             android:id="@+id/ftb_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -67,7 +67,7 @@
             android:textAlignment="center"
             android:textColor="@color/commonButtonNormalTextColor" />
 
-    <view class="mbs.studio.view.SeekBar"
+    <view class="cn.lx.mbs.ui.view.SeekBar"
         android:id="@+id/transition_duration_seekbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -98,7 +98,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
-    <view class="mbs.studio.view.ControlArea$RecordingButton"
+    <view class="cn.lx.mbs.ui.view.ControlArea$RecordingButton"
         android:id="@+id/recording_button"
         android:layout_width="100px"
         android:layout_height="100px"
@@ -107,7 +107,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
-    <view class="mbs.studio.view.SwitchButton"
+    <view class="cn.lx.mbs.ui.view.SwitchButton"
         android:id="@+id/enable_streaming"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -120,7 +120,7 @@
         android:textSize="28px"
         android:switchPadding="18px" />
 
-    <view class="mbs.studio.view.SwitchButton"
+    <view class="cn.lx.mbs.ui.view.SwitchButton"
         android:id="@+id/enable_recording"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -177,7 +177,7 @@
             android:layout_weight="1"
             android:orientation="horizontal">
 
-            <view class="mbs.studio.view.ControlArea$TransitionButton"
+            <view class="cn.lx.mbs.ui.view.ControlArea$TransitionButton"
                 android:id="@+id/cut_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -187,7 +187,7 @@
                 android:text="CUT"
                 android:textColor="@color/commonButtonNormalTextColor" />
 
-            <view class="mbs.studio.view.ControlArea$TransitionButton"
+            <view class="cn.lx.mbs.ui.view.ControlArea$TransitionButton"
                 android:id="@+id/fade_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -246,7 +246,7 @@
 
         </LinearLayout>
 
-        <view class="mbs.studio.view.ControlArea$RecordingButton"
+        <view class="cn.lx.mbs.ui.view.ControlArea$RecordingButton"
             android:id="@+id/recording_button"
             android:layout_width="100px"
             android:layout_height="100px"

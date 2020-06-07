@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/wrapperBackgroundColor"
-    tools:context="mbs.studio.MainActivity">
+    tools:context="cn.lx.mbs.ui.MainActivity">
 
     <!-- Guide lines -->
     <androidx.constraintlayout.widget.Guideline

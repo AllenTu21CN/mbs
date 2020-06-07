@@ -20,7 +20,7 @@
         android:paddingLeft="6px"
         android:paddingRight="6px" />
 
-    <view class="mbs.studio.view.AudioMixerArea$VUMeter"
+    <view class="cn.lx.mbs.ui.view.AudioMixerArea$VUMeter"
         android:id="@+id/vu_meter"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -31,7 +31,7 @@
         android:layout_marginLeft="10px"
         android:layout_marginRight="10px"/>
 
-    <view class="mbs.studio.view.AudioMixerArea$OnAfvOffButton"
+    <view class="cn.lx.mbs.ui.view.AudioMixerArea$OnAfvOffButton"
         android:id="@+id/dynamic_button_1"
         android:layout_width="80px"
         android:layout_height="0dp"
@@ -42,7 +42,7 @@
         android:layout_marginTop="10px"
         android:layout_marginBottom="10px" />
 
-    <view class="mbs.studio.view.AudioMixerArea$SoloButton"
+    <view class="cn.lx.mbs.ui.view.AudioMixerArea$SoloButton"
         android:id="@+id/dynamic_button_2"
         android:layout_width="80px"
         android:layout_height="0dp"
@@ -65,7 +65,7 @@
         android:tint="@color/secondaryTextColor"
         android:tintMode="src_in" />
 
-    <view class="mbs.studio.view.AudioMixerArea$VolumeSlider"
+    <view class="cn.lx.mbs.ui.view.AudioMixerArea$VolumeSlider"
         android:id="@+id/volume_seekbar"
         android:layout_width="0dp"
         android:layout_height="0dp"

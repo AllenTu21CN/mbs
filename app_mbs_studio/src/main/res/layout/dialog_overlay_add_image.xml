@@ -25,7 +25,7 @@
         app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
         app:layout_constraintBottom_toBottomOf="@id/scene_editor_bg">
 
-        <mbs.studio.view.OverlayEditableView
+        <cn.lx.mbs.ui.view.OverlayEditableView
             android:id="@+id/scene_editor_overlay"
             android:layout_width="500px"
             android:layout_height="300px"
@@ -73,7 +73,7 @@
         android:text="Scale"
         android:textSize="28px" />
 
-    <mbs.studio.view.SeekBar
+    <cn.lx.mbs.ui.view.SeekBar
         android:id="@+id/scale_seek_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -107,7 +107,7 @@
         android:text="Rotation"
         android:textSize="28px" />
 
-    <mbs.studio.view.SeekBar
+    <cn.lx.mbs.ui.view.SeekBar
         android:id="@+id/rotation_seek_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
         android:text="Opacity"
         android:textSize="28px" />
 
-    <mbs.studio.view.SeekBar
+    <cn.lx.mbs.ui.view.SeekBar
         android:id="@+id/opacity_seek_bar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -199,17 +199,17 @@
 
         <TableRow>
             <TextView android:text="Scale" android:textSize="28px" />
-            <mbs.studio.view.SeekBar />
+            <cn.lx.mbs.ui.view.SeekBar />
         </TableRow>
 
         <TableRow>
             <TextView android:text="Rotation" android:textSize="28px" />
-            <mbs.studio.view.SeekBar />
+            <cn.lx.mbs.ui.view.SeekBar />
         </TableRow>
 
         <TableRow>
             <TextView android:text="Opacity" android:textSize="28px" />
-            <mbs.studio.view.SeekBar />
+            <cn.lx.mbs.ui.view.SeekBar />
         </TableRow>
 
         <TableRow>

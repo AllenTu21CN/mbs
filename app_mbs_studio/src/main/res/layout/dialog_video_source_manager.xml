@@ -222,7 +222,7 @@
                 android:textColor="@color/primaryTextColor"
                 android:textSize="28px" />
 
-            <view class="mbs.studio.view.SwitchButton"
+            <view class="cn.lx.mbs.ui.view.SwitchButton"
                 android:id="@+id/rtsp_use_tcp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -296,7 +296,7 @@
                 android:textColor="@color/primaryTextColor"
                 android:textSize="28px" />
 
-            <view class="mbs.studio.view.SwitchButton"
+            <view class="cn.lx.mbs.ui.view.SwitchButton"
                 android:id="@+id/file_loop"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
