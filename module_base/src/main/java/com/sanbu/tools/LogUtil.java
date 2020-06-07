@@ -202,6 +202,7 @@ public class LogUtil {
             info.setLevel(level);
             info.setContent(text);
             info.setThrowable(tr);
+            // EventBus.getDefault().post(info);
         }
     }
 

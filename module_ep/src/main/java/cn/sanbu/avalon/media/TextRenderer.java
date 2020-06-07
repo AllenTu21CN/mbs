@@ -14,6 +14,8 @@ import java.io.File;
 
 public class TextRenderer {
 
+    private static final boolean CALC_PADDING = true;
+
     public static Bitmap renderTextAsBitmap(String text,
                                             String fontFamily, float fontSize,
                                             int fontWeight, boolean fontItalic,
@@ -62,7 +64,7 @@ public class TextRenderer {
         textPaint.setTextAlign(Paint.Align.LEFT);
 
         // calculate the max width with all lines
-        int padding = (int)(fontSize / 2.f);
+        int padding = CALC_PADDING ? (int)(fontSize / 2.f) : 0;
         String[] lines = text.replace("\r", "").split("\n");
         int width = 0;
         for (String line: lines) {
@@ -77,7 +79,7 @@ public class TextRenderer {
 
         // init a multiple-lines layout
         StaticLayout layout = new StaticLayout(text, textPaint, width,
-                Layout.Alignment.ALIGN_CENTER, 1.0F, 0.0F, false);
+                Layout.Alignment.ALIGN_CENTER, 1.0F, 0.0F, !CALC_PADDING);
 
         // create a Bitmap with the layout
         int canvasWidth = layout.getWidth();

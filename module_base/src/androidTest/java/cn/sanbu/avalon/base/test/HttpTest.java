@@ -1,6 +1,6 @@
 package cn.sanbu.avalon.base.test;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 
 import com.sanbu.base.Callback;
 import com.sanbu.base.Result;

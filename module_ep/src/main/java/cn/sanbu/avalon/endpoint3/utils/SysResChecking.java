@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import cn.sanbu.avalon.media.HdmiInputDevice;
+import cn.sanbu.avalon.media.CameraHelper;
 
 public class SysResChecking {
 
@@ -65,11 +65,18 @@ public class SysResChecking {
 
                 List<Integer> usingCameras = (List<Integer>) result1.data;
                 if (usingCameras.size() > 0) {
-                    String hint = "HDMI-IN被占用: ";
+                    CameraHelper helper = CameraHelper.getInstance();
+                    String hint = "硬件资源被占用: ";
                     for (int id: usingCameras) {
-                        int hdmi = HdmiInputDevice.getInstance().cameraIdToHdmiDeviceId(id) + 1;
-                        hint += "#" + hdmi + ", ";
+                        if (helper.isNormative(id)) {
+                            int hdmi = CameraHelper.getInstance().cameraId2HDMIPort(id) + 1;
+                            hint += "HDMI-IN#" + hdmi + ", ";
+                        } else {
+                            hint += "Camera#" + id + ", ";
+                        }
+
                     }
+
                     Result error = genError("checkCameraUsing", BaseError.ACTION_ILLEGAL, hint, hint);
                     callback.done(error);
                     return;

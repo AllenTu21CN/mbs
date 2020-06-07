@@ -22,6 +22,7 @@ import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
 import cn.sanbu.avalon.endpoint3.structures.DisplayCell;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPDir;
+import cn.sanbu.avalon.endpoint3.structures.jni.EPEvent;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
 import cn.sanbu.avalon.endpoint3.structures.EPObjectType;
 import cn.sanbu.avalon.endpoint3.structures.H264Profile;
@@ -348,6 +349,11 @@ public class Example implements Endpoint3.Callback {
 
     @Override
     public void onCallerError(int call_id, int errcode, String error) {
+
+    }
+
+    @Override
+    public void onEvent(EPObjectType obj_type, int obj_id, EPEvent event, String params) {
 
     }
 }

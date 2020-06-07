@@ -3,7 +3,9 @@ package com.sanbu.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -131,6 +133,10 @@ public class FileUtil {
      * @param buffer buffer
      * @param filePath 文件路径
      */
+    public static void readLinesToBuffer(StringBuffer buffer, String filePath) throws IOException {
+        readToBuffer(buffer, filePath);
+    }
+
     public static void readToBuffer(StringBuffer buffer, String filePath) throws IOException {
         InputStream is = new FileInputStream(filePath);
         String line; // 用来保存每行读取的内容
@@ -143,6 +149,77 @@ public class FileUtil {
         }
         reader.close();
         is.close();
+    }
+
+    public static String readToText(String file) {
+        File target = new File(file);
+        if (!target.exists() || !target.isFile())
+            return null;
+
+        InputStream is = null;
+        BufferedReader reader = null;
+        char buffer[] = new char[1024];
+
+        try {
+            StringBuffer sb = new StringBuffer();
+            is = new FileInputStream(target);
+            reader = new BufferedReader(new InputStreamReader(is));
+
+            int len = 0;
+            while ((len = reader.read(buffer)) > 0)
+                sb.append(buffer, 0, len);
+
+            return sb.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (reader != null)
+                    reader.close();
+                if (is != null)
+                    is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static boolean writeToFile(String filePath, String data) {
+        File file = new File(filePath);
+        if (!file.exists()) {
+            try {
+                if (!(file.createNewFile())) {
+                    LogUtil.w(String.format("create file[%s] failed", filePath));
+                    return false;
+                }
+            } catch (IOException e) {
+                LogUtil.w(String.format("create file[%s] failed2", filePath), e);
+                return false;
+            }
+        } else if (!file.isFile()) {
+            LogUtil.e(filePath + " is not a file");
+            return false;
+        }
+
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(file);
+            fw.write(data);
+            fw.close();
+            return true;
+        } catch (Exception e) {
+            LogUtil.e("file write error", e);
+            return false;
+        } finally {
+            if (fw != null) {
+                try {
+                    fw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**

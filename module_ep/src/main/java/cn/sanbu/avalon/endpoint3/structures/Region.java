@@ -13,10 +13,6 @@ public class Region {
         this.height = height;
     }
 
-    public Region(Region other) {
-        this(other.x, other.y, other.width, other.height);
-    }
-
     public boolean isEqual(Region other) {
         return (x == other.x &&
                 y == other.y &&

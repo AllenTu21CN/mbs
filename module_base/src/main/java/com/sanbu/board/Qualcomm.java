@@ -13,8 +13,7 @@ public class Qualcomm {
     }
 
     public static boolean isVT6105() {
-        String model = Build.MODEL;
-        return model.contains("VT6105");
+        return Build.MODEL.equals("SOM-9X20_VT6105");
     }
 
     public static int fixEncodingHeight(int height) {

@@ -8,10 +8,10 @@ public class EmptyBoardSupportClient implements BoardSupportClient {
 
     @Override
     public int cameraIdToHdmiDeviceId(int cameraId) {
-        if (HDMI_IN_PORT_1 == cameraId) {
-            return 0;
-        } else if (HDMI_IN_PORT_2 == cameraId) {
-            return 1;
+        if (0 == cameraId) {
+            return HDMI_IN_PORT_1;
+        } else if (1 == cameraId) {
+            return HDMI_IN_PORT_2;
         } else {
             LogUtil.e(TAG, "Invalid camera id. " + cameraId);
             return -1;
@@ -19,17 +19,36 @@ public class EmptyBoardSupportClient implements BoardSupportClient {
     }
 
     @Override
-    public boolean isSupportHdmiChecking() {
+    public int hdmiDeviceIdToCameraId(int port) {
+        if (HDMI_IN_PORT_1 == port) {
+            return 0;
+        } else if (HDMI_IN_PORT_2 == port) {
+            return 1;
+        } else {
+            LogUtil.e(TAG, "Invalid port id. " + port);
+            return -1;
+        }
+    }
+
+    @Override
+    public void startQueryingHDMIIn(int port) {
+
+    }
+
+    @Override
+    public boolean isQueryingHDMIIn(int port) {
         return false;
     }
 
     @Override
-    public boolean invokeVideoInputPortIsPlugged(int port) {
+    public boolean isHDMIInPlugged(int port) {
         return true;
     }
 
     @Override
-    public HDMIFormat invokeVideoInputPortQueryFormat(int port) {
+    public HDMIFormat getHDMIInFormat(int port) {
         return new HDMIFormat(1920, 1080, 60);
     }
+
+
 }

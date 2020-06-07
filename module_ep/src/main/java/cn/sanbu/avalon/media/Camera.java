@@ -13,9 +13,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import androidx.annotation.NonNull;
 import android.util.Log;
+import android.util.Size;
 import android.view.Surface;
-
-import com.sanbu.board.HDMIFormat;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +39,7 @@ public class Camera {
     private LinkedList<Surface> mAttachedDisplaySurfaces = new LinkedList<>();
     private LinkedList<Integer> mAttachedSinks = new LinkedList<>();
     private final boolean mCaptureSizeAutoFit = true;
-    private HdmiInputDevice mHdmiInputDevice = HdmiInputDevice.getInstance();
+    private CameraHelper mCameraHelper = CameraHelper.getInstance();
     private volatile boolean mCameraReopening = false;
     private volatile boolean mCameraClosing   = false;
     private volatile boolean mCameraCaptureSessionCreating;
@@ -125,27 +124,8 @@ public class Camera {
             return;
         }
 
-        // If auto fit capture size, use current resolution
-        if (mCaptureSizeAutoFit) {
-            // Re-open only HDMI-IN is plugged
-            int port = mHdmiInputDevice.cameraIdToHdmiDeviceId(cameraID);
-            if (!mHdmiInputDevice.isPlugged(port)) {
-                return;
-            }
-
-            // Always wait for format valid, otherwise query format opertion may conflicts
-            // open camera operation which leads always unplugged.
-            HDMIFormat fmt = mHdmiInputDevice.queryFormat(port);
-            if (fmt == null) {
-                return;
-            }
-            Log.d(TAG, "Using detected size=" + fmt.width + "x" + fmt.height + " for capture.");
-            mCaptureWidth = fmt.width;
-            mCaptureHeight = fmt.height;
-        } else {
-            mCaptureWidth       = width;
-            mCaptureHeight      = height;
-        }
+        if (!checkCamera(width, height))
+            return;
 
         Log.i(TAG, "Reopening camera: " + cameraID + "...");
         mCameraReopening    = true;
@@ -156,6 +136,38 @@ public class Camera {
 
         open();
         Log.i(TAG, "reopen camera end");
+    }
+
+    private boolean checkCamera(int width, int height) {
+        if (!mCameraHelper.isConnected(mCameraID)) {
+            Log.d(TAG, "Camera#" + mCameraID + " is not connected");
+            // trigger to check camera status once
+            mCameraHelper.flush(mCameraID);
+            return false;
+        }
+
+        if (!mCameraHelper.isAvailable(mCameraID)) {
+            Log.d(TAG, "Camera#" + mCameraID + " is not available");
+            return false;
+        }
+
+        // If auto fit capture size, use current resolution
+        if (mCaptureSizeAutoFit) {
+            Size size = mCameraHelper.getDefaultSize(mCameraID);
+            if (size == null) {
+                Log.d(TAG, "Can not get default size for Camera#" + mCameraID);
+                return false;
+            }
+
+            Log.d(TAG, "Camera#" + mCameraID + " using default size=" + size.getWidth() + "x" + size.getHeight());
+            mCaptureWidth = size.getWidth();
+            mCaptureHeight = size.getHeight();
+        } else {
+            mCaptureWidth = width;
+            mCaptureHeight = height;
+        }
+
+        return true;
     }
 
     private void open() {
@@ -229,8 +241,7 @@ public class Camera {
             }
         }
 
-        int port = mHdmiInputDevice.cameraIdToHdmiDeviceId(mCameraID);
-        mHdmiInputDevice.clearCache(port);
+        mCameraHelper.flush(mCameraID);
     }
 
     private void createCameraPreviewSession() {

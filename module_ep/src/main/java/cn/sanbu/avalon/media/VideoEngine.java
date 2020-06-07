@@ -39,8 +39,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import com.sanbu.board.BoardSupportClient;
-import com.sanbu.board.HDMIFormat;
 import com.sanbu.board.Rockchip;
 import com.sanbu.tools.LogUtil;
 import com.sanbu.tools.StringUtil;
@@ -80,14 +78,12 @@ import cn.sanbu.avalon.media.gles.TransitionProgram;
 import cn.sanbu.avalon.media.gles.WindowSurface;
 
 public class VideoEngine {
+
     private boolean mEnableNDK = false;
+
     private static final String TAG = "avalon_" + VideoEngine.class.getSimpleName();
 
     public static volatile boolean gRenderFrozen = false;
-
-    public static void init(BoardSupportClient client) {
-        HdmiInputDevice.init(client);
-    }
 
     // Limits
     public static final int MAXIMUM_WIDTH                   = 3840;
@@ -108,6 +104,9 @@ public class VideoEngine {
     // Thresholds
     private static final int NO_SIGNAL_THRESHOLD            = 3000; // 3000ms
 
+    private static final long CAMERA_REOPEN_MIN_THRESHOLD   = 1 * 60;
+    private static final long CAMERA_REOPEN_MAX_THRESHOLD   = 5 * 60;
+
     private static VideoEngine mInstance = null;
 
     private static String mNoSignalHint = "text://No Signal";
@@ -122,6 +121,7 @@ public class VideoEngine {
     private Map<Integer, Source> mSources   = new TreeMap<>();
     private Map<Integer, Scene> mScenes     = new TreeMap<>();
     private Map<Integer, Sink> mSinks       = new TreeMap<>();
+    private Map<Integer, Source> mCameras   = new TreeMap<>();
 
     private MixerThread mMixerThread;
     private MixerHandler mMixerHandler;
@@ -136,6 +136,8 @@ public class VideoEngine {
 
     private CameraManager mCameraMgr;
     private volatile boolean[] mCameraReopeningFlag;
+    private long[] mCameraReopenAttempts;
+    private long[] mCameraAttemptThreshold;
     private final Object mCameraReopeningLock = new Object();
 
     private Point mDisplaySize = new Point();
@@ -144,8 +146,7 @@ public class VideoEngine {
     private Bitmap mNoSignalImage;
     private Bitmap mLoadingImage;
 
-    private HdmiInputDevice mHdmiInputDevice = HdmiInputDevice.getInstance();
-    private volatile boolean[] mHdmiInputDeviceHasSignal = new boolean[] { true, true };
+    private CameraHelper mCameraHelper = CameraHelper.getInstance();
 
     /**
      * Video source object.
@@ -174,6 +175,7 @@ public class VideoEngine {
         private boolean mCaptureSizeAutoFit = true;
         private int mCaptureWidth = -1;
         private int mCaptureHeight = -1;
+        private volatile boolean mCameraHasSignal = false;
 
         private Semaphore mCameraOpenCloseLock = new Semaphore(1);
         private CameraDevice mCameraDevice;
@@ -192,6 +194,7 @@ public class VideoEngine {
                 LogUtil.e(TAG, "CameraDevice onDisconnected!");
                 mCameraOpenCloseLock.release();
                 cameraDevice.close();
+                mCameraHelper.flush(mCameraId);
                 mCameraDevice = null;
                 mCameraReopeningFlag[mCameraId] = false;
             }
@@ -201,6 +204,7 @@ public class VideoEngine {
                 LogUtil.e(TAG, "CameraDevice onError!");
                 mCameraOpenCloseLock.release();
                 cameraDevice.close();
+                mCameraHelper.flush(mCameraId);
                 mCameraDevice = null;
                 mCameraReopeningFlag[mCameraId] = false;
             }
@@ -216,7 +220,6 @@ public class VideoEngine {
 
         private HandlerThread mCameraBackgroundThread;
         private Handler mCameraBackgroundHandler;
-        private Thread mOpenCameraThread;
 
         private Texture2dProgram mTextureProgram;
         private ScaledDrawable2d mRectDrawable;
@@ -499,6 +502,7 @@ public class VideoEngine {
                 if (null != mCameraDevice) {
                     mCameraDevice.close();
                     mCameraDevice = null;
+                    mCameraHelper.flush(mCameraId);
                 }
             } catch (InterruptedException e) {
                 throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
@@ -518,12 +522,15 @@ public class VideoEngine {
                 }
             }
 
-            int port = mHdmiInputDevice.cameraIdToHdmiDeviceId(mCameraId);
-            mHdmiInputDevice.clearCache(port);
+            mCameraHelper.flush(mCameraId);
         }
 
         private void reopenCamera() {
             synchronized (mCameraReopeningLock) {
+                ++mCameraReopenAttempts[mCameraId];
+                if (mCameraReopenAttempts[mCameraId] < mCameraAttemptThreshold[mCameraId])
+                    return; // to avoid reopen camera too frequently
+
                 for (int i = 0; i < mCameraReopeningFlag.length; i++) {
                     if (mCameraReopeningFlag[i]) {
                         //LogUtil.v(TAG, "Camera id=" + i + " is reopening, wait for next turn.");
@@ -532,34 +539,51 @@ public class VideoEngine {
                 }
                 mCameraReopeningFlag[mCameraId] = true;
             }
+            mCameraReopenAttempts[mCameraId] = 0;
 
-            LogUtil.d(TAG, "Reopen camera id=" + mCameraId);
-
-            // If auto fit capture size, use current resolution
-            if (mCaptureSizeAutoFit) {
-                // Re-open only HDMI-IN is plugged
-                int port = mHdmiInputDevice.cameraIdToHdmiDeviceId(mCameraId);
-                if (!mHdmiInputDevice.isPlugged(port)) {
-                    mCameraReopeningFlag[mCameraId] = false;
-                    return;
-                }
-
-                // Always wait for format valid, otherwise query format opertion may conflicts
-                // open camera operation which leads always unplugged.
-                HDMIFormat fmt = mHdmiInputDevice.queryFormat(port);
-                if (fmt == null) {
-                    mCameraReopeningFlag[mCameraId] = false;
-                    return;
-                }
-
-                LogUtil.d(TAG, "Camera ID=" + mCameraId + " using detected size=" + fmt.width + "x" + fmt.height);
-                mCaptureWidth = fmt.width;
-                mCaptureHeight = fmt.height;
+            if (!checkCamera()) {
+                mCameraReopeningFlag[mCameraId] = false;
+                mCameraAttemptThreshold[mCameraId] += 1000;
+                if (mCameraAttemptThreshold[mCameraId] > CAMERA_REOPEN_MAX_THRESHOLD)
+                    mCameraAttemptThreshold[mCameraId] = CAMERA_REOPEN_MAX_THRESHOLD;
+                return;
             }
+            mCameraAttemptThreshold[mCameraId] = CAMERA_REOPEN_MIN_THRESHOLD;
+
+            LogUtil.d(TAG, "Reopen camera#" + mCameraId + " with " + mCaptureWidth + "x" + mCaptureHeight);
 
             closeCamera();
 
             openCamera();
+        }
+
+        private boolean checkCamera() {
+            if (!mCameraHelper.isConnected(mCameraId)) {
+                LogUtil.d(TAG, "Camera#" + mCameraId + " is not connected");
+                // trigger to check camera status once
+                mCameraHelper.flush(mCameraId);
+                return false;
+            }
+
+            if (!mCameraHelper.isAvailable(mCameraId)) {
+                LogUtil.d(TAG, "Camera#" + mCameraId + " is not available");
+                return false;
+            }
+
+            // If auto fit capture size, use current resolution
+            if (mCaptureSizeAutoFit) {
+                Size size = mCameraHelper.getDefaultSize(mCameraId);
+                if (size == null) {
+                    LogUtil.d(TAG, "Can not get default size for Camera#" + mCameraId);
+                    return false;
+                }
+
+                LogUtil.d(TAG, "Camera#" + mCameraId + " using default size=" + size.getWidth() + "x" + size.getHeight());
+                mCaptureWidth = size.getWidth();
+                mCaptureHeight = size.getHeight();
+            }
+
+            return true;
         }
 
         private void createCameraPreviewSession() {
@@ -624,8 +648,8 @@ public class VideoEngine {
                                 // When the session is ready, we start displaying the preview.
                                 mCameraCaptureSession = cameraCaptureSession;
                                 try {
-                                    if (Build.MODEL.equals("SOM-9X20_VT6105") || Rockchip.isAIO3399()) {
-                                        // Disable 3A settings for HDMI-IN devices
+                                    if (!mCameraHelper.isNormative(mCameraId)) {
+                                        // Disable 3A settings for un-normative camera
                                         mCameraPreviewRequestBuilder.set(CaptureRequest.CONTROL_MODE,
                                                 CaptureRequest.CONTROL_MODE_OFF);
                                     } else {
@@ -653,6 +677,8 @@ public class VideoEngine {
                                                         s.frameAvailableSoon();
                                                     }
 
+                                                    mCameraHasSignal = true;
+
                                                     // Stat fps for capture device
                                                     statFrameRate();
                                                 }
@@ -664,6 +690,7 @@ public class VideoEngine {
                                                     super.onCaptureFailed(session, request, failure);
 
                                                     LogUtil.e(TAG, "CameraCaptureSession.onCaptureFailed");
+                                                    mCameraHasSignal = false;
                                                     // TODO:
                                                 }
                                             }, mCameraBackgroundHandler);
@@ -697,6 +724,7 @@ public class VideoEngine {
                                     mCameraCaptureSessionLock.notify();
                                 }
                                 mCameraReopeningFlag[mCameraId] = false;
+                                mCameraHasSignal = false;
                             }
 
                             @Override
@@ -707,6 +735,7 @@ public class VideoEngine {
                                     mCameraCaptureSessionConfigured = false;
                                     mCameraCaptureSessionLock.notify();
                                 }
+                                mCameraHasSignal = false;
                             }
                         }, mCameraBackgroundHandler
                 );
@@ -891,8 +920,7 @@ public class VideoEngine {
 
         boolean hasSignal() {
             if (mType == SOURCE_TYPE_CAPTURE) {
-                int port = mHdmiInputDevice.cameraIdToHdmiDeviceId(mCameraId);
-                return mHdmiInputDeviceHasSignal[port];
+                return mCameraHasSignal;
             } else {
                 return mDecoderHasOutput;
             }
@@ -3165,11 +3193,19 @@ public class VideoEngine {
                 final String CONFIG_FRAME_RATE_KEY = "frame_rate";
                 if (configObject.has(CONFIG_FRAME_RATE_KEY)) {
                     frameRate = configObject.get(CONFIG_FRAME_RATE_KEY).getAsInt();
+                    if (frameRate <= 0 || frameRate > MAXIMUM_FPS) {
+                        LogUtil.e(TAG, "Invalid frame rate for video sink #" + mId + ", set to 1 fps.");
+                        frameRate = 1;
+                    }
                 }
 
                 final String CONFIG_KEY_FRAME_INTERVAL_KEY = "key_frame_interval";
                 if (configObject.has(CONFIG_KEY_FRAME_INTERVAL_KEY)) {
                     keyFrameInterval = configObject.get(CONFIG_KEY_FRAME_INTERVAL_KEY).getAsInt();
+                    if (keyFrameInterval <= 0 || keyFrameInterval > Integer.MAX_VALUE / 1000) {
+                        LogUtil.i(TAG, "Key frame interval is out of range. Set to FPS * 3600.");
+                        keyFrameInterval = frameRate * 3600;
+                    }
                 }
             }
 
@@ -4323,11 +4359,18 @@ public class VideoEngine {
             mDisplayRefreshRate = 60.0f;
         }
 
-        // Enumerate local cameras and HDMI-IN devices
+        // Enumerate local cameras
         if (!mEnableNDK) {
             mCameraMgr = (CameraManager) mContext.getSystemService(Context.CAMERA_SERVICE);
-            String[] cameraIdList = getCameraIdList();
-            mCameraReopeningFlag = new boolean[cameraIdList.length];
+
+            int cameraCount = getCameraIdList().size();
+            mCameraReopeningFlag = new boolean[cameraCount];
+            mCameraReopenAttempts = new long[cameraCount];
+            mCameraAttemptThreshold = new long[cameraCount];
+            for (int i = 0 ; i < cameraCount ; ++i) {
+                mCameraReopenAttempts[i] = CAMERA_REOPEN_MIN_THRESHOLD;
+                mCameraAttemptThreshold[i] = CAMERA_REOPEN_MIN_THRESHOLD;
+            }
         }
 
         // Query HDMI-IN status
@@ -4382,12 +4425,8 @@ public class VideoEngine {
 		}
     }
 
-    public String[] getCameraIdList() {
-        try {
-            return mCameraMgr.getCameraIdList();
-        } catch (CameraAccessException e) {
-            return null;
-        }
+    public List<Integer> getCameraIdList() {
+        return mCameraHelper.getConnectedCameras();
     }
 
     public float getDisplayRefreshRate() {
@@ -4459,6 +4498,8 @@ public class VideoEngine {
         }
 
         mSources.put(id, s);
+        if (sourceType == SOURCE_TYPE_CAPTURE)
+            mCameras.put(s.mCameraId, s);
 
         return true;
     }
@@ -4489,7 +4530,9 @@ public class VideoEngine {
             return false;
         }
 
-        mSources.remove(sourceId);
+        Source source = mSources.remove(sourceId);
+        if (source != null && source.mType == SOURCE_TYPE_CAPTURE)
+            mCameras.remove(source.mCameraId);
 
         return true;
     }
@@ -4506,12 +4549,14 @@ public class VideoEngine {
         return stats;
     }
 
-    public boolean hdmiDeviceHasSignal(int port) {
-        boolean isPlugged = mHdmiInputDevice.isPlugged(port);
-        mHdmiInputDeviceHasSignal[port] = isPlugged;
+    public boolean hasSignal(int sourceId) {
+        Source source = mSources.get(sourceId);
+        return source == null ? false : source.hasSignal();
+    }
 
-        LogUtil.d(TAG, "HDMI-IN Device is plugged: " + isPlugged);
-        return isPlugged;
+    public boolean hasCameraSignal(int cameraId) {
+        Source source = mCameras.get(cameraId);
+        return source == null ? false : source.hasSignal();
     }
 
     public boolean attachDisplaySurfaceToSource(int sourceId, int surfaceId) {

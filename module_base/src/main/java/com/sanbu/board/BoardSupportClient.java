@@ -5,7 +5,11 @@ public interface BoardSupportClient {
     int HDMI_IN_PORT_2 = 0x01;
 
     int cameraIdToHdmiDeviceId(int cameraId);
-    boolean isSupportHdmiChecking();
-    boolean invokeVideoInputPortIsPlugged(int port);
-    HDMIFormat invokeVideoInputPortQueryFormat(int port);
+    int hdmiDeviceIdToCameraId(int port);
+
+    void startQueryingHDMIIn(int port);
+    boolean isQueryingHDMIIn(int port);
+
+    boolean isHDMIInPlugged(int port);
+    HDMIFormat getHDMIInFormat(int port);
 }

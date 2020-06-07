@@ -10,6 +10,7 @@ import android.os.SystemProperties;
 public class Rockchip {
 
     private static String gHWVersion;
+    private static final String g3BuVersion = SystemProperties.get("ro.sanbu.product.ver", "");
 
     public static boolean isProduct() {
         String model = Build.MODEL;
@@ -27,8 +28,7 @@ public class Rockchip {
     }
 
     public static boolean is3BUEdition() {
-        String model = Build.MODEL;
-        return model.contains("3399") && !SystemProperties.get("ro.sanbu.product.ver", "").isEmpty();
+        return Build.MODEL.contains("3399") && !g3BuVersion.isEmpty();
     }
 
     public static String getAIO3399HWVersion() {

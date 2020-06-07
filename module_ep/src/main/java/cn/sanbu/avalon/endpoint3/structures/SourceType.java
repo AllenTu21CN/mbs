@@ -8,9 +8,7 @@ public enum SourceType {
     RMSP("rmsp://"),
     RTMP("rtmp://"),
 
-    File("file://"),
-
-    Caller("h323|sip|sbs:");
+    File("file://");
 
     public final String prefix;
 

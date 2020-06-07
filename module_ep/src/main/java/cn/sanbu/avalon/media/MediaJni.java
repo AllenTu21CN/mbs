@@ -24,7 +24,7 @@ public class MediaJni {
     public static void init(Context context, final String epLib, BoardSupportClient client) {
         synchronized (MediaJni.class) {
             if (!gInited) {
-                VideoEngine.init(client);
+                CameraHelper.init(context, client);
                 gVideoEngine = VideoEngine.allocateInstance(context, gEnableVENDK);
                 System.loadLibrary(epLib);
                 jniEnvInit(gVideoEngine.getDisplayRefreshRate(), gEnableVENDK);
@@ -36,7 +36,7 @@ public class MediaJni {
     public static void initEnv(Context context, BoardSupportClient client) {
         synchronized (MediaJni.class) {
             if (!gInited) {
-                VideoEngine.init(client);
+                CameraHelper.init(context, client);
                 gVideoEngine = VideoEngine.allocateInstance(context, gEnableVENDK);
                 jniEnvInit(gVideoEngine.getDisplayRefreshRate(), gEnableVENDK);
                 gInited = true;

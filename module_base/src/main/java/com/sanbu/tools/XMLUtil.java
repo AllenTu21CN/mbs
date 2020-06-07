@@ -1,6 +1,7 @@
 package com.sanbu.tools;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -28,7 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 
 public class XMLUtil {
 
-    public static Document getXmlDocument(String fileUrl) throws Exception{
+    public static Document getXmlDocument(String fileUrl) throws Exception {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = null;
         Document doc = null;
@@ -40,7 +41,16 @@ public class XMLUtil {
 
     public static String getXmlString(String fileUrl, String encoding) {
         try {
-            Document doc = getXmlDocument(fileUrl);
+            Document document = getXmlDocument(fileUrl);
+            return getXmlString(document, encoding);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String getXmlString(Document doc, String encoding) {
+        try {
             Source source = new DOMSource(doc);
             ByteArrayOutputStream outStream = new ByteArrayOutputStream();
             OutputStreamWriter write = new OutputStreamWriter(outStream);
@@ -62,8 +72,6 @@ public class XMLUtil {
     }
 
     public static Document stringToDoc(String xmlStr, String encoding) {
-        //字符串转XML
-        Document doc = null;
         try {
             xmlStr = new String(xmlStr.getBytes(),encoding);
             StringReader sr = new StringReader(xmlStr);
@@ -71,7 +79,7 @@ public class XMLUtil {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder;
             builder = factory.newDocumentBuilder();
-            doc = builder.parse(is);
+            return builder.parse(is);
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
             return null;
@@ -82,22 +90,25 @@ public class XMLUtil {
             e.printStackTrace();
             return null;
         }
-        return doc;
     }
 
-    public static void writeStringToXmlFile(String strXml, String fileUrl)
+    public static void writeStringToXmlFile(String strXml, String fileUrl, String encoding)
             throws TransformerException, FileNotFoundException {
-        Document document = stringToDoc(strXml,"UTF-8");
+        Document document = stringToDoc(strXml, encoding);
+        writeDocToXmlFile(document, fileUrl, encoding);
+    }
+
+    public static void writeDocToXmlFile(Node document, String fileUrl, String encoding)
+            throws TransformerException, FileNotFoundException {
         //将DOM对象document写入到xml文件中
         TransformerFactory tf = TransformerFactory.newInstance();
         Transformer transformer = tf.newTransformer();
         DOMSource source = new DOMSource(document);
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+        transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
         transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
         transformer.setOutputProperty(OutputKeys.STANDALONE, "yes");
         PrintWriter pw = new PrintWriter(new FileOutputStream(fileUrl));
         StreamResult result = new StreamResult(pw);
         transformer.transform(source, result);     //关键转换
     }
-
 }

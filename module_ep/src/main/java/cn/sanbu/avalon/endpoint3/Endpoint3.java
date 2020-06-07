@@ -23,6 +23,7 @@ import cn.sanbu.avalon.endpoint3.structures.CallingStatistics;
 import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
 import cn.sanbu.avalon.endpoint3.structures.EPObjectType;
+import cn.sanbu.avalon.endpoint3.structures.jni.EPEvent;
 import cn.sanbu.avalon.endpoint3.structures.jni.StreamDesc;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.MediaStatistics;
@@ -112,6 +113,13 @@ public class Endpoint3 {
         // @param call_id [IN] call id
         // @param error [IN] error information
         void onCallerError(int call_id, int errcode, String error);
+
+        // EP internal event
+        // @param obj_type [IN] type of object
+        // @param obj_id [IN] id of object
+        // @param event [IN] value of event
+        // @param params [IN] params of event
+        void onEvent(EPObjectType obj_type, int obj_id, EPEvent event, String params);
     }
 
     // Terminal endpoint single instance
@@ -995,6 +1003,21 @@ public class Endpoint3 {
 
         if (m_cb != null)
             m_cb.onCallerError(call_id, errcode, error);
+    }
+
+    public void onEvent(int obj_type, int obj_id, int event, String params) {
+        EPObjectType type = EPObjectType.fromId(obj_type);
+        EPEvent evt = EPEvent.fromValue(event);
+        if (type == null || evt == null) {
+            LogUtil.w(EPConst.TAG, String.format("onEvent got invalid params, obj_type:%s obj_id:%d event:%d params:%s",
+                    type.name(), obj_id, event, params));
+            return;
+        }
+
+        LogUtil.i(EPConst.TAG, String.format("onEvent, obj_type:%s obj_id:%d event:%d params:%s",
+                type.name(), obj_id, event, params));
+        if (m_cb != null)
+            m_cb.onEvent(type, obj_id, evt, params);
     }
 
     /////////////////////////////// init and configure native interfaces

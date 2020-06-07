@@ -1,7 +1,6 @@
 package cn.sanbu.avalon.endpoint3.structures;
 
 import com.sanbu.tools.LogUtil;
-import com.sanbu.tools.StringUtil;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -15,13 +14,9 @@ public class CallingUrl {
     public int port;
     public String confId;
 
-    private CallingUrl() {
+    public CallingUrl() {
         protocol = CallingProtocol.Unknown;
         port = -1;
-    }
-
-    public CallingUrl(CallingProtocol protocol, String address) {
-        this(protocol, null, address, 0, null);
     }
 
     public CallingUrl(CallingProtocol protocol, String username,
@@ -31,10 +26,6 @@ public class CallingUrl {
         this.address = address;
         this.port = port;
         this.confId = confId;
-    }
-
-    public boolean isValid() {
-        return protocol != null && protocol != CallingProtocol.Unknown && StringUtil.isEmpty(address);
     }
 
     public String toString() {

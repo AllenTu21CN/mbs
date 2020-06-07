@@ -198,6 +198,24 @@ public class IxNCamera {
         return jniApplyPresetValue(mJniObject, targetId, number);
     }
 
+    public int switchDefaultScene(IxNScene scene) {
+        if (mState != State.Done) {
+            LogUtil.w(EPConst.TAG, TAG, "switchDefaultScene: has not connected with camera");
+            return BaseError.ACTION_ILLEGAL;
+        }
+
+        return jniSetSwitchScene(mJniObject, scene.id);
+    }
+
+    public int switchChannelMode(IxNChannelMode mode) {
+        if (mState != State.Done) {
+            LogUtil.w(EPConst.TAG, TAG, "switchChannelMode: has not connected with camera");
+            return BaseError.ACTION_ILLEGAL;
+        }
+
+        return jniSetSwitchChannel(mJniObject, mode.id);
+    }
+
     ///////////////// callback for JNI
 
     public void onCameraConnected(int id, String ip, int port) {
@@ -306,4 +324,8 @@ public class IxNCamera {
     private native int jniSetZoomValue(int object_id, int camera_id, int zoom);
 
     private native int jniGetZoomValue(int object_id, int camera_id);
+
+    private native int jniSetSwitchScene(int object_id, int target_id);
+
+    private native int jniSetSwitchChannel(int object_id, int channel_id);
 }
