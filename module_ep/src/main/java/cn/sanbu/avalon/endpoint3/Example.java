@@ -45,7 +45,7 @@ public class Example implements Endpoint3.Callback {
         Endpoint3.initEnv(context, "ep3_android");
 
         // init media engine jni environment
-        MediaJni.initEnv(context, new EmptyBoardSupportClient());
+        MediaJni.initEnv(context, new EmptyBoardSupportClient(), true);
     }
 
     private static class Caller {

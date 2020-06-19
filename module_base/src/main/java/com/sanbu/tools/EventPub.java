@@ -127,7 +127,17 @@ public class EventPub {
     }
 
     public Event post(int evtId) {
-        Event event = new Event(evtId);
+        return post(evtId, -1, -1, null);
+    }
+
+    public Event post(int evtId, int arg1) {
+        Event event = new Event(evtId, arg1, -1, null);
+        post(event);
+        return event;
+    }
+
+    public Event post(int evtId, Object obj) {
+        Event event = new Event(evtId, -1, -1, obj);
         post(event);
         return event;
     }

@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 
-import cn.lx.mbs.support.Const;
+import cn.lx.mbs.LXConst;
 import cn.lx.mbs.support.MBS;
 import com.sanbu.tools.LogUtil;
 
@@ -50,7 +50,7 @@ public class NetworkReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if (action.equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-            LogUtil.i(Const.TAG, TAG, "NETWORK_STATE_CHANGED");
+            LogUtil.i(LXConst.TAG, TAG, "NETWORK_STATE_CHANGED");
             MBS.getInstance().onNetworkChanged();
         }
     }

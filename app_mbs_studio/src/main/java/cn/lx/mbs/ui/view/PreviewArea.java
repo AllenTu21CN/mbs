@@ -3,7 +3,7 @@ package cn.lx.mbs.ui.view;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Paint;
-import android.util.Log;
+import com.sanbu.tools.LogUtil;
 import android.util.TypedValue;
 import android.view.SurfaceView;
 import android.view.View;
@@ -66,7 +66,7 @@ public class PreviewArea {
                     // TODO:
                     if (v instanceof SceneButton) {
                         SceneButton btn = (SceneButton) v;
-                        Log.d(TAG, "Scene button clicked! Button Id:" + btn.getText());
+                        LogUtil.d(TAG, "Scene button clicked! Button Id:" + btn.getText());
                         if (mActiveSceneIndex != btn.getSceneId()) {
                             if (0 <= mActiveSceneIndex && mActiveSceneIndex < SCENE_COUNT) {
                                 mSceneButtons[mActiveSceneIndex].setActive(false);

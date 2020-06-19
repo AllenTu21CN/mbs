@@ -105,6 +105,14 @@ public class DisplayConfig {
         return this;
     }
 
+    public TransitionDesc getTransition() {
+        return transition;
+    }
+
+    public void setTransition(TransitionDesc transition) {
+        this.transition = transition;
+    }
+
     public boolean isEqual(DisplayConfig other) {
         if (other == null)
             return false;
@@ -136,6 +144,12 @@ public class DisplayConfig {
     public boolean isValid() {
         return (overlays != null || background_color != null ||
                 display_name_visible != null || transition != null);
+    }
+
+    public static DisplayConfig buildOverlays(List<DisplayOverlay> overlays) {
+        DisplayConfig config = new DisplayConfig();
+        config.overlays = overlays;
+        return config;
     }
 
     public static DisplayConfig buildOverlays(List<Region> layout, List<DisplayCell> cells) {

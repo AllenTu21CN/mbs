@@ -1,5 +1,7 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
+import com.sanbu.tools.CompareHelper;
+
 import cn.sanbu.avalon.endpoint3.structures.H264Profile;
 import cn.sanbu.avalon.endpoint3.structures.Resolution;
 
@@ -68,5 +70,13 @@ public class VideoCapability {
 
     public void setKeyFrameInterval(int inFrames) {
         this.key_frame_interval = inFrames;
+    }
+
+    public boolean isEqual(VideoCapability other) {
+        return CompareHelper.isEqual(codec, other.codec) &&
+                CompareHelper.isEqual(profile, other.profile) &&
+                CompareHelper.isEqual(resolution, other.resolution) &&
+                max_frame_rate == other.max_frame_rate &&
+                key_frame_interval == other.key_frame_interval;
     }
 }

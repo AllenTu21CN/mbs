@@ -1,6 +1,7 @@
 package cn.lx.mbs.support.structures;
 
 import com.sanbu.tools.CompareHelper;
+import com.sanbu.tools.StringUtil;
 
 import cn.sanbu.avalon.endpoint3.structures.Region;
 
@@ -28,6 +29,12 @@ public abstract class Overlay {
         );
     }
 
+    public boolean isValid() {
+        return type != null && dst.isValid() &&
+                zIndex >= 0 && zIndex <= 9999 &&
+                transparency >= 0.0f && transparency <= 1.0;
+    }
+
     public enum Type {
         Stream,
         Image,
@@ -45,22 +52,43 @@ public abstract class Overlay {
         public boolean isEqual(Stream other) {
             return super.isEqual(other) && CompareHelper.isEqual(channel, other.channel);
         }
+
+        @Override
+        public boolean isValid() {
+            return super.isValid() && channel != null;
+        }
     }
 
-    public class Image extends Overlay {
+    public static class Image extends Overlay {
         public final String imagePath;
+        public final Region src;
 
         public Image(String imagePath, Region dst) {
             super(Type.Image, dst);
             this.imagePath = imagePath;
+            this.src = Region.buildFull();
+        }
+
+        public Image(String imagePath, Region src, Region dst) {
+            super(Type.Image, dst);
+            this.imagePath = imagePath;
+            this.src = src;
         }
 
         public boolean isEqual(Image other) {
-            return super.isEqual(other) && CompareHelper.isEqual(imagePath, other.imagePath);
+            return super.isEqual(other) &&
+                    CompareHelper.isEqual(imagePath, other.imagePath) &&
+                    src.isEqual(other.src);
+        }
+
+        @Override
+        public boolean isValid() {
+            return super.isValid() && !StringUtil.isEmpty(imagePath) &&
+                    src != null && src.isValid();
         }
     }
 
-    public class Bitmap extends Overlay {
+    public static class Bitmap extends Overlay {
         public final Bitmap bitmap;
 
         public Bitmap(Bitmap bitmap, Region dst) {
@@ -70,6 +98,11 @@ public abstract class Overlay {
 
         public boolean isEqual(Bitmap other) {
             return super.isEqual(other) && bitmap == other.bitmap;
+        }
+
+        @Override
+        public boolean isValid() {
+            return super.isValid() && bitmap != null;
         }
     }
 }

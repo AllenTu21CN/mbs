@@ -2,7 +2,7 @@ package cn.lx.mbs.ui.view;
 
 import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
+import com.sanbu.tools.LogUtil;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -47,7 +47,7 @@ public class OverlayArea {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("VideoSourcesManageDialog", "Item index " + i + " clicked!");
+                LogUtil.i("VideoSourcesManageDialog", "Item index " + i + " clicked!");
                 // Clear and set highlight
                 for (int n = 0; n < adapterView.getChildCount(); n++) {
                     View item = adapterView.getChildAt(n);

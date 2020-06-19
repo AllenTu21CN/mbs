@@ -18,6 +18,7 @@ import cn.sanbu.avalon.endpoint3.director.structures.TokenType;
 import cn.sanbu.avalon.endpoint3.director.structures.ValueType;
 
 /* 简单状态处理模型:
+*  . logicId: BI_SIMPLE
 *  . 根据接收事件配置的值来设置当前状态的值
 *  . 并维护指定名称的token,用于生成查找最终场景的key
 * */

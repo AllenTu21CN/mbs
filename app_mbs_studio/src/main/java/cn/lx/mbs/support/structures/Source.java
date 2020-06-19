@@ -2,134 +2,171 @@ package cn.lx.mbs.support.structures;
 
 import com.sanbu.tools.StringUtil;
 
-import cn.sanbu.avalon.endpoint3.structures.CallingUrl;
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.lx.mbs.LXConst;
 import cn.sanbu.avalon.endpoint3.structures.Resolution;
 import cn.sanbu.avalon.endpoint3.structures.SourceType;
+import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 
 public class Source {
-    // common
     public final int id;              // 源ID
     public final String name;         // 源名称
     public final SourceType type;     // 源类型
     public final String url;          // 源URL
+    public final boolean useAudio;    // 是否使用源的音频流
 
-    // for video capture
-    public final Resolution capRes;   // 指定分辨率, RES_UNKNOWN表示自动
+    // for VideoCapture
+    public Resolution resolution; // 指定分辨率, RES_UNKNOWN表示自动
 
-    // for rtsp source
-    public final boolean rtspOverTCP; // RTSP源是否启用TCP传输
-    public final String extraOptions; // RTSP额外选项
+    // for RTSP
+    public boolean overTCP;       // RTSP源是否启用TCP传输
+    public String extraOptions;   // RTSP额外选项
 
-    // for file source
-    public final boolean loop;        // 文件源是否循环播放
+    // for RMSP
+    public VideoFormat videoFormat;
+    public AudioFormat audioFormat;
 
-    // for remote source
-    // public final String videoFormat;
-    // public final String audioFormat;
+    // for File
+    public boolean loop; // 文件源是否循环播放
 
-    // for caller
-    public final VideoFormat vFormat;
+    // for Caller
+    public List<AudioCodec> audioCodecs;
 
-    public static Source buildVideoCapture(String name, int capId, Resolution capRes) {
-        return buildVideoCapture(-1, name, capId, capRes);
+    public static Source buildVideoCapture(String name, String deviceId, Resolution resolution) {
+        return buildVideoCapture(-1, name, deviceId, resolution);
     }
 
-    public static Source buildAudioCapture(String name, int capId) {
-        return buildAudioCapture(-1, name, capId);
-    }
-
-    public static Source buildRTSPSource(String name, String url,
-                                         boolean rtspOverTCP, String extraOptions) {
-        return buildRTSPSource(-1, name, url, rtspOverTCP, extraOptions);
-    }
-
-    public static Source buildRMSPSource(String name, String host, int port) {
-        return buildRMSPSource(-1, name, host, port);
-    }
-
-    public static Source buildRTMPSource(String name, String url) {
-        return buildRTMPSource(-1, name, url);
-    }
-
-    public static Source buildFileSource(String name, String path, boolean loop) {
-        return buildFileSource(-1, name, path, loop);
-    }
-
-    public static Source buildVideoCapture(int id, String name, int capId, Resolution capRes) {
-        if (capId < 0 || capRes == null)
+    public static Source buildVideoCapture(int id, String name, String deviceId, Resolution resolution) {
+        if (StringUtil.isEmpty(deviceId) || resolution == null)
             throw new RuntimeException("invalid params");
 
-        SourceType type = SourceType.VideoCapture;
-        String url = type.prefix + capId;
-        return new Source(id, name, type, url, capRes,
-                false, null, false, null);
+        String url = SourceType.VideoCapture.prefix + deviceId;
+        Source source = new Source(id, name, SourceType.VideoCapture, url);
+        source.resolution = resolution;
+        return source;
     }
 
-    public static Source buildAudioCapture(int id, String name, int capId) {
-        if (capId < 0)
+    public static Source buildAudioCapture(String name, int deviceId) {
+        if (deviceId < 0)
             throw new RuntimeException("invalid params");
 
-        SourceType type = SourceType.AudioCapture;
-        String url = type.prefix + capId;
-        return new Source(id, name, type, url,
-                null, false, null, false, null);
+        String url = SourceType.AudioCapture.prefix + deviceId;
+        return new Source(-1, name, SourceType.AudioCapture, url);
     }
 
-    public static Source buildRTSPSource(int id, String name, String url,
-                                         boolean rtspOverTCP, String extraOptions) {
+    public static Source buildRTSP(String name, String url, boolean useAudio,
+                                   boolean rtspOverTCP, String extraOptions) {
+        return buildRTSP(-1, name, url, useAudio, rtspOverTCP, extraOptions);
+    }
+
+    public static Source buildRTSP(int id, String name, String url, boolean useAudio,
+                                   boolean rtspOverTCP, String extraOptions) {
         if (StringUtil.isEmpty(url) || !url.startsWith(SourceType.RTSP.prefix))
             throw new RuntimeException("invalid params");
 
-        return new Source(id, name, SourceType.RTSP, url, null,
-                rtspOverTCP, extraOptions, false, null);
+        Source source = new Source(id, name, SourceType.RTSP, url, useAudio);
+        source.overTCP = rtspOverTCP;
+        source.extraOptions = extraOptions;
+        return source;
     }
 
-    public static Source buildRMSPSource(int id, String name, String host, int port) {
-        if (StringUtil.isEmpty(host) || port <= 0)
-            throw new RuntimeException("invalid params");
-
-        SourceType type = SourceType.RMSP;
-        String url = type.prefix + host + ":" + port;
-        return new Source(id, name, type, url, null,
-                false, null, false, null);
+    public static Source buildRTMP(String name, String url) {
+        return buildRTMP(-1, name, url);
     }
 
-    public static Source buildRTMPSource(int id, String name, String url) {
+    public static Source buildRTMP(int id, String name, String url) {
         if (StringUtil.isEmpty(url) || !url.startsWith(SourceType.RTMP.prefix))
             throw new RuntimeException("invalid params");
 
-        return new Source(id, name, SourceType.RTMP, url, null,
-                false, null, false, null);
+        return new Source(id, name, SourceType.RTMP, url);
     }
 
-    public static Source buildFileSource(int id, String name, String path, boolean loop) {
+    public static Source buildRMSP(String name, String url,
+                                   VideoFormat videoFormat, AudioFormat audioFormat) {
+        return buildRMSP(-1, name, url, videoFormat, audioFormat);
+    }
+
+    public static Source buildRMSP(int id, String name, String url,
+                                   VideoFormat videoFormat, AudioFormat audioFormat) {
+        if (StringUtil.isEmpty(url) || !url.startsWith(SourceType.RMSP.prefix))
+            throw new RuntimeException("invalid params");
+
+        Source source = new Source(id, name, SourceType.RMSP, url);
+        source.videoFormat = videoFormat;
+        source.audioFormat = audioFormat;
+        return source;
+    }
+
+    public static Source buildFile(String name, String path, boolean loop) {
+        return buildFile(-1, name, path, loop);
+    }
+
+    public static Source buildFile(int id, String name, String path, boolean loop) {
         if (StringUtil.isEmpty(path) || !path.startsWith("/"))
             throw new RuntimeException("invalid params");
 
-        SourceType type = SourceType.File;
-        String url = type.prefix + path;
-        return new Source(id, name, type, url, null,
-                false, null, loop, null);
+        String url = SourceType.File.prefix + path;
+        Source source = new Source(id, name, SourceType.File, url);
+        source.loop = loop;
+        return source;
+    }
+
+    public static Source buildCaller(String name, String url) {
+        return buildCaller(name, url, LXConst.DEFAULT_CALLING_AUDIO_CODECS);
+    }
+
+    public static Source buildCaller(String name, String url, List<AudioCodec> audioCodecs) {
+        return buildCaller(-1, name, url, audioCodecs);
+    }
+
+    public static Source buildCaller(int id, String name, String url, List<AudioCodec> audioCodecs) {
+        if (StringUtil.isEmpty(url) ||
+                SourceType.fromUrl(url) != SourceType.Caller)
+            throw new RuntimeException("invalid params");
+
+        Source source = new Source(id, name, SourceType.Caller, url);
+        source.audioCodecs = audioCodecs;
+        return source;
     }
 
     public static Source copy(int id, Source other) {
-        return new Source(id, other.name, other.type,
-                other.url, other.capRes, other.rtspOverTCP,
-                other.extraOptions, other.loop, other.vFormat);
+        return new Source(id, other.name, other.type, other.url,
+                other.useAudio, other.resolution,
+                other.overTCP, other.extraOptions,
+                other.videoFormat, other.audioFormat,
+                other.loop, other.audioCodecs);
     }
 
-    public Source(int id, String name, SourceType type, String url, Resolution capRes,
-                  boolean rtspOverTCP, String extraOptions, boolean loop,
-                  VideoFormat vFormat) {
+    private Source(int id, String name, SourceType type, String url) {
+        this(id, name, type, url, true);
+    }
+
+    private Source(int id, String name, SourceType type, String url, boolean useAudio) {
         this.id = id;
         this.name = name;
         this.type = type;
         this.url = url;
-        this.capRes = capRes;
-        this.rtspOverTCP = rtspOverTCP;
+        this.useAudio = useAudio;
+    }
+
+    public Source(int id, String name, SourceType type, String url, boolean useAudio,
+                  Resolution resolution, boolean overTCP, String extraOptions,
+                  VideoFormat videoFormat, AudioFormat audioFormat, boolean loop,
+                  List<AudioCodec> audioCodecs) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.url = url;
+        this.useAudio = useAudio;
+        this.resolution = resolution;
+        this.overTCP = overTCP;
         this.extraOptions = extraOptions;
+        this.videoFormat = videoFormat;
+        this.audioFormat = audioFormat;
         this.loop = loop;
-        this.vFormat = vFormat;
+        this.audioCodecs = audioCodecs;
     }
 }

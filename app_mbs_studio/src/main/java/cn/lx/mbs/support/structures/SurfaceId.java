@@ -1,6 +1,6 @@
 package cn.lx.mbs.support.structures;
 
-public enum DisplayId {
+public enum SurfaceId {
     PGM("输出"),
     PVW("预监"),
     IN1("输入#1"),
@@ -10,7 +10,7 @@ public enum DisplayId {
 
     public final String desc;
 
-    DisplayId(String desc) {
+    SurfaceId(String desc) {
         this.desc = desc;
     }
 }

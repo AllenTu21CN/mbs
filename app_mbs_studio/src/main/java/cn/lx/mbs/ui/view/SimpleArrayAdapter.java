@@ -1,7 +1,7 @@
 package cn.lx.mbs.ui.view;
 
 import android.content.Context;
-import android.util.Log;
+import com.sanbu.tools.LogUtil;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -70,7 +70,7 @@ public class SimpleArrayAdapter<T> extends ArrayAdapter<T> {
                 }
             }
         } catch (ClassCastException e) {
-            Log.e("SimpleArrayAdapter", "You must supply a resource ID for a TextView");
+            LogUtil.e("SimpleArrayAdapter", "You must supply a resource ID for a TextView");
             throw new IllegalStateException(
                     "ArrayAdapter requires the resource ID to be a TextView", e);
         }

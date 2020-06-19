@@ -1,31 +1,39 @@
 package cn.lx.mbs.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.content.pm.PackageManager;
-import android.hardware.camera2.CameraCharacteristics;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
 import android.view.Gravity;
-import android.view.LayoutInflater;
+import android.view.KeyEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 
 
-import java.util.LinkedList;
-import java.util.List;
+import com.google.gson.Gson;
+import com.sanbu.tools.EventPub;
+import com.sanbu.tools.LogUtil;
+import com.sanbu.tools.PermissionUtil;
+import com.sanbu.tools.ToastUtil;
+
+import java.util.Arrays;
 
 import cn.lx.mbs.R;
+import cn.lx.mbs.LXConst;
+import cn.lx.mbs.support.MBS;
+import cn.lx.mbs.support.structures.SurfaceId;
 import cn.lx.mbs.ui.model.SceneOverlayDataModel;
 import cn.lx.mbs.ui.model.VideoSourcesDataModel;
 import cn.lx.mbs.ui.view.AudioMixerArea;
 import cn.lx.mbs.ui.view.ControlArea;
-import cn.lx.mbs.ui.view.BaseDialog;
+import cn.lx.mbs.ui.view.HintDialog;
 import cn.lx.mbs.ui.view.OverlayArea;
 import cn.lx.mbs.ui.view.PreviewArea;
 import cn.lx.mbs.ui.view.ProgramArea;
@@ -34,130 +42,100 @@ import cn.lx.mbs.ui.view.SettingsFragment;
 import cn.lx.mbs.ui.view.Utils;
 import cn.lx.mbs.ui.view.VideoSourcesArea;
 import cn.lx.mbs.ui.view.VideoSourcesManageDialog;
+import cn.sanbu.avalon.endpoint3.utils.SysResChecking;
 import cn.sanbu.avalon.media.CameraHelper;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int PERMISSION_REQUEST_CODE = 1;
 
+    public static final String APP_REQUEST_PERMISSION[] = {
+            // network
+            Manifest.permission.ACCESS_WIFI_STATE,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.INTERNET,
+
+            // storage
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+
+            // multimedia
+            Manifest.permission.CAMERA,
+            Manifest.permission.RECORD_AUDIO,
+            // Manifest.permission.MODIFY_AUDIO_SETTINGS,
+
+            // others
+            // Manifest.permission.WAKE_LOCK,
+
+            // Manifest.permission.BROADCAST_STICKY,
+            // Manifest.permission.DISABLE_KEYGUARD,
+            // Manifest.permission.WRITE_SETTINGS,
+            // Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS,
+    };
+
+    private Handler mHandler;
+
+    private View mTopGroup;
     private PreviewArea mPreviewArea;
     private ProgramArea mProgramArea;
     private ControlArea mControlArea;
     private OverlayArea mOverlayArea;
     private AudioMixerArea mAudioMixerArea;
     private VideoSourcesArea mVideoSourcesArea;
-    private SettingsFragment mSettingsFragment;
-    private SettingsDialog mSettingsDialog;
-    private BaseDialog mVideoSourceManageDialog;
 
     private VideoSourcesDataModel mVideoSourcesDataModel = new VideoSourcesDataModel();
     private SceneOverlayDataModel[] mSceneOverlayDataModel = new SceneOverlayDataModel[10];
 
-    public VideoSourcesDataModel getVideoSourcesDataModel() {
-        return mVideoSourcesDataModel;
-    }
-
-    public SceneOverlayDataModel getSceneOverlayDataModel(int index) { return mSceneOverlayDataModel[index]; }
-
     @Override
+    @SuppressLint("SourceLockedOrientationActivity")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        checkPermissions();
-
-        keepScreenOn();
-
-        generateTestData();
-
-        String[] cameraIdList = CameraHelper.getInstance().getCameraIdList();
-        for (String id : cameraIdList) {
-            CameraCharacteristics info = CameraHelper.getInstance().getCameraCharacteristics(id);
-            Log.i(TAG, "Camera ID=" + id + ", Characteristics=" + info.toString());
-        }
+        LogUtil.w(UIConst.TAG, TAG,"onCreate");
+        mHandler = new Handler();
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
         hideSystemUI();
-
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        Utils.init(this);
+        // grant PERMISSION first
+        if (!PermissionUtil.isGranted(this, APP_REQUEST_PERMISSION)) {
+            PermissionUtil.checkPermissions(this, APP_REQUEST_PERMISSION, granted -> {
+                if (granted) {
+                    LogUtil.w(UIConst.TAG, TAG, "request permissions succ, reboot application now");
+                    mHandler.post(() -> ToastUtil.show("授权成功,请重启", true));
+                } else {
+                    LogUtil.e(UIConst.TAG, TAG, "request permissions failed: " + new Gson().toJson(APP_REQUEST_PERMISSION));
+                    mHandler.post(() -> ToastUtil.show("未授权,无法启动", true));
+                }
 
-        mPreviewArea = new PreviewArea(this);
-        mPreviewArea.init();
+                mHandler.postDelayed(() -> MyApplication.exit(), 1000);
+            });
 
-        mProgramArea = new ProgramArea(this);
-        mProgramArea.init();
-
-        mControlArea = new ControlArea(this);
-        mControlArea.init();
-
-        mOverlayArea = new OverlayArea(this);
-        mOverlayArea.init();
-
-        mAudioMixerArea = new AudioMixerArea(this);
-        mAudioMixerArea.init();
-
-        mVideoSourcesArea = new VideoSourcesArea(this);
-        mVideoSourcesArea.init();
-
-        if (savedInstanceState == null) {
-            mSettingsFragment = new SettingsFragment();
+            // give up init for application
+            return;
         }
 
-        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        generateTestData();
+        initViews();
+        initEvents();
 
-        mSettingsDialog = new SettingsDialog(this, Utils.PX(1500), Utils.PX(930));
-        //mSettingsDialog.setTitle("Settings");
-        //mSettingsDialog.setContent(mSettingsFragment.getListView());
-
-        mVideoSourceManageDialog = new VideoSourcesManageDialog(this, Utils.PX(1200), Utils.PX(930));
-    }
-
-    public void checkPermissions() {
-        String[] requiredPermissions = new String[] {
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE };
-
-        List<String> ungrantedPermissions = new LinkedList<>();
-        for (String permission : requiredPermissions) {
-            if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                ungrantedPermissions.add(permission);
-            }
-        }
-
-        if (ungrantedPermissions.size() > 0) {
-            ActivityCompat.requestPermissions(this,
-                    ungrantedPermissions.toArray(new String[0]), PERMISSION_REQUEST_CODE);
-        }
+        checkSysRes(3);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_CODE: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
-                } else {
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
-                }
-
-                return;
-            }
-
-            // other 'case' lines to check for other
-            // permissions this app might request.
-        }
+    protected void onDestroy() {
+        LogUtil.w(UIConst.TAG, TAG, "onDestroy");
+        releaseEvents();
+        super.onDestroy();
+        MyApplication.exit();
     }
 
-    private void keepScreenOn() {
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    @Override
+    protected void onStop() {
+        LogUtil.w(UIConst.TAG, TAG, "onStop");
+        super.onStop();
+        MyApplication.exit();
     }
 
     @Override
@@ -166,6 +144,37 @@ public class MainActivity extends AppCompatActivity {
         if (hasFocus) {
             hideSystemUI();
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                return true;
+            default:
+                break;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_BACK:
+                new HintDialog(this, Utils.PX(800), Utils.PX(500),
+                        "Warning", "Are you sure to exit?\nThat will stop all task automatically",
+                        true, () -> {
+                    // onConfirmed
+                    MyApplication.exit();
+                    return true;
+                }).show(mTopGroup);
+                return true;
+            default:
+                break;
+        }
+
+        return super.onKeyUp(keyCode, event);
     }
 
     public void hideSystemUI() {
@@ -186,7 +195,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void showSettingsDialog() {
-        mSettingsDialog.showAtLocation(findViewById(R.id.area_control), Gravity.CENTER, 0, 0);
+        if (!MBS.getInstance().isReady()) {
+            ToastUtil.show("尚未启动完成,无法使用", true);
+            return;
+        }
+
+        SettingsDialog settingsDialog = new SettingsDialog(this, Utils.PX(1500), Utils.PX(930));
+        //settingsDialog.setTitle("Settings");
+        //settingsDialog.setContent(mSettingsFragment.getListView());
+
+        settingsDialog.showAtLocation(findViewById(R.id.area_control), Gravity.CENTER, 0, 0);
         // inflate the layout of the popup window
         /*LayoutInflater inflater = (LayoutInflater)
                 getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -210,42 +228,164 @@ public class MainActivity extends AppCompatActivity {
         ft.commit();*/
     }
 
+    @Deprecated
+    public void showSettingsDialog2() {
+        SettingsFragment mSettingsFragment = new SettingsFragment();
+    }
+
     public void showVideoSourceManageDialog() {
-        mVideoSourceManageDialog.showAtLocation(findViewById(R.id.main_layout), Gravity.CENTER, 0, 0);
+        if (!MBS.getInstance().isReady()) {
+            ToastUtil.show("尚未启动完成,无法使用", true);
+            return;
+        }
+
+        VideoSourcesManageDialog videoSourceManageDialog = new VideoSourcesManageDialog(this, Utils.PX(1200), Utils.PX(930));
+        videoSourceManageDialog.showAtLocation(mTopGroup, Gravity.CENTER, 0, 0);
     }
 
     public void showPickImageDialog() {
+        if (!MBS.getInstance().isReady()) {
+            ToastUtil.show("尚未启动完成,无法使用", true);
+            return;
+        }
+
         Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         startActivityForResult(pickPhoto , 1);//one can be replaced with any action code
     }
 
-    public void generateTestData() {
+    public VideoSourcesDataModel getVideoSourcesDataModel() {
+        return mVideoSourcesDataModel;
+    }
+
+    public SceneOverlayDataModel getSceneOverlayDataModel(int index) { return mSceneOverlayDataModel[index]; }
+
+    private void initViews() {
+        Utils.init(this);
+
+        mTopGroup = findViewById(R.id.main_layout);
+
+        mPreviewArea = new PreviewArea(this);
+        mPreviewArea.init();
+
+        mProgramArea = new ProgramArea(this);
+        mProgramArea.init();
+
+        mControlArea = new ControlArea(this);
+        mControlArea.init();
+
+        mOverlayArea = new OverlayArea(this);
+        mOverlayArea.init();
+
+        mAudioMixerArea = new AudioMixerArea(this);
+        mAudioMixerArea.init();
+
+        mVideoSourcesArea = new VideoSourcesArea(this);
+        mVideoSourcesArea.init();
+
+        initSurfaceCallbacks();
+    }
+
+    private void initEvents() {
+    }
+
+    private void releaseEvents() {
+        EventPub.getDefaultPub().syncPending();
+    }
+
+    private void initSurfaceCallbacks() {
+        // preview surfaceView callback
+        SurfaceHolderCallback callback = new SurfaceHolderCallback(SurfaceId.PVW);
+        SurfaceView view = (SurfaceView) findViewById(R.id.preview_surface_view);
+        SurfaceHolder holder = view.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        holder.addCallback(callback);
+
+        // preview surfaceView callback
+        callback = new SurfaceHolderCallback(SurfaceId.PGM);
+        view = (SurfaceView) findViewById(R.id.program_surface_view);
+        holder = view.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        holder.addCallback(callback);
+
+        View videoSourceArea = findViewById(R.id.area_video_source);
+
+        // preview surfaceView callback
+        callback = new SurfaceHolderCallback(SurfaceId.IN1);
+        view = (SurfaceView) videoSourceArea.findViewById(R.id.video_source_1).findViewById(R.id.source_surface_view);
+        holder = view.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        holder.addCallback(callback);
+
+        // preview surfaceView callback
+        callback = new SurfaceHolderCallback(SurfaceId.IN2);
+        view = (SurfaceView) videoSourceArea.findViewById(R.id.video_source_2).findViewById(R.id.source_surface_view);
+        holder = view.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        holder.addCallback(callback);
+
+        // preview surfaceView callback
+        callback = new SurfaceHolderCallback(SurfaceId.IN3);
+        view = (SurfaceView) videoSourceArea.findViewById(R.id.video_source_3).findViewById(R.id.source_surface_view);
+        holder = view.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        holder.addCallback(callback);
+
+        // preview surfaceView callback
+        callback = new SurfaceHolderCallback(SurfaceId.IN4);
+        view = (SurfaceView) videoSourceArea.findViewById(R.id.video_source_4).findViewById(R.id.source_surface_view);
+        holder = view.getHolder();
+        holder.setFormat(PixelFormat.TRANSPARENT);
+        holder.addCallback(callback);
+    }
+
+    private void checkSysRes(int retryCount) {
+        String[] cameraIds = CameraHelper.getInstance().getCameraIdList();
+
+        SysResChecking.check(MyApplication.getContext(), mHandler, result -> {
+            if (!result.isSuccessful()) {
+                if (retryCount == 0) {
+                    ToastUtil.show("应用启动失败, " + result.getMessage(), true);
+                    mHandler.postDelayed(() -> MyApplication.exit(), 1000);
+                } else {
+                    ToastUtil.show(result.getMessage() + ", 请稍等", true);
+                    LogUtil.w(UIConst.TAG, TAG, "system resource is in using, try it later");
+                    mHandler.postDelayed(() -> checkSysRes(retryCount - 1), 1000);
+                }
+                return;
+            }
+
+            LogUtil.i(UIConst.TAG, TAG, "mbs system resource is ready");
+            MBS.getInstance().startEP(MyApplication.getContext());
+        }, LXConst.REQUIRED_PORTS, Arrays.asList(cameraIds));
+    }
+
+    private void generateTestData() {
         // TEST ////////////////////////////////////////////////////////////////////////////////////
         for (int i = 1; i <= 5; i++) {
             VideoSourcesDataModel.VideoSourceConfig s = new VideoSourcesDataModel.VideoSourceConfig();
             s.alias = String.format("Test Source %d", i);
             s.type = i;
             s.localCameraConfig.cameraId = "1";
-            s.localCameraConfig.captureWidth = 352;
-            s.localCameraConfig.captureHeight = 288;
+            s.localCameraConfig.captureWidth = 1280;
+            s.localCameraConfig.captureHeight = 720;
 
             s.remoteCameraConfig.host = "192.168.0.9";
             s.remoteCameraConfig.port = 5555;
 
-            s.rtspConfig.url = "10.1.36.111:5000/ch2";
+            s.rtspConfig.url = "10.1.11.161:554/ch1";
             s.rtspConfig.useTcp = true;
 
             s.rtmpConfig.url = "8.8.8.8:1935/live/a";
 
-            s.fileConfig.path = "/sdcard/video/clip-1.mp4";
+            s.fileConfig.path = "/sdcard/ZeddAlessiaCara-Stay.mp4";
             s.fileConfig.loop = true;
 
             mVideoSourcesDataModel.add(s);
         }
 
         String json = mVideoSourcesDataModel.toJson();
-        Log.i("MainActivity", json);
+        LogUtil.i(UIConst.TAG, TAG, json);
 
         mSceneOverlayDataModel[0] = new SceneOverlayDataModel();
 
@@ -263,7 +403,33 @@ public class MainActivity extends AppCompatActivity {
             mSceneOverlayDataModel[0].add(textOverlay);
         }
 
-
         // TEST ENDS ///////////////////////////////////////////////////////////////////////////////
+    }
+
+    class SurfaceHolderCallback implements SurfaceHolder.Callback {
+
+        private SurfaceId mId;
+
+        private SurfaceHolderCallback(SurfaceId id) {
+            mId = id;
+        }
+
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            LogUtil.i(UIConst.TAG, TAG, mId.name() + " surfaceCreated");
+            MBS.getInstance().onSurfaceCreated(mId, holder.getSurface());
+        }
+
+        @Override
+        public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            LogUtil.i(UIConst.TAG, TAG, mId.name() + " surfaceChanged");
+            MBS.getInstance().onSurfaceChanged(mId, format, width, height);
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            LogUtil.i(UIConst.TAG, TAG, mId.name() + " surfaceDestroyed");
+            MBS.getInstance().onSurfaceDestroyed(mId);
+        }
     }
 }

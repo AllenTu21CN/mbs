@@ -3,8 +3,18 @@ package com.sanbu.base;
 import com.sanbu.tools.EventPub;
 
 public class BaseEvents {
-    public static final int USER_HINT   = 0x000;    // params: arg1=important[1:true 0:false] obj=message
-    public static final int RESTART_APP = 0x001;    // params: obj=message(reason)
+
+    //////////////////// events (0x000~0x0ff)
+
+    private static final int START = 0x000;
+
+    // 应用层提示
+    // params: arg1=important[1:true 0:false] obj=message
+    public static final int USER_HINT = START;
+
+    // 应用重启
+    // params: obj=message(reason)
+    public static final int RESTART_APP = START + 1;
 
     public static EventPub.Event buildEvt4UserHint(String message, boolean important) {
         return new EventPub.Event(USER_HINT, important ? 1 : 0, -1, message);

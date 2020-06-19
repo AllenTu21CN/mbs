@@ -94,7 +94,7 @@ public class LayoutMapper implements LogicHandler, StateObserver {
             if (staticEvt.id == event.id) {
                 // gen scene token
                 String token = genSceneToken();
-                LogUtil.d(DIRUtils.TAG, mName, "scene token: " + token);
+                LogUtil.d(DIRUtils.TAG, mName, "pushEvent event: " + event.id + ", scene token: " + token);
 
                 // get scene by token
                 List<DisplayConfig> scene = mSceneEnum.get(token);
@@ -105,8 +105,16 @@ public class LayoutMapper implements LogicHandler, StateObserver {
 
                 // gen display layout by config
                 mLayout = new Layout[scene.size()];
-                for (int i = 0 ; i < scene.size() ; ++i)
-                    mLayout[i] = genLayout(mName, i, scene.get(i), mSubStatus, mValidRoles);
+                for (int i = 0 ; i < scene.size() ; ++i) {
+                    DisplayConfig config = scene.get(i);
+                    if (config.copy != null) {
+                        if (config.copy >= i)
+                            throw new RuntimeException("invalid config of directing table for " + mName);
+                        mLayout[i] = mLayout[config.copy];
+                    } else {
+                        mLayout[i] = genLayout(mName, i, config, mSubStatus, mValidRoles);
+                    }
+                }
 
                 LogUtil.d(DIRUtils.TAG, mName, "layout: " + new Gson().toJson(mLayout));
                 break;
@@ -302,11 +310,14 @@ public class LayoutMapper implements LogicHandler, StateObserver {
         public final LayoutNameConfig layoutName;
         public final List<String> required;
         public final List<String> optional;
+        public final Integer copy;
 
-        public DisplayConfig(LayoutNameConfig layoutName, List<String> required, List<String> optional) {
+        public DisplayConfig(LayoutNameConfig layoutName, List<String> required,
+                             List<String> optional, Integer copy) {
             this.layoutName = layoutName;
             this.required = required;
             this.optional = optional;
+            this.copy = copy;
         }
     }
 

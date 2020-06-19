@@ -1,6 +1,6 @@
 package cn.lx.mbs.support.base;
 
-import cn.lx.mbs.support.Const;
+import cn.lx.mbs.LXConst;
 
 import com.sanbu.tools.LogUtil;
 
@@ -36,10 +36,16 @@ public class Basics {
     }
 
     public void init() {
-        LogUtil.i(Const.TAG, TAG, "TODO：init");
+        LogUtil.i(LXConst.TAG, TAG, "TODO：init");
     }
 
     public void release() {
+
+    }
+
+    /////////////////////////////// callbacks
+
+    public void onNetworkChanged() {
 
     }
 }

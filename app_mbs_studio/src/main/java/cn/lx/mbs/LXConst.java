@@ -1,4 +1,4 @@
-package cn.lx.mbs.support;
+package cn.lx.mbs;
 
 import android.os.Environment;
 import android.os.Handler;
@@ -13,16 +13,30 @@ import com.sanbu.base.Tuple;
 import com.sanbu.tools.FileSaveUtil;
 import com.sanbu.tools.LogUtil;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.lx.mbs.support.structures.AudioCodec;
+import cn.lx.mbs.support.structures.MixMode;
+import cn.lx.mbs.support.structures.RecProp;
 import cn.sanbu.avalon.endpoint3.EPConst;
+import cn.sanbu.avalon.endpoint3.structures.AACProfile;
+import cn.sanbu.avalon.endpoint3.structures.AudioSamplerate;
+import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
+import cn.sanbu.avalon.endpoint3.structures.H264Profile;
+import cn.sanbu.avalon.endpoint3.structures.RecFileFormat;
+import cn.sanbu.avalon.endpoint3.structures.Resolution;
+import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
+import cn.sanbu.avalon.endpoint3.structures.jni.CodecType;
+import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
+import cn.sanbu.avalon.endpoint3.structures.jni.RecSplitMode;
+import cn.sanbu.avalon.endpoint3.structures.jni.Reconnecting;
+import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 import cn.sanbu.avalon.endpoint3.utils.SysResChecking;
 
-public class Const {
+public class LXConst {
 
     public static final String TAG = "app_mbs";
 
@@ -39,16 +53,18 @@ public class Const {
 
     ////////////////////////////////// SP
 
-    public static final String SP_NAMESPACE = "cn.lx.mbs";
+    public static final String SP_COMMON_NAMESPACE = "cn.lx.mbs.comm";
+    public static final String SP_COMMON_FILE_PATH = SP_PATH + "/" + SP_COMMON_NAMESPACE + ".xml";
 
-    public static final String SP_KEY_EP_BASE_CONFIG = "ep_base_config";
-    public static final String SP_KEY_EP_FIXED_CONFIG = "ep_fixed_config";
-    public static final String SP_KEY_EP_VIDEO_CAPABILITY = "ep_video_capability";
-    public static final String SP_KEY_EP_AUDIO_CAPABILITY = "ep_audio_capability";
-    public static final String SP_KEY_EP_H323_REG_STATE = "ep_h323_reg_state";
-    public static final String SP_KEY_EP_SIP_REG_STATE = "ep_sip_reg_state";
-    public static final String SP_KEY_EP_H323_REG_CONFIG = "ep_h323_reg_config";
-    public static final String SP_KEY_EP_SIP_REG_CONFIG = "ep_sip_reg_config";
+    public static final String SP_PERSONALIZED_NAMESPACE = "cn.lx.mbs.per";
+    public static final String SP_PERSONALIZED_FILE_PATH = SP_PATH + "/" + SP_PERSONALIZED_NAMESPACE + ".xml";
+
+    public static final String SP_KEY_CORE_SOURCES = "core_sources";
+    public static final String SP_KEY_CORE_SR_AUDIO_FORMAT = "core_sr_audio_format";
+    public static final String SP_KEY_CORE_SR_S_VIDEO_FORMAT = "core_sr_s_video_format";
+    public static final String SP_KEY_CORE_SR_R_VIDEO_FORMAT = "core_sr_r_video_format";
+    public static final String SP_KEY_CORE_SR_S_URLS = "core_sr_s_urls";
+    public static final String SP_KEY_CORE_SR_R_PROP = "core_sr_r_prop";
 
     ///////////////// resources and assets
 
@@ -60,22 +76,16 @@ public class Const {
     public static final Map<String/*toFile*/, Tuple<String/*asset*/, FileSaveUtil.Action>> BUILD_IN_ASSETS = new HashMap<String, Tuple<String, FileSaveUtil.Action>>() {{
     }};
 
-    ///////////////// DB
+    ////////////////////////////////// 静态定义
 
-    public static final String DB_NAME = "mbs.db";
-    public static final int DB_VERSION = 1;
-
-    // 数据库表类
-    public static final List<Class> DB_TABLE_LIST = new ArrayList<Class>() {{
-    }};
-
-    ////////////////////////////////// 默认值
+    // 非实时工作队列线程名
+    public static final String CHILD_THREAD_NAME = "RTWorker@MBS";
 
     // 必须要独占的系统资源
     public static final List<SysResChecking.Port> REQUIRED_PORTS = Arrays.asList(
-            // new SysResChecking.Port("tcp", "40000")
+            new SysResChecking.Port("tcp", "40000"),
+            new SysResChecking.Port("tcp", "30001")
     );
-    public static final List<Integer> REQUIRED_CAMERAS = Arrays.asList(0, 1);
 
     // 通过LogUtil允许输出的日志级别
     public static final int LOG_UTIL_ENABLED_OUTPUT_LEVEL = Log.DEBUG;
@@ -89,6 +99,46 @@ public class Const {
 
     // 消息盒中最多记录数
     public static final int MAX_MESSAGE_BOX_SIZE = 100;
+
+    // 是否使用内部NoSignal替代图片
+    public static final boolean USING_INTERNAL_NO_SIGNAL_IMG = false;
+
+    // 网络重连参数
+    public static final Reconnecting SOURCE_RECONNECTING = new Reconnecting(
+            -1, 3000, 8000, 100);
+
+    ////////////////////////////////// 默认值
+
+    // 默认推流录制音频格式
+    public static final AudioFormat DEFAULT_SR_AUDIO_FORMAT = new AudioFormat(CodecType.AAC,
+            AudioSamplerate.HZ_48K, 2, Bandwidth._128K, AACProfile.LC);
+
+    // 默认推流视频格式
+    public static final VideoFormat DEFAULT_SR_S_VIDEO_FORMAT = new VideoFormat(CodecType.H264,
+            H264Profile.Main, Resolution.RES_720P, 30, Bandwidth._2M, 5);
+
+    // 默认录制视频格式
+    public static final VideoFormat DEFAULT_SR_R_VIDEO_FORMAT = new VideoFormat(CodecType.H264,
+            H264Profile.Main, Resolution.RES_1080P, 30, Bandwidth._4M, 10);
+
+    // 默认录制属性
+    public static final RecProp DEFAULT_SR_REC_PROP = new RecProp("/sdcard/", RecFileFormat.MP4,
+            "%N-%T-%t", RecSplitMode.BySize, 512 * 1024 * 1024
+    );
+
+    // 默认EP固定配置
+    public static final EPFixedConfig DEFAULT_EP_FIXED_CONFIG = new EPFixedConfig(
+            true, true, true,
+            15060, 11720, 17070, 20000, 21999,
+            20000, 21999, "", "",
+            1, true, "INFO", "#0F0F0F"
+    );
+
+    // 默认MIC的混音模式(输出)
+    public static final MixMode DEFAULT_MIC_MIX_MODE_4_OUTPUT = MixMode.On;
+
+    // 默认呼叫音频格式
+    public static final List<AudioCodec> DEFAULT_CALLING_AUDIO_CODECS = Arrays.asList(AudioCodec.G711A, AudioCodec.G711U);
 
     ///////////////// util functions
 

@@ -11,7 +11,7 @@ import com.sanbu.board.BoardSupportClient;
 public class MediaJni {
 
     public static final String EP_ANDROID_LIB = "ep_android";
-    public static final String EP_LEGACY_ANDROID_LIB = "ep_android_legacy";
+    public static final String EP_LEGACY_ANDROID_LIB = "ep_android_box_legacy";
 
     private static boolean gInited = false;
     private static boolean gEnableVENDK = false;
@@ -33,11 +33,11 @@ public class MediaJni {
         }
     }
 
-    public static void initEnv(Context context, BoardSupportClient client) {
+    public static void initEnv(Context context, BoardSupportClient client, boolean showNoSignal) {
         synchronized (MediaJni.class) {
             if (!gInited) {
                 CameraHelper.init(context, client);
-                gVideoEngine = VideoEngine.allocateInstance(context, gEnableVENDK);
+                gVideoEngine = VideoEngine.allocateInstance(context, gEnableVENDK, showNoSignal);
                 jniEnvInit(gVideoEngine.getDisplayRefreshRate(), gEnableVENDK);
                 gInited = true;
             }

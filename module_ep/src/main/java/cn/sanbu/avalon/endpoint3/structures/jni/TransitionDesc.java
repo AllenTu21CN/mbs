@@ -18,4 +18,8 @@ public class TransitionDesc {
         return (CompareHelper.isEqual(type, other.type) &&
                 duration == other.duration);
     }
+
+    public static TransitionDesc buildEmpty() {
+        return new TransitionDesc(TransitionMode.Unknown, 0.0f);
+    }
 }

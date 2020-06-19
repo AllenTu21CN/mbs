@@ -4,8 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Handler;
 
-import cn.lx.mbs.support.Const;
+import cn.lx.mbs.Events;
+import cn.lx.mbs.LXConst;
 import cn.lx.mbs.support.MBS;
+import cn.lx.mbs.support.structures.StreamState;
 import cn.lx.mbs.ui.service.NetworkReceiver;
 import com.sanbu.base.BaseEvents;
 import com.sanbu.base.NetType;
@@ -28,7 +30,7 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        LogUtil.w(Const.TAG, TAG, "onCreate");
+        LogUtil.w(LXConst.TAG, TAG, "onCreate");
         gContext = getApplicationContext();
         init();
     }
@@ -59,10 +61,10 @@ public class MyApplication extends Application {
             Pending.clean(gMainHandler);
             gMainHandler = null;
         } catch (Exception e) {
-            LogUtil.e(Const.TAG, TAG, "exit app error", e);
+            LogUtil.e(LXConst.TAG, TAG, "exit app error", e);
         }
 
-        LogUtil.w(Const.TAG, TAG, "exit app !!!");
+        LogUtil.w(LXConst.TAG, TAG, "exit app !!!");
         System.exit(0);
     }
 
@@ -71,7 +73,7 @@ public class MyApplication extends Application {
         gMainHandler = new Handler();
 
         // init log util
-        LogUtil.setLogLevel(Const.LOG_UTIL_ENABLED_OUTPUT_LEVEL);
+        LogUtil.setLogLevel(LXConst.LOG_UTIL_ENABLED_OUTPUT_LEVEL);
 
         // init TSX200 environment
         MBS.initEnv(gContext);
@@ -83,7 +85,7 @@ public class MyApplication extends Application {
         DBUtil.init(gContext);
 
         // init sp util
-        SPUtil.init(gContext, Const.SP_PATH);
+        SPUtil.init(gContext, LXConst.SP_PATH);
 
         // init event pub
         EventPub.getDefaultPub().init();
@@ -118,7 +120,7 @@ public class MyApplication extends Application {
         for (int i = 0 ; i < 5 ; ++i) {
             if (NetworkUtil.getActiveType(context) != NetType.None)
                 return;
-            LogUtil.w(Const.TAG, TAG,"network is not ready, sleep 1s then check again");
+            LogUtil.w(LXConst.TAG, TAG,"network is not ready, sleep 1s then check again");
             try { Thread.sleep(1000); } catch (InterruptedException e) { }
         }
 
@@ -137,11 +139,21 @@ public class MyApplication extends Application {
             gMainHandler.postDelayed(MyApplication::exit, 500);
             return true;
         });
+
+        EventPub.getDefaultPub().subscribe(Events.STREAM_STATE_CHANGED , TAG, (evtId, arg1, arg2, obj) -> {
+            StreamState state = (StreamState) obj;
+            String message = String.format("流状态变化: %s, %s, %s",
+                    state.channelId.name(), state.type.name, state.ready);
+
+            gMainHandler.postDelayed(() -> ToastUtil.show(message, false), 50);
+            return false;
+        });
     }
 
     private static void releaseEvent() {
         EventPub.getDefaultPub().unsubscribe(BaseEvents.USER_HINT, TAG);
         EventPub.getDefaultPub().unsubscribe(BaseEvents.RESTART_APP, TAG);
+        EventPub.getDefaultPub().unsubscribe(Events.STREAM_STATE_CHANGED, TAG);
         EventPub.getDefaultPub().syncPending();
     }
 }

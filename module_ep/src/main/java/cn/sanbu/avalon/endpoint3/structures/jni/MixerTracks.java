@@ -73,6 +73,16 @@ public class MixerTracks {
         return true;
     }
 
+    public boolean contains(int decId) {
+        if (tracks == null)
+            return false;
+        for (Track track: tracks) {
+            if (track.source_id == decId)
+                return true;
+        }
+        return false;
+    }
+
     public static MixerTracks buildEmpty() {
         return new MixerTracks(new LinkedList<>());
     }

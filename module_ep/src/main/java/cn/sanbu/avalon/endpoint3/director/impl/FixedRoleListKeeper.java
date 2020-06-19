@@ -18,6 +18,7 @@ import cn.sanbu.avalon.endpoint3.director.structures.StateObserver;
 import cn.sanbu.avalon.endpoint3.director.structures.TokenType;
 
 /* 固定角色列表处理模型:
+ *  . logicId: BI_FIXED_ROLE_LIST
  *  . 维护的列表中角色相同,仅objId不同,一般只会用作Caller角色的维护
  *  . 根据接收事件配置的值(+/-)来增加删除列表中的值
  *  . 并维护指定名称的token,用于生成查找最终场景的key

@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.util.Log;
+import com.sanbu.tools.LogUtil;
 import android.util.Size;
 import android.view.Gravity;
 import android.view.View;
@@ -75,7 +75,7 @@ public class VideoSourcesManageDialog extends BaseDialog {
         mSourcesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("VideoSourcesManageDialo", "Item index " + i + " clicked!");
+                LogUtil.i("VideoSourcesManageDialo", "Item index " + i + " clicked!");
                 // Clear and set highlight
                 for (int n = 0; n < adapterView.getChildCount(); n++) {
                     adapterView.getChildAt(n).findViewById(R.id.layout).setBackground(
@@ -226,7 +226,7 @@ public class VideoSourcesManageDialog extends BaseDialog {
 
         CameraCharacteristics characteristics = CameraHelper.getInstance().getCameraCharacteristics(selectedCameraId);
         StreamConfigurationMap configs = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-        //Log.d(TAG, configs.toString());
+        //LogUtil.d(TAG, configs.toString());
         mLocalCameraCaptureSizeList = configs.getOutputSizes(SurfaceTexture.class);
         SimpleArrayAdapter<Size> captureSizeAdapter = new SimpleArrayAdapter<>(
                 mContext,

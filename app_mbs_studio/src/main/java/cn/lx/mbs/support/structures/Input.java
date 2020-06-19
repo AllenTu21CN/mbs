@@ -13,28 +13,29 @@ import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 
 public class Input {
-    public final ChannelId inId;
     public final Source config;
+    public final ChannelId channelId;
 
     public int epId;
     public State connState;
 
-    public boolean micMuted;
-    public float micVolume;
+    public float volume;
+    public boolean muted;
 
     public Region srcRegion;
 
     public List<AVStream> aStreams = new LinkedList<>();
     public List<AVStream> vStreams = new LinkedList<>();
 
-    public Input(ChannelId id, Source config) {
-        this.inId = id;
+    public Input(Source config, ChannelId channelId, int epId,
+                 State connState, float volume, boolean muted) {
         this.config = config;
-
-        this.epId = -1;
-        this.connState = State.None;
-        this.micMuted = false;
-        this.micVolume = EPConst.EP_DEFAULT_AUDIO_VOLUME;
+        this.channelId = channelId;
+        this.epId = epId;
+        this.connState = connState;
+        this.volume = volume;
+        this.muted = muted;
+        this.srcRegion = Region.buildFull();
     }
 
     public AVStream removeStream(DataType type, int streamId) {
@@ -51,27 +52,31 @@ public class Input {
         return null;
     }
 
-    public AVStream getVideoStream() {
-        if (vStreams.size() == 0)
-            return null;
-        return vStreams.get(0);
+    public List<Integer> getDecodingIds(DataType type) {
+        List<AVStream> streams = type == DataType.AUDIO ? aStreams : vStreams;
+        List<Integer> ids = new LinkedList<>();
+        for (AVStream stream: streams) {
+            if (stream.isDecReady())
+                ids.add(stream.getDecId());
+        }
+        return ids;
     }
 
-    public AVStream getAudioStream() {
-        if (aStreams.size() == 0)
-            return null;
-        return aStreams.get(0);
+    public AVStream getDecodedAudioStream() {
+        for (AVStream stream: aStreams) {
+            if (stream.isDecReady())
+                return stream;
+        }
+
+        return null;
     }
 
-    public VideoFormat getVideoFormat() {
-        if (vStreams.size() == 0)
-            return null;
-        return (VideoFormat) vStreams.get(0).format;
-    }
-
-    public AudioFormat getAudioFormat() {
-        if (aStreams.size() == 0)
-            return null;
-        return (AudioFormat) aStreams.get(0).format;
+    public AVStream findStreamByDecId(DataType type, int decId) {
+        List<AVStream> streams = type == DataType.AUDIO ? aStreams : vStreams;
+        for (AVStream stream: streams) {
+            if (stream.getDecId() == decId)
+                return stream;
+        }
+        return null;
     }
 }

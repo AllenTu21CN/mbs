@@ -80,8 +80,6 @@ import cn.sanbu.avalon.media.gles.WindowSurface;
 
 public class VideoEngine {
 
-    private boolean mEnableNDK = false;
-
     private static final String TAG = "avalon_" + VideoEngine.class.getSimpleName();
 
     public static volatile boolean gRenderFrozen = false;
@@ -96,8 +94,8 @@ public class VideoEngine {
     public static final int MAXIMUM_DISPLAY_SURFACE_COUNT   = 16;
 
     // Source type enum
-    private static final int SOURCE_TYPE_DECODER            = 0x00;
-    private static final int SOURCE_TYPE_CAPTURE            = 0x10;
+    public static final int SOURCE_TYPE_DECODER            = 0x00;
+    public static final int SOURCE_TYPE_CAPTURE            = 0x10;
 
     // Styles
     private static final float[] DISPLAY_NAME_PADDINGS = new float[] { 0.008f, 0.008f, 0.008f, 0.008f };
@@ -142,10 +140,13 @@ public class VideoEngine {
     private Point mDisplaySize = new Point();
     private float mDisplayRefreshRate;
 
+    private final boolean mShowNoSignal;
     private Bitmap mNoSignalImage;
     private Bitmap mLoadingImage;
 
     private CameraHelper mCameraHelper = CameraHelper.getInstance();
+
+    private final boolean mEnableNDK;
 
     /**
      * Video source object.
@@ -556,7 +557,7 @@ public class VideoEngine {
 
             if (!checkCamera()) {
                 flag.trying = false;
-                flag.threshold += 1000;
+                flag.threshold += 100;
                 if (flag.threshold > CAMERA_REOPEN_MAX_THRESHOLD)
                     flag.threshold = CAMERA_REOPEN_MAX_THRESHOLD;
                 return;
@@ -690,7 +691,10 @@ public class VideoEngine {
                                                         s.frameAvailableSoon();
                                                     }
 
-                                                    mCameraHasSignal = true;
+                                                    if (!mCameraHasSignal) {
+                                                        mCameraHasSignal = true;
+                                                        onSourceStateChanged(mId, mType, mCameraHasSignal);
+                                                    }
 
                                                     // Stat fps for capture device
                                                     statFrameRate();
@@ -703,7 +707,12 @@ public class VideoEngine {
                                                     super.onCaptureFailed(session, request, failure);
 
                                                     LogUtil.e(TAG, "CameraCaptureSession.onCaptureFailed");
-                                                    mCameraHasSignal = false;
+
+                                                    if (mCameraHasSignal) {
+                                                        mCameraHasSignal = false;
+                                                        onSourceStateChanged(mId, mType, mCameraHasSignal);
+                                                    }
+
                                                     // TODO:
                                                 }
                                             }, mCameraBackgroundHandler);
@@ -737,7 +746,11 @@ public class VideoEngine {
                                     mCameraCaptureSessionLock.notify();
                                 }
                                 mCameraReopeningFlags.get(mCameraId).trying = false;
-                                mCameraHasSignal = false;
+
+                                if (mCameraHasSignal) {
+                                    mCameraHasSignal = false;
+                                    onSourceStateChanged(mId, mType, mCameraHasSignal);
+                                }
                             }
 
                             @Override
@@ -748,7 +761,11 @@ public class VideoEngine {
                                     mCameraCaptureSessionConfigured = false;
                                     mCameraCaptureSessionLock.notify();
                                 }
-                                mCameraHasSignal = false;
+
+                                if (mCameraHasSignal) {
+                                    mCameraHasSignal = false;
+                                    onSourceStateChanged(mId, mType, mCameraHasSignal);
+                                }
                             }
                         }, mCameraBackgroundHandler
                 );
@@ -864,6 +881,7 @@ public class VideoEngine {
                     boolean hasOutput = (last_pts > 0 && now - last_pts < NO_SIGNAL_THRESHOLD);
                     if (mDecoderHasOutput != hasOutput) {
                         mDecoderHasOutput = hasOutput;
+                        onSourceStateChanged(mId, mType, mDecoderHasOutput);
                         LogUtil.d(TAG, "Source id=" + mId + " signal status changed: " + hasOutput);
                     }
                 }
@@ -1470,7 +1488,7 @@ public class VideoEngine {
                 if (s != null) {
                     if (s.hasSignal()) {
                         s.draw(getSrcRectFB(s), mDstRect);
-                    } else {
+                    } else if (mShowNoSignal) {
                         if (s.getType() == SOURCE_TYPE_CAPTURE)
                             drawNoSignal();
                         else
@@ -2568,13 +2586,13 @@ public class VideoEngine {
             mSharedTexMgr = new SharedTextureManager(4, 4);
 
             // Update No Signal texture
-            if (null != mNoSignalImage) {
+            if (mShowNoSignal && null != mNoSignalImage) {
                 mNoSignalTexSlot = mSharedTexMgr.getIdleSlot(0, 0);
                 mSharedTexMgr.updateTexture(mNoSignalTexSlot, mNoSignalImage);
             }
 
             // Update Loading texture
-            if (null != mLoadingImage) {
+            if (mShowNoSignal && null != mLoadingImage) {
                 mLoadingTexSlot = mSharedTexMgr.getIdleSlot(0, 0);
                 mSharedTexMgr.updateTexture(mLoadingTexSlot, mLoadingImage);
             }
@@ -3207,7 +3225,7 @@ public class VideoEngine {
                 if (configObject.has(CONFIG_FRAME_RATE_KEY)) {
                     frameRate = configObject.get(CONFIG_FRAME_RATE_KEY).getAsInt();
                     if (frameRate <= 0 || frameRate > MAXIMUM_FPS) {
-                        LogUtil.e(TAG, "Invalid frame rate for video sink #" + mId + ", set to 1 fps.");
+                        LogUtil.e(TAG, "Invalid frame rate(" + frameRate + ") for video sink #" + mId + ", set to 1 fps.");
                         frameRate = 1;
                     }
                 }
@@ -3216,7 +3234,7 @@ public class VideoEngine {
                 if (configObject.has(CONFIG_KEY_FRAME_INTERVAL_KEY)) {
                     keyFrameInterval = configObject.get(CONFIG_KEY_FRAME_INTERVAL_KEY).getAsInt();
                     if (keyFrameInterval <= 0 || keyFrameInterval > Integer.MAX_VALUE / 1000) {
-                        LogUtil.i(TAG, "Key frame interval is out of range. Set to FPS * 3600.");
+                        LogUtil.i(TAG, "Key frame interval(" + keyFrameInterval + ") is out of range. Set to FPS * 3600.");
                         keyFrameInterval = frameRate * 3600;
                     }
                 }
@@ -4318,10 +4336,14 @@ public class VideoEngine {
     }
 
     public static VideoEngine allocateInstance(Context context, boolean enableNDK) {
+        return allocateInstance(context, enableNDK, true);
+    }
+
+    public static VideoEngine allocateInstance(Context context, boolean enableNDK, boolean showNoSignal) {
         if (mInstance == null) {
             synchronized (VideoEngine.class) {
                 if (mInstance ==null) {
-                    mInstance = new VideoEngine(context, enableNDK);
+                    mInstance = new VideoEngine(context, enableNDK, showNoSignal);
                 }
             }
         }
@@ -4332,9 +4354,10 @@ public class VideoEngine {
         return mInstance;
     }
 
-    private VideoEngine(Context context, boolean enableNDK) {
+    private VideoEngine(Context context, boolean enableNDK, boolean showNoSignal) {
         LogUtil.i(TAG, "Constructing VideoEngine singleton object.");
         mEnableNDK = enableNDK;
+        mShowNoSignal = showNoSignal;
 
         if (context != null) {
             mContext = context;
@@ -4417,8 +4440,10 @@ public class VideoEngine {
         LogUtil.i(TAG, info);*/
         if (!mEnableNDK){
 	        // Prepare No Signal image
-	        mNoSignalImage = genHintBitmap(mNoSignalHint);
-	        mLoadingImage = genHintBitmap(mLoadingHint);
+            if (mShowNoSignal) {
+                mNoSignalImage = genHintBitmap(mNoSignalHint);
+                mLoadingImage = genHintBitmap(mLoadingHint);
+            }
 
 	        // Start mixer thread
 	        LogUtil.i(TAG, "Starting video mixer thread.");
@@ -4915,7 +4940,13 @@ public class VideoEngine {
         }
     }
 
+    private void onSourceStateChanged(int sourceId, int sourceType, boolean ready) {
+        onSDKEvent(MediaEventId.SOURCE_DECODING_STATE_CHANGED.value, sourceId, sourceType, ready ? "true" : "false");
+    }
+
     private native int onEncodedPacketReady(int sinkId, byte[] packetData);
+    private native void onSDKEvent(int eventId, int arg1, int arg2, String data);
+
     private native int registerDisplaySurfaceNDK(Surface surface);
     private native boolean unregisterDisplaySurfaceNDK(int surfaceID);
     private native boolean onDisplaySurfaceChangedNDK(int surfaceId, int format, int width, int height);

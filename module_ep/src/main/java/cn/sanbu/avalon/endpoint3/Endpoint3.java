@@ -59,7 +59,6 @@ public class Endpoint3 {
 
         // init endpoint jni environment
         // jniEnvInit();
-        LogUtil.w(EPConst.TAG, "TODO: skip jniEnvInit");
         getInstance().jniEnvInit();
     }
 
@@ -492,7 +491,7 @@ public class Endpoint3 {
     }
 
     // @brief Adds common net source
-    // @param url [IN] source url, e.g. rtsp/rtmp/...
+    // @param url [IN] source url, e.g. rtmp/...
     // @param reconnecting [IN] configure of reconnecting
     // @return source_id
     public int epAddNetSource(String url, @NonNull Reconnecting reconnecting) {

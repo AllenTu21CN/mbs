@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
+import com.sanbu.tools.LogUtil;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -47,7 +47,7 @@ public class OverlayEditableView extends View {
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
             mScaleFactor *= detector.getScaleFactor();
-            Log.d(TAG, "Scale gesture detected, scale factor=" + mScaleFactor);
+            LogUtil.d(TAG, "Scale gesture detected, scale factor=" + mScaleFactor);
 
             // Don't let the object get too small or too large.
             mScaleFactor = Math.max(0.1f, Math.min(mScaleFactor, 10.0f));
@@ -123,7 +123,7 @@ public class OverlayEditableView extends View {
         right = centerX + (int)(scaledWidth / 2.f);
         bottom = centerY + (int)(scaledHeight / 2.f);
 
-        //Log.d(TAG, String.format("Position changed: left=%d, top=%d, right=%d, bottom=%d",
+        //LogUtil.d(TAG, String.format("Position changed: left=%d, top=%d, right=%d, bottom=%d",
         //        left, top, right, bottom));
         if (mOnPositionChangeListener != null) {
             mOnPositionChangeListener.onPositionChanged(left, top, right, bottom, centerX, centerY);
@@ -231,7 +231,7 @@ public class OverlayEditableView extends View {
                 case MotionEvent.ACTION_DOWN : {
                     final float x = ev.getRawX();
                     final float y = ev.getRawY();
-                    //Log.d(TAG, "Down event, x=" + x + ", y=" + y);
+                    //LogUtil.d(TAG, "Down event, x=" + x + ", y=" + y);
 
                     // Remember where we started (for dragging)
                     mLastTouchX = x;
@@ -247,7 +247,7 @@ public class OverlayEditableView extends View {
                     // Calculate the distance moved
                     final float dx = x - mLastTouchX;
                     final float dy = y - mLastTouchY;
-                    //Log.d(TAG, "Move event, distance moved: dx=" + dx + ", dy=" + dy);
+                    //LogUtil.d(TAG, "Move event, distance moved: dx=" + dx + ", dy=" + dy);
 
                     float posX = this.getX() + dx;
                     float posY = this.getY() + dy;

@@ -5,11 +5,13 @@ public class StaticEvent {
     public final int id;
     public final String value;
     public final String top;
+    public final String disable;
 
-    public StaticEvent(String name, int id, String value, String top) {
+    public StaticEvent(String name, int id, String value, String top, String disable) {
         this.name = name;
         this.id = id;
         this.value = value;
         this.top = top;
+        this.disable = disable;
     }
 }

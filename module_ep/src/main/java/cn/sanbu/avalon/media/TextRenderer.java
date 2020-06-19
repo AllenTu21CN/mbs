@@ -14,7 +14,7 @@ import java.io.File;
 
 public class TextRenderer {
 
-    private static final boolean CALC_PADDING = false;
+    private static final boolean CALC_PADDING = true;
 
     public static Bitmap renderTextAsBitmap(String text,
                                             String fontFamily, float fontSize,

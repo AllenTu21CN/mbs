@@ -11,10 +11,10 @@ public class VideoSourcesDataModel {
     public static class VideoSourceConfig {
         public static final int TYPE_NONE = 0;
         public static final int TYPE_LOCAL_CAMERA = 1;
+        public static final int TYPE_FILE = 2;
+        public static final int TYPE_RTSP = 3;
+        public static final int TYPE_RTMP = 4;
         public static final int TYPE_REMOTE_CAMERA = 5;
-        public static final int TYPE_RTSP = 2;
-        public static final int TYPE_RTMP = 3;
-        public static final int TYPE_FILE = 4;
 
         public class LocalCameraConfig {
             public String cameraId;

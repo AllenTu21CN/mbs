@@ -14,14 +14,14 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.sanbu.tools.EventPub;
+
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import cn.lx.mbs.ui.Event;
+import cn.lx.mbs.Events;
 import cn.lx.mbs.R;
 import cn.lx.mbs.ui.MainActivity;
-
-import org.greenrobot.eventbus.EventBus;
 
 public class ControlArea {
     private Activity mActivity;
@@ -248,9 +248,7 @@ public class ControlArea {
                     mIsRecording = !mIsRecording;
                     invalidate();
 
-                    // Post RecordingStartEvent/RecordingStopEvent
-                    EventBus.getDefault().post(mIsRecording ?
-                            new Event.RecordingStartEvent() : new Event.RecordingStopEvent());
+                    EventPub.getDefaultPub().post(Events.SR_SWITCH_CHANGED, mIsRecording ? 1 : 0);
                 }
             });
         }
