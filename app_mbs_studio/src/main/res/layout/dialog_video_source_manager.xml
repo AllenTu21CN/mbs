@@ -307,6 +307,19 @@
     </TableLayout>
 
     <Button
+        android:id="@+id/load"
+        android:text="Load"
+        android:textSize="24px"
+        android:background="@drawable/common_button_bg"
+        android:layout_width="180px"
+        android:layout_height="0dp"
+        android:layout_marginBottom="18px"
+        android:paddingLeft="18px"
+        app:layout_constraintTop_toTopOf="@id/save"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/save" />
+
+    <Button
         android:id="@+id/save"
         android:text="Save"
         android:textSize="24px"

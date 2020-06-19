@@ -24,10 +24,15 @@ import com.sanbu.tools.PermissionUtil;
 import com.sanbu.tools.ToastUtil;
 
 import java.util.Arrays;
+import java.util.List;
 
 import cn.lx.mbs.R;
 import cn.lx.mbs.LXConst;
 import cn.lx.mbs.support.MBS;
+import cn.lx.mbs.support.structures.ChannelId;
+import cn.lx.mbs.support.structures.Layout;
+import cn.lx.mbs.support.structures.Overlay;
+import cn.lx.mbs.support.structures.Source;
 import cn.lx.mbs.support.structures.SurfaceId;
 import cn.lx.mbs.ui.model.SceneOverlayDataModel;
 import cn.lx.mbs.ui.model.VideoSourcesDataModel;
@@ -42,6 +47,8 @@ import cn.lx.mbs.ui.view.SettingsFragment;
 import cn.lx.mbs.ui.view.Utils;
 import cn.lx.mbs.ui.view.VideoSourcesArea;
 import cn.lx.mbs.ui.view.VideoSourcesManageDialog;
+import cn.sanbu.avalon.endpoint3.structures.Region;
+import cn.sanbu.avalon.endpoint3.structures.Resolution;
 import cn.sanbu.avalon.endpoint3.utils.SysResChecking;
 import cn.sanbu.avalon.media.CameraHelper;
 
@@ -85,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
     private VideoSourcesDataModel mVideoSourcesDataModel = new VideoSourcesDataModel();
     private SceneOverlayDataModel[] mSceneOverlayDataModel = new SceneOverlayDataModel[10];
+    private List<Layout> mSceneLayouts;
 
     @Override
     @SuppressLint("SourceLockedOrientationActivity")
@@ -128,14 +136,16 @@ public class MainActivity extends AppCompatActivity {
         LogUtil.w(UIConst.TAG, TAG, "onDestroy");
         releaseEvents();
         super.onDestroy();
-        MyApplication.exit();
+        if (MBS.getInstance().isReady())
+            MyApplication.exit();
     }
 
     @Override
     protected void onStop() {
         LogUtil.w(UIConst.TAG, TAG, "onStop");
         super.onStop();
-        MyApplication.exit();
+        if (MBS.getInstance().isReady())
+            MyApplication.exit();
     }
 
     @Override
@@ -233,13 +243,13 @@ public class MainActivity extends AppCompatActivity {
         SettingsFragment mSettingsFragment = new SettingsFragment();
     }
 
-    public void showVideoSourceManageDialog() {
+    public void showVideoSourceManageDialog(VideoSourcesArea parent, int entryId) {
         if (!MBS.getInstance().isReady()) {
             ToastUtil.show("尚未启动完成,无法使用", true);
             return;
         }
 
-        VideoSourcesManageDialog videoSourceManageDialog = new VideoSourcesManageDialog(this, Utils.PX(1200), Utils.PX(930));
+        VideoSourcesManageDialog videoSourceManageDialog = new VideoSourcesManageDialog(this, Utils.PX(1200), Utils.PX(930), parent, entryId);
         videoSourceManageDialog.showAtLocation(mTopGroup, Gravity.CENTER, 0, 0);
     }
 
@@ -259,6 +269,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public SceneOverlayDataModel getSceneOverlayDataModel(int index) { return mSceneOverlayDataModel[index]; }
+
+    public Layout getSceneLayout(int index) {
+        return mSceneLayouts.get(index % 3);
+    }
 
     private void initViews() {
         Utils.init(this);
@@ -357,7 +371,17 @@ public class MainActivity extends AppCompatActivity {
 
             LogUtil.i(UIConst.TAG, TAG, "mbs system resource is ready");
             MBS.getInstance().startEP(MyApplication.getContext());
+
+            mHandler.post(() -> doTest());
+
         }, LXConst.REQUIRED_PORTS, Arrays.asList(cameraIds));
+    }
+
+    private void doTest() {
+        MBS.getInstance().removeSource(0, null);
+        MBS.getInstance().removeSource(1, null);
+        MBS.getInstance().removeSource(2, null);
+        MBS.getInstance().removeSource(3, null);
     }
 
     private void generateTestData() {
@@ -373,7 +397,7 @@ public class MainActivity extends AppCompatActivity {
             s.remoteCameraConfig.host = "192.168.0.9";
             s.remoteCameraConfig.port = 5555;
 
-            s.rtspConfig.url = "10.1.11.161:554/ch1";
+            s.rtspConfig.url = "rtsp://10.1.11.161:554/ch3";
             s.rtspConfig.useTcp = true;
 
             s.rtmpConfig.url = "8.8.8.8:1935/live/a";
@@ -402,6 +426,20 @@ public class MainActivity extends AppCompatActivity {
             textOverlay.name = "Lower thirds";
             mSceneOverlayDataModel[0].add(textOverlay);
         }
+
+        Layout layout1 = new Layout().setOverlays(Arrays.asList(
+                new Overlay.Image(LXConst.BG_IMAGE_LOADING, new Region(0.0, 0.25, 0.5, 0.5)),
+                new Overlay.Image(LXConst.BG_IMAGE_LOADING, new Region(0.5, 0.25, 0.5, 0.5))));
+
+        Layout layout2 = new Layout().setOverlays(Arrays.asList(
+                new Overlay.Stream(ChannelId.IN1, new Region(0.0, 0.25, 0.5, 0.5)),
+                new Overlay.Image(LXConst.BG_IMAGE_LOADING, new Region(0.5, 0.25, 0.5, 0.5))));
+
+        Layout layout3 = new Layout().setOverlays(Arrays.asList(
+                new Overlay.Stream(ChannelId.IN1, new Region(0.0, 0.25, 0.5, 0.5)),
+                new Overlay.Stream(ChannelId.IN2, new Region(0.5, 0.25, 0.5, 0.5))));
+
+        mSceneLayouts = Arrays.asList(layout1, layout2, layout3);
 
         // TEST ENDS ///////////////////////////////////////////////////////////////////////////////
     }

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -15,13 +16,19 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.sanbu.tools.EventPub;
+import com.sanbu.tools.ToastUtil;
 
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import cn.lx.mbs.Events;
 import cn.lx.mbs.R;
+import cn.lx.mbs.support.MBS;
+import cn.lx.mbs.support.structures.SRId;
+import cn.lx.mbs.support.structures.SRState;
 import cn.lx.mbs.ui.MainActivity;
+import cn.sanbu.avalon.endpoint3.structures.jni.TransitionDesc;
+import cn.sanbu.avalon.endpoint3.structures.jni.TransitionMode;
 
 public class ControlArea {
     private Activity mActivity;
@@ -70,6 +77,22 @@ public class ControlArea {
             btn.setTextSize(TypedValue.COMPLEX_UNIT_PX, transitionBtnTextSize);
             Utils.setSize(btn, transitionBtnWidth, transitionBtnHeight);
         }
+
+        mCutButton.setOnClickListener(view -> {
+            MBS.getInstance().switchPVW2PGM(TransitionDesc.buildEmpty(), null);
+        });
+
+        mFadeButton.setOnClickListener(view -> {
+            MBS.getInstance().switchPVW2PGM(new TransitionDesc(TransitionMode.fade, (float)mTransitionDurationMs / 1000.0f), null);
+        });
+
+        mWipeButton.setOnClickListener(view -> {
+            MBS.getInstance().switchPVW2PGM(new TransitionDesc(TransitionMode.wipeDown, (float)mTransitionDurationMs / 1000.0f), null);
+        });
+
+        mFtbButton.setOnClickListener(view -> {
+            MBS.getInstance().switchPVW2PGM(new TransitionDesc(TransitionMode.flyeye, (float)mTransitionDurationMs / 1000.0f), null);
+        });
 
         /*Utils.setMargins(mCutButton, 0, Utils.PX(36), Utils.PX(18), 0);
         Utils.setMargins(mFadeButton, Utils.PX(18), 0, 0, 0);
@@ -134,6 +157,7 @@ public class ControlArea {
         int recordingButtonSize = Utils.PX(100);
         mRecordingButton = mActivity.findViewById(R.id.recording_button);
         Utils.setSize(mRecordingButton, recordingButtonSize, recordingButtonSize);
+        mRecordingButton.setData(this);
 
         mEnableStreamingSwitch = mActivity.findViewById(R.id.enable_streaming);
         mEnableRecordingSwitch = mActivity.findViewById(R.id.enable_recording);
@@ -235,9 +259,12 @@ public class ControlArea {
 
         private boolean mIsRecording;
         private Paint mPaint;
+        private ControlArea mParent;
+        private Handler mHandler;
 
         public RecordingButton(Context context, AttributeSet attrs) {
             super(context, attrs);
+            mHandler = new Handler();
 
             setBackgroundDrawable(null);
             setPadding(0, 0, 0, 0);
@@ -249,8 +276,31 @@ public class ControlArea {
                     invalidate();
 
                     EventPub.getDefaultPub().post(Events.SR_SWITCH_CHANGED, mIsRecording ? 1 : 0);
+
+                    if (mIsRecording) {
+                        if (mParent.mEnableRecordingSwitch.isChecked()) {
+                            MBS.getInstance().switchSRState(SRId.Recording, SRState.Start, result -> {
+                                if (!result.isSuccessful())
+                                    mHandler.post(() -> ToastUtil.show("Start recording failed", false));
+                            });
+                        }
+
+                        if (mParent.mEnableStreamingSwitch.isChecked()) {
+                            MBS.getInstance().switchSRState(SRId.Streaming, SRState.Start, result -> {
+                                if (!result.isSuccessful())
+                                    mHandler.post(() -> ToastUtil.show("Start steaming failed", false));
+                            });
+                        }
+                    } else {
+                        MBS.getInstance().switchSRState(SRId.Streaming, SRState.Stop, null);
+                        MBS.getInstance().switchSRState(SRId.Recording, SRState.Stop, null);
+                    }
                 }
             });
+        }
+
+        public void setData(ControlArea parent) {
+            mParent = parent;
         }
 
         @Override

@@ -12,6 +12,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import cn.lx.mbs.R;
+import cn.lx.mbs.support.MBS;
+import cn.lx.mbs.support.structures.Layout;
+import cn.lx.mbs.ui.MainActivity;
 
 public class PreviewArea {
     private static final String TAG = PreviewArea.class.getSimpleName();
@@ -82,6 +85,9 @@ public class PreviewArea {
                                 mActiveSceneIndex = btn.getSceneId();
                             }
                         }
+
+                        Layout layout = ((MainActivity) mActivity).getSceneLayout(btn.mSceneId);
+                        MBS.getInstance().setPVWLayout(layout, null);
                     }
                 }
             });

@@ -60,6 +60,7 @@ public class MBS implements EndpointMBS.Observer {
         new File(LXConst.DB_PATH).mkdirs();
         new File(LXConst.UPGRADE_PATH).mkdirs();
         new File(LXConst.RESOURCE_PATH).mkdirs();
+        new File(LXConst.MEDIA_PATH).mkdirs();
 
         // save resources to storage
         saveResToStorage(context);

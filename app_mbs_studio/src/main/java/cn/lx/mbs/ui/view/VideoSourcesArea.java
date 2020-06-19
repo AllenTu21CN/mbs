@@ -11,12 +11,23 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.sanbu.tools.LogUtil;
+
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import cn.lx.mbs.support.MBS;
+import cn.lx.mbs.support.structures.ChannelId;
+import cn.lx.mbs.support.structures.Source;
 import cn.lx.mbs.ui.MainActivity;
 import cn.lx.mbs.R;
+import cn.lx.mbs.ui.UIConst;
+import cn.lx.mbs.ui.model.VideoSourcesDataModel;
+import cn.sanbu.avalon.endpoint3.structures.Resolution;
 
 public class VideoSourcesArea {
+
+    private static final String TAG = VideoSourcesArea.class.getSimpleName();
+
     final static int VIDEO_SOURCE_COUNT = 4;
 
     MainActivity mActivity;
@@ -189,16 +200,7 @@ public class VideoSourcesArea {
             mAddSourceButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    mActivity.showVideoSourceManageDialog();
-
-                    // TODO:
-                    if (0 == mId % 2) {
-                        mVideoSourceItems[mId] = new RtspVideoSource(mId, mSelf);
-                    } else {
-                        mVideoSourceItems[mId] = new LocalCameraVideoSource(mId, mSelf);
-                    }
-                    mVideoSourceItems[mId].init();
+                    mActivity.showVideoSourceManageDialog(VideoSourcesArea.this, mId);
                 }
             });
 
@@ -209,9 +211,50 @@ public class VideoSourcesArea {
         }
     }
 
+    public boolean loadSource(int itemId, VideoSourcesDataModel.VideoSourceConfig config) {
+        VideoSourceItem item = mVideoSourceItems[itemId];
+        if (item == null)
+            return false;
+
+        ChannelId channel = getChannelId(itemId);
+
+        if (config.type == VideoSourcesDataModel.VideoSourceConfig.TYPE_LOCAL_CAMERA) {
+            VideoSourcesDataModel.VideoSourceConfig.LocalCameraConfig camera = config.localCameraConfig;
+            Resolution resolution = Resolution.fromRes(camera.captureWidth, camera.captureHeight);
+
+            MBS.getInstance().addSource(Source.buildVideoCapture("Camera", camera.cameraId, resolution), (ret) -> {
+                if (ret.isSuccessful())
+                    MBS.getInstance().loadInput(channel, (Integer) ret.data, null);
+            });
+            item = new LocalCameraVideoSource(itemId, item.mSelf, config.localCameraConfig);
+        } else if (config.type == VideoSourcesDataModel.VideoSourceConfig.TYPE_RTSP) {
+            VideoSourcesDataModel.VideoSourceConfig.RtspConfig rtsp = config.rtspConfig;
+
+            MBS.getInstance().addSource(Source.buildRTSP("IPC", rtsp.url, false, rtsp.useTcp, rtsp.extraOptions), (ret) -> {
+                if (ret.isSuccessful())
+                    MBS.getInstance().loadInput(channel, (Integer) ret.data, null);
+            });
+            item = new RtspVideoSource(itemId, item.mSelf, config.rtspConfig);
+        } else if (config.type == VideoSourcesDataModel.VideoSourceConfig.TYPE_FILE) {
+            LogUtil.w(UIConst.TAG, TAG, "not support file source");
+            return false;
+        } else {
+            LogUtil.w(UIConst.TAG, TAG, "not support source: " + config.type);
+            return false;
+        }
+
+        item.init();
+        mVideoSourceItems[itemId] = item;
+        return true;
+    }
+
     class RtspVideoSource extends VideoSourceItem {
-        RtspVideoSource(int id, ConstraintLayout view) {
+
+        VideoSourcesDataModel.VideoSourceConfig.RtspConfig config;
+
+        RtspVideoSource(int id, ConstraintLayout view, VideoSourcesDataModel.VideoSourceConfig.RtspConfig config) {
             super(id, view);
+            this.config = config;
         }
 
         @Override
@@ -235,6 +278,13 @@ public class VideoSourcesArea {
             mButtons[3].setType(DynamicButton.TYPE_SETTINGS);
             mButtons[3].setEnabled(true);
 
+            mButtons[0].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MBS.getInstance().cutInputVideo(getChannelId(mId), null);
+                }
+            });
+
             mButtons[1].setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -250,8 +300,12 @@ public class VideoSourcesArea {
     }
 
     class LocalCameraVideoSource extends VideoSourceItem {
-        LocalCameraVideoSource(int id, ConstraintLayout view) {
+
+        private VideoSourcesDataModel.VideoSourceConfig.LocalCameraConfig config;
+
+        LocalCameraVideoSource(int id, ConstraintLayout view, VideoSourcesDataModel.VideoSourceConfig.LocalCameraConfig config) {
             super(id, view);
+            this.config = config;
         }
 
         @Override
@@ -273,6 +327,13 @@ public class VideoSourcesArea {
             mButtons[2].setEnabled(true);
             mButtons[3].setType(DynamicButton.TYPE_SETTINGS);
             mButtons[3].setEnabled(true);
+
+            mButtons[0].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MBS.getInstance().cutInputVideo(getChannelId(mId), null);
+                }
+            });
 
             mButtons[1].setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -302,6 +363,21 @@ public class VideoSourcesArea {
         for (int i = 0; i < VIDEO_SOURCE_COUNT; i++) {
             mVideoSourceItems[i] = new NullVideoSource(i, children[i]);
             mVideoSourceItems[i].init();
+        }
+    }
+
+    private static ChannelId getChannelId(int itemId) {
+        switch (itemId) {
+            case 0:
+                return ChannelId.IN1;
+            case 1:
+                return ChannelId.IN2;
+            case 2:
+                return ChannelId.IN3;
+            case 3:
+                return ChannelId.IN4;
+            default:
+                return null;
         }
     }
 }

@@ -50,6 +50,7 @@ public class LXConst {
     public static final String UPGRADE_PATH = APP_EXTERNAL_PATH + "/upgrade";
     public static final String RESOURCE_PATH = APP_EXTERNAL_PATH + "/resource";
     public static final String IMAGE_PATH = RESOURCE_PATH + "/image";
+    public static final String MEDIA_PATH = APP_EXTERNAL_PATH + "/media";
 
     ////////////////////////////////// SP
 
@@ -68,8 +69,14 @@ public class LXConst {
 
     ///////////////// resources and assets
 
+    // 内置的背景图片
+    public static final String BG_IMAGE_LOADING = IMAGE_PATH + "/loading_720p.png";
+    public static final String BG_IMAGE_NONE = IMAGE_PATH + "/none_720p.png";
+
     // 须复制到存储的资源列表
     public static final Map<String/*toFile*/, Tuple<Integer/*resId*/, FileSaveUtil.Action>> FIXED_RESOURCE = new HashMap<String, Tuple<Integer, FileSaveUtil.Action>>() {{
+        put(BG_IMAGE_LOADING, new Tuple<>(R.raw.loading_720p, FileSaveUtil.Action.Simple));
+        put(BG_IMAGE_NONE, new Tuple<>(R.raw.none_720p, FileSaveUtil.Action.Simple));
     }};
 
     // 须复制到存储的Assert列表
@@ -122,7 +129,7 @@ public class LXConst {
             H264Profile.Main, Resolution.RES_1080P, 30, Bandwidth._4M, 10);
 
     // 默认录制属性
-    public static final RecProp DEFAULT_SR_REC_PROP = new RecProp("/sdcard/", RecFileFormat.MP4,
+    public static final RecProp DEFAULT_SR_REC_PROP = new RecProp(MEDIA_PATH, RecFileFormat.MP4,
             "%N-%T-%t", RecSplitMode.BySize, 512 * 1024 * 1024
     );
 

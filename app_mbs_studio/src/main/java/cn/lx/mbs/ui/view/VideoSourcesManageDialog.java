@@ -5,6 +5,8 @@ import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import com.sanbu.tools.LogUtil;
+import com.sanbu.tools.ToastUtil;
+
 import android.util.Size;
 import android.view.Gravity;
 import android.view.View;
@@ -58,9 +60,16 @@ public class VideoSourcesManageDialog extends BaseDialog {
     private VideoSourceDeleteDialog mDeleteSourceDialog;
 
     private Button mSaveButton;
+    private Button mLoadButton;
 
-    public VideoSourcesManageDialog(Context context, int width, int height) {
+    private VideoSourcesArea mParent;
+    private int mEntryId;
+
+    public VideoSourcesManageDialog(Context context, int width, int height,
+                                    VideoSourcesArea parent, int entryId) {
         super(context, width, height);
+        mParent = parent;
+        mEntryId = entryId;
 
         mVideoSourcesDataModel = ((MainActivity)context).getVideoSourcesDataModel();
 
@@ -162,6 +171,23 @@ public class VideoSourcesManageDialog extends BaseDialog {
             @Override
             public void onClick(View v) {
                 save();
+            }
+        });
+
+        mLoadButton = mView.findViewById(R.id.load);
+        mLoadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                VideoSourcesDataModel.VideoSourceConfig item = mVideoSourcesDataModel.getItem(mCurrentSourceIndex);
+                if (item == null) {
+                    ToastUtil.show("Please select one", false);
+                    return;
+                }
+
+                if (mParent.loadSource(mEntryId, item))
+                    dismiss();
+                else
+                    ToastUtil.show("Load failed", false);
             }
         });
 
