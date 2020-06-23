@@ -39,6 +39,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import com.sanbu.board.HuaWei;
 import com.sanbu.board.Rockchip;
 import com.sanbu.tools.LogUtil;
 import com.sanbu.tools.StringUtil;
@@ -3339,6 +3340,10 @@ public class VideoEngine {
                 format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
 
                 // I frame interval - DISABLE, self request instead.
+                if (HuaWei.isProduct()) {
+                    LogUtil.w(TAG, "TODO, to avoid blocking error to fix KEY_I_FRAME_INTERVAL as 24 hours");
+                    keyFrameInterval = 24 * 3600 * 60;
+                }
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, keyFrameInterval);
 
                 // Maximum number of B frames between I or P frames
