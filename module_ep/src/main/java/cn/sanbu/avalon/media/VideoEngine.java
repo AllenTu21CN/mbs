@@ -3171,6 +3171,8 @@ public class VideoEngine {
             public int      height = 1080;
             public int      frameRate = 30;
             public int      keyFrameInterval;
+            // the maximum number of B frames between I or P frames
+            public int      maxBFrames = 0;
 
             public Config(String config) {
                 JsonObject configObject = (JsonObject)new JsonParser().parse(config);
@@ -3193,6 +3195,8 @@ public class VideoEngine {
                 final String CONFIG_PROFILE_KEY = "profile";
                 if (configObject.has(CONFIG_PROFILE_KEY)) {
                     profile = configObject.get(CONFIG_PROFILE_KEY).getAsString();
+                } else {
+                    profile = "";
                 }
 
                 final String CONFIG_LEVEL_KEY = "level";
@@ -3240,6 +3244,15 @@ public class VideoEngine {
                         keyFrameInterval = frameRate * 3600;
                     }
                 }
+
+                final String CONFIG_KEY_MAX_B_FRAMES = "max_b_frames";
+                if (configObject.has(CONFIG_KEY_MAX_B_FRAMES)) {
+                    maxBFrames = configObject.get(CONFIG_KEY_MAX_B_FRAMES).getAsInt();
+                    if (maxBFrames < 0) {
+                        LogUtil.e(TAG, "Invalid max B frames(" + maxBFrames + ") for video sink #" + mId + ", set to 0.");
+                        maxBFrames = 0;
+                    }
+                }
             }
 
             public boolean isValid() {
@@ -3259,7 +3272,7 @@ public class VideoEngine {
                 return null;
             }
 
-            public MediaFormat getMediaFormat() {
+            public MediaFormat getMediaFormat(MediaCodec codec) {
                 String mimeType = getMimeType();
                 // Set encoder media format
                 MediaFormat format = MediaFormat.createVideoFormat(mimeType, width, height);
@@ -3293,15 +3306,30 @@ public class VideoEngine {
                             LogUtil.e(TAG, "Invalid profile(" + profile + ") for codec(" + codec + ")");
                     }
                 }
-                if (profile != -1) {
-                    if (!Rockchip.is3BUVersion())
-                        format.setInteger(MediaFormat.KEY_PROFILE, profile);
-                }
 
-                // Level
-                if (level != AVCLevel.UNSPECIFIED) {
-                    if (!Rockchip.is3BUVersion())
-                        format.setInteger(MediaFormat.KEY_LEVEL, level.android);
+                // Profile and level
+                if (profile != -1 || level != AVCLevel.UNSPECIFIED) {
+                    MediaCodecInfo.CodecCapabilities capabilities = codec.getCodecInfo().getCapabilitiesForType(mimeType);
+                    MediaFormat defaultFormat = capabilities.getDefaultFormat();
+
+                    profile = profile != -1 ? profile : defaultFormat.getInteger(MediaFormat.KEY_PROFILE);
+                    int lvl = level != AVCLevel.UNSPECIFIED ? level.android : defaultFormat.getInteger(MediaFormat.KEY_LEVEL);
+
+                    boolean setup = false;
+                    MediaCodecInfo.CodecProfileLevel[] levels = capabilities.profileLevels;
+                    for (MediaCodecInfo.CodecProfileLevel supported: levels) {
+                        if (supported.profile == profile && supported.level == lvl) {
+                            if (!Rockchip.is3BUVersion()) {
+                                format.setInteger(MediaFormat.KEY_PROFILE, profile);
+                                format.setInteger(MediaFormat.KEY_LEVEL, lvl);
+                                setup = true;
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!setup)
+                        LogUtil.w(TAG, "non-supported profile: " + mConfig.profile + ", level: " + level.name);
                 }
 
                 // Bitrate
@@ -3312,6 +3340,10 @@ public class VideoEngine {
 
                 // I frame interval - DISABLE, self request instead.
                 format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, keyFrameInterval);
+
+                // Maximum number of B frames between I or P frames
+                // supported from API level 29
+                // format.setInteger(MediaFormat.KEY_MAX_B_FRAMES, maxBFrames);
 
                 return format;
             }
@@ -3396,7 +3428,7 @@ public class VideoEngine {
                 mMediaCodec = MediaCodec.createEncoderByType(mConfig.getMimeType());
 
                 // Config as encoder
-                mMediaCodec.configure(mConfig.getMediaFormat(), null, null,
+                mMediaCodec.configure(mConfig.getMediaFormat(mMediaCodec), null, null,
                         MediaCodec.CONFIGURE_FLAG_ENCODE);
 
                 // Create input surface
