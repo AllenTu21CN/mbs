@@ -148,6 +148,8 @@ public class VideoEngine {
 
     private final boolean mEnableNDK;
 
+    private int mMaxTextureSize = -1;
+
     /**
      * Video source object.
      */
@@ -2583,7 +2585,7 @@ public class VideoEngine {
 
         private void prepareSharedTexture() {
             LogUtil.i(TAG, "Allocate shared texture manager for scene#" + mId);
-            mSharedTexMgr = new SharedTextureManager(4, 4);
+            mSharedTexMgr = new SharedTextureManager(mMaxTextureSize);
 
             // Update No Signal texture
             if (mShowNoSignal && null != mNoSignalImage) {
@@ -3827,9 +3829,12 @@ public class VideoEngine {
             GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, maxTextureUnits, 0);
             LogUtil.i(TAG, "[GLES] Maximum texture image units: " + maxTextureUnits[0]);
 
-            int[] maxTextureSize = new int[1];
-            GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
-            LogUtil.i(TAG, "[GLES] Maximum texture size: " + maxTextureSize[0]);
+            if (mMaxTextureSize < 0) {
+                int[] maxTextureSize = new int[1];
+                GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
+                LogUtil.i(TAG, "[GLES] Maximum texture size: " + maxTextureSize[0]);
+                mMaxTextureSize = maxTextureSize[0];
+            }
 
             // Notify
             synchronized (mStartLock) {

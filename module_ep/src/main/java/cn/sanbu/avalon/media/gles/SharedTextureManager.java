@@ -28,7 +28,10 @@ public class SharedTextureManager {
 
     private float[] mDisplayProjectionMatrix = new float[16];
 
-    public SharedTextureManager(int rowCount, int columnCount) {
+    public SharedTextureManager(int maxTextureSize) {
+        int rowCount = maxTextureSize > 0 ? (maxTextureSize / SINGLE_IMAGE_MAXIMUM_HEIGHT) : 1;
+        int columnCount = maxTextureSize > 0 ? (maxTextureSize / SINGLE_IMAGE_MAXIMUM_WIDTH) : 1;
+
         mGridRowCount = rowCount;
         mGridColumnCount = columnCount;
         mSlots = new int[mGridRowCount][mGridColumnCount];
@@ -54,6 +57,7 @@ public class SharedTextureManager {
         GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA,
                 getTotalWidth(), getTotalHeight(),
                 0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        GlUtil.checkGlError("glTexImage2D");
 
         // Set parameters
         GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR);
