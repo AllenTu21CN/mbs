@@ -101,37 +101,54 @@ public class CallingStatistics {
             instance.sinks = new SS();
             instance.sources = new SS();
 
-            instance.sinks.audio = new ArrayList<>(sink.audio.size());
-            for (_Sink sink : sink.audio) {
-                ASS a = new ASS();
-                a.id = sink.id;
-                a.impl = gson.fromJson(sink.sink, AudioSS.class);
-                instance.sinks.audio.add(a);
+            if (sink == null || sink.audio == null) {
+                instance.sinks.audio = new ArrayList<>();
+            } else {
+                instance.sinks.audio = new ArrayList<>(sink.audio.size());
+                for (_Sink sink : sink.audio) {
+                    ASS a = new ASS();
+                    a.id = sink.id;
+                    a.impl = gson.fromJson(sink.sink, AudioSS.class);
+                    instance.sinks.audio.add(a);
+                }
             }
 
-            instance.sinks.video = new ArrayList<>(sink.video.size());
-            for (_Sink sink : sink.video) {
-                VSS v = new VSS();
-                v.id = sink.id;
-                v.impl = gson.fromJson(sink.sink, VideoSS.class);
-                instance.sinks.video.add(v);
+            if (sink == null || sink.video == null) {
+                instance.sinks.video = new ArrayList<>();
+            } else {
+                instance.sinks.video = new ArrayList<>(sink.video.size());
+                for (_Sink sink : sink.video) {
+                    VSS v = new VSS();
+                    v.id = sink.id;
+                    v.impl = gson.fromJson(sink.sink, VideoSS.class);
+                    instance.sinks.video.add(v);
+                }
             }
 
-            instance.sources.audio = new ArrayList<>(source.audio.size());
-            for (_Source source : source.audio) {
-                ASS a = new ASS();
-                a.id = source.id;
-                a.impl = gson.fromJson(source.source, AudioSS.class);
-                instance.sources.audio.add(a);
+            if (source == null || source.audio == null) {
+                instance.sources.audio = new ArrayList<>();
+            } else {
+                instance.sources.audio = new ArrayList<>(source.audio.size());
+                for (_Source source : source.audio) {
+                    ASS a = new ASS();
+                    a.id = source.id;
+                    a.impl = gson.fromJson(source.source, AudioSS.class);
+                    instance.sources.audio.add(a);
+                }
             }
 
-            instance.sources.video = new ArrayList<>(source.video.size());
-            for (_Source source : source.video) {
-                VSS v = new VSS();
-                v.id = source.id;
-                v.impl = gson.fromJson(source.source, VideoSS.class);
-                instance.sources.video.add(v);
+            if (source == null || source.video == null) {
+                instance.sources.video = new ArrayList<>();
+            } else {
+                instance.sources.video = new ArrayList<>(source.video.size());
+                for (_Source source : source.video) {
+                    VSS v = new VSS();
+                    v.id = source.id;
+                    v.impl = gson.fromJson(source.source, VideoSS.class);
+                    instance.sources.video.add(v);
+                }
             }
+
         } catch (Exception e) {
             LogUtil.d(EPConst.TAG, "invalid statistics: " + e.getMessage());
         }

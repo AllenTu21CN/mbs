@@ -141,12 +141,12 @@ public class MultiScreenPresentation extends Presentation {
 
     @Override
     public void show() {
-        /*
+        ///*
         if (Rockchip.is3BUVersion())
             getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);
-        else if (Qualcomm.isVIA820())
+        else if (Qualcomm.isVT6105())
             getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
-        */
+        //*/
         super.show();
     }
 }

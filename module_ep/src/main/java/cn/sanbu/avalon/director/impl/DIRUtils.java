@@ -1,4 +1,4 @@
-package cn.sanbu.avalon.endpoint3.director.impl;
+package cn.sanbu.avalon.director.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -9,10 +9,10 @@ import com.sanbu.tools.StringUtil;
 
 import java.util.List;
 
-import cn.sanbu.avalon.endpoint3.director.structures.LogicParam;
-import cn.sanbu.avalon.endpoint3.director.structures.StaticEvent;
-import cn.sanbu.avalon.endpoint3.director.structures.TokenType;
-import cn.sanbu.avalon.endpoint3.director.structures.ValueType;
+import cn.sanbu.avalon.director.structures.LogicParam;
+import cn.sanbu.avalon.director.structures.StaticEvent;
+import cn.sanbu.avalon.director.structures.TokenType;
+import cn.sanbu.avalon.director.structures.ValueType;
 
 public class DIRUtils {
 

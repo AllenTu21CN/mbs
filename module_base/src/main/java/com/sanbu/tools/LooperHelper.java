@@ -12,66 +12,158 @@ public class LooperHelper {
 
     private static final String TAG = LooperHelper.class.getSimpleName();
 
+    private static final int STATE_NONE = 0;
+    private static final int STATE_PREPARED = 1;
+    private static final int STATE_PAUSING = 2;
+    private static final int STATE_PAUSED = 3;
+    private static final int STATE_STARTING = 4;
+    private static final int STATE_READY = 5;
+    private static final int STATE_OVER = 6;
+
     private String mThreadName;
     private Thread mWorkingThread = null;
     private WorkHandler mWorkHandler = null;
 
-    private Object mRunningLock = new Object();
-    private boolean mRunning = false;
+    private Object mStateLock = new Object();
+    private int mState = STATE_NONE;
 
     public LooperHelper(String name) {
         mThreadName = name;
     }
 
     public boolean startLoopInNewThreadUntilReady() {
-        if (mWorkHandler == null) {
-
-            mWorkingThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Looper.prepare();
-                    mWorkHandler = new WorkHandler();
-                    LooperHelper.this.notifyReady();
-
-                    while (true) {
-                        try {
-                            Looper.loop();
-                            break;
-                        } catch (Exception e) {
-                            LogUtil.e(TAG, "Looper.loop error:");
-                            e.printStackTrace();
-                            LogUtil.w(TAG, "try Looper.loop again");
-                        }
-                    }
-
-                    LooperHelper.this.notifyOver();
-                }
-            }, mThreadName);
-
-            mWorkingThread.setDaemon(true);
-            mWorkingThread.start();
-            waitUntilReady();
+        if (mWorkingThread != null || mWorkHandler != null || mState != STATE_NONE) {
+            LogUtil.e(TAG, "logical error: had created thread or handler1");
+            return false;
         }
+
+        mWorkingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                mWorkHandler = new WorkHandler();
+
+                LooperHelper.this.notifyState(STATE_READY);
+                while (true) {
+                    try {
+                        Looper.loop();
+                        break;
+                    } catch (Exception e) {
+                        LogUtil.e(TAG, "Looper.loop error:");
+                        e.printStackTrace();
+                        LogUtil.w(TAG, "try Looper.loop again");
+                    }
+                }
+
+                LooperHelper.this.notifyState(STATE_OVER);
+            }
+        }, mThreadName);
+
+        mWorkingThread.setDaemon(true);
+        mWorkingThread.start();
+        waitState(STATE_READY);
+
+        return true;
+    }
+
+    public boolean prepareLoopThread() {
+        if (mWorkingThread != null || mWorkHandler != null || mState != STATE_NONE) {
+            LogUtil.e(TAG, "logical error: had created thread or handler2");
+            return false;
+        }
+
+        mWorkingThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                mWorkHandler = new WorkHandler();
+                LooperHelper.this.notifyState(STATE_PREPARED);
+                LooperHelper.this.waitState(STATE_STARTING);
+
+                LooperHelper.this.notifyState(STATE_READY);
+                while (true) {
+                    try {
+                        Looper.loop();
+                        break;
+                    } catch (Exception e) {
+                        LogUtil.e(TAG, "Looper.loop error:");
+                        e.printStackTrace();
+                        LogUtil.w(TAG, "try Looper.loop again");
+                    }
+                }
+
+                LooperHelper.this.notifyState(STATE_OVER);
+            }
+        }, mThreadName);
+
+        mWorkingThread.setDaemon(true);
+        mWorkingThread.start();
+        waitState(STATE_PREPARED);
+
+        return true;
+    }
+
+    public boolean startPreparedThreadUntilReady() {
+        if (mWorkHandler == null || mWorkingThread == null || mState < STATE_PREPARED) {
+            LogUtil.e(TAG, "logical error: had created thread or handler3");
+            return false;
+        }
+
+        notifyState(STATE_STARTING);
+        waitState(STATE_READY);
         return true;
     }
 
     public void stopTheLoopThreadUntilOver(boolean forced) {
+        stopTheLoopThreadUntilOver(forced, -1);
+    }
+
+    public void stopTheLoopThreadUntilOver(boolean forced, long timeoutMs) {
         if (mWorkHandler != null && mWorkingThread != null) {
             mWorkHandler.sendEmptyMessage(WorkHandler.STOP_LOOPER);
 
             if (forced)
                 mWorkingThread.interrupt();
-            waitUntilOver();
+            waitState(STATE_OVER, timeoutMs);
             mWorkHandler = null;
             mWorkingThread = null;
         }
     }
 
     public boolean attachLoopInCurrentThread() {
-        if (mWorkingThread != null)
-            throw new RuntimeException("logical error: cannot call startLoopInNewThreadUntilReady and attachLoopInCurrentThread at the same time");
+        if (mWorkingThread != null || mWorkHandler != null || mState != STATE_NONE) {
+            LogUtil.e(TAG, "logical error: had created thread or handler4");
+            return false;
+        }
         if (mWorkHandler == null)
             mWorkHandler = new WorkHandler();
+        return true;
+    }
+
+    public boolean pauseLooper() {
+        if (mWorkHandler == null || mState < STATE_STARTING) {
+            LogUtil.e(TAG, "logical error: had created thread or handler5");
+            return false;
+        }
+
+        LogUtil.i(TAG, "pause looper");
+        synchronized (mStateLock) {
+            mState = STATE_PAUSING;
+        }
+        mWorkHandler.sendEmptyMessage(WorkHandler.PAUSE_LOOPER);
+        waitState(STATE_PAUSED);
+        return true;
+    }
+
+    public boolean unPauseLooper() {
+        if (mWorkHandler == null || mState < STATE_PREPARED) {
+            LogUtil.e(TAG, "logical error: had created thread or handler5");
+            return false;
+        }
+
+        notifyState(STATE_STARTING);
+        waitState(STATE_READY);
+        LogUtil.i(TAG, "unPaused looper");
         return true;
     }
 
@@ -97,37 +189,45 @@ public class LooperHelper {
         return waitPendingCallback(h, timeoutMS);
     }
 
-    private void waitUntilReady() {
-        synchronized (mRunningLock) {
-            while (!mRunning) {
+    private boolean waitState(int state) {
+        return waitState(state, -1);
+    }
+
+    private boolean waitState(int state, long timeoutMs) {
+        long timeoutPointMs = (timeoutMs > 0) ?
+                (System.currentTimeMillis() + timeoutMs) : -1;
+
+        synchronized (mStateLock) {
+            while (mState < state) {
                 try {
-                    mRunningLock.wait();
-                } catch (InterruptedException ie) { /* not expected */ }
+                    if (timeoutPointMs > 0) {
+                        timeoutMs = timeoutPointMs - System.currentTimeMillis();
+                        if (timeoutMs > 0)
+                            mStateLock.wait(timeoutMs);
+                        else
+                            return false;
+                    } else {
+                        mStateLock.wait();
+                    }
+                } catch (InterruptedException ie) {
+                    LogUtil.w(TAG, "waitState interrupted", ie);
+                    return false;
+                }
             }
+
+            // reset state
+            if (mState == STATE_OVER)
+                mState = STATE_NONE;
         }
+
+        return true;
     }
 
-    private void notifyReady() {
-        synchronized (mRunningLock) {
-            mRunning = true;
-            mRunningLock.notify();
-        }
-    }
-
-    private void waitUntilOver() {
-        synchronized (mRunningLock) {
-            while (mRunning) {
-                try {
-                    mRunningLock.wait();
-                } catch (InterruptedException ie) { /* not expected */ }
-            }
-        }
-    }
-
-    private void notifyOver() {
-        synchronized (mRunningLock) {
-            mRunning = false;
-            mRunningLock.notify();
+    private void notifyState(int state) {
+        synchronized (mStateLock) {
+            if (mState < state)
+                mState = state;
+            mStateLock.notify();
         }
     }
 
@@ -144,12 +244,17 @@ public class LooperHelper {
 
     private class WorkHandler extends Handler {
         static final int STOP_LOOPER = -1;
+        static final int PAUSE_LOOPER = -2;
 
         @Override
         public void handleMessage(Message msg) {
             try {
                 if (msg.what == STOP_LOOPER) {
                     Looper.myLooper().quit();
+                } else if (msg.what == PAUSE_LOOPER) {
+                    LooperHelper.this.notifyState(STATE_PAUSED);
+                    LooperHelper.this.waitState(STATE_STARTING);
+                    LooperHelper.this.notifyState(STATE_READY);
                 } else {
                     LogUtil.w(TAG, "get unknown message: " + msg.what);
                 }

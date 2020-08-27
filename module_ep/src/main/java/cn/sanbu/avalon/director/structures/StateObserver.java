@@ -1,4 +1,4 @@
-package cn.sanbu.avalon.endpoint3.director.structures;
+package cn.sanbu.avalon.director.structures;
 
 import java.util.List;
 

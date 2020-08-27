@@ -36,6 +36,7 @@ import cn.sanbu.avalon.endpoint3.structures.Resolution;
 import cn.sanbu.avalon.endpoint3.structures.TransProtocol;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
+import cn.sanbu.avalon.media.MediaEventId;
 import cn.sanbu.avalon.media.VideoEngine;
 
 /*
@@ -63,21 +64,70 @@ public class Endpoint3 {
     }
 
     // Terminal endpoint callbacks
-    public interface Callback {
-
+    public interface EPCallback {
         // Internal error occurred
-        void onError(int errcode, String error);
+        void onError(int errCode, String reason);
 
+        // EP internal event
+        // @param obj_type [IN] type of object
+        // @param obj_id [IN] id of object
+        // @param event [IN] value of event
+        // @param params [IN] params of event
+        void onEvent(EPObjectType objType, int objId, EPEvent event, String params);
+    }
+
+    // Terminal stream callbacks
+    public interface StreamCallback {
         // Stream is open/closed which is owned by source/caller/output
         // @param parent_type [IN] type of stream parent
         // @param parent_id [IN] id of stream parent
         // @param stream_id [IN] id of stream
         // @param desc [IN] description of stream
         // @param format [IN] format of stream, @see cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat and AudioFormat
-        void onStreamOpen(EPObjectType parent_type, int parent_id, int stream_id, StreamDesc desc, Object format);
+        void onStreamOpen(EPObjectType parentType, int parentId, int streamId, StreamDesc desc, Object format);
 
-        void onStreamClose(EPObjectType parent_type, int parent_id, int stream_id, StreamDesc desc);
+        void onStreamClose(EPObjectType parentType, int parentId, int streamId, StreamDesc desc);
 
+        // Rx video stream is ready/unavailable to use which is owned by source/caller
+        // @param parent_type [IN] type of stream parent
+        // @param parent_id [IN] id of stream parent
+        // @param dec_id [IN] decoding id of stream
+        void onRxVideoStreamAvailabilityChanged(EPObjectType parentType, int parentId,
+                                                int decId, boolean ready);
+    }
+
+    // Terminal calling callbacks
+    public interface CallingCallback {
+        // A new sip or h.323 calling is incoming
+        // @param call_id [IN] the incoming call id
+        // @param number [IN] the incoming call's number
+        // @param call_url [IN] the incoming call's url
+        // @param protocol [IN] call protocol
+        void onIncomingCall(int callId, String number, String callUrl, CallingProtocol protocol);
+
+        // Remote peer is ring when receiving a call
+        // @param call_id [IN] call id
+        void onRemoteRinging(int callId);
+
+        // Established the calling
+        // @param call_id [IN] call id
+        // @param vendor [IN] the peer's vendor information
+        // @param name [IN] the peer's vendor display name
+        void onEstablished(int callId, String vendor, String name);
+
+        // Calling is finished
+        // @param call_id [IN] call id
+        // @param reason [IN] reason of finished
+        void onFinished(int callId, int errCode, String reason);
+
+        // Caller error occurred
+        // @param call_id [IN] call id
+        // @param error [IN] error information
+        void onCallerError(int callId, int errCode, String reason);
+    }
+
+    // Terminal signal registering callbacks
+    public interface RegisteringCallback {
         // GateKeeper register, unregister, and status notify
         // @param result [IN] 0 is ok, or error occurred
         void onRegistering(int result, CallingProtocol protocol);
@@ -85,40 +135,6 @@ public class Endpoint3 {
         void onUnRegistering(int result, CallingProtocol protocol);
 
         void onNotifyRegisterStatus(int result, CallingProtocol protocol);
-
-        // A new sip or h.323 calling is incoming
-        // @param call_id [IN] the incoming call id
-        // @param number [IN] the incoming call's number
-        // @param call_url [IN] the incoming call's url
-        // @param protocol [IN] call protocol
-        void onIncomingCall(int call_id, String number, String call_url, CallingProtocol protocol);
-
-        // Remote peer is ring when receiving a call
-        // @param call_id [IN] call id
-        void onRemoteRinging(int call_id);
-
-        // Established the calling
-        // @param call_id [IN] call id
-        // @param vendor [IN] the peer's vendor information
-        // @param name [IN] the peer's vendor display name
-        void onEstablished(int call_id, String vendor, String name);
-
-        // Calling is finished
-        // @param call_id [IN] call id
-        // @param reason [IN] reason of finished
-        void onFinished(int call_id, int errcode, String reason);
-
-        // Caller error occurred
-        // @param call_id [IN] call id
-        // @param error [IN] error information
-        void onCallerError(int call_id, int errcode, String error);
-
-        // EP internal event
-        // @param obj_type [IN] type of object
-        // @param obj_id [IN] id of object
-        // @param event [IN] value of event
-        // @param params [IN] params of event
-        void onEvent(EPObjectType obj_type, int obj_id, EPEvent event, String params);
     }
 
     // Terminal endpoint single instance
@@ -132,7 +148,10 @@ public class Endpoint3 {
     private static volatile int m_hidden_display_id = VideoEngine.MAXIMUM_DISPLAY_SURFACE_COUNT;
 
     // callback for ep and caller, like incoming call, established and so on
-    private Callback m_cb = null;
+    private EPCallback m_ep_cb = null;
+    private StreamCallback m_stream_cb = null;
+    private CallingCallback m_call_cb = null;
+    private RegisteringCallback m_reg_cb = null;
 
     private Endpoint3() {
 
@@ -141,11 +160,14 @@ public class Endpoint3 {
     /////////////////////////////// init and configure interfaces
 
     // @brief Inits endpoint.
-    // @param cb [IN] callback for ep
     // @param config [IN] endpoint fixed config
+    // @param epCallback [IN] callback for ep
+    // @param streamCallback [IN] callback for stream
     // @return 0 is suc, or failed
-    public int epInit(Callback cb, EPFixedConfig config) {
-        m_cb = cb;
+    public int epInit(EPFixedConfig config, EPCallback epCallback,
+                      StreamCallback streamCallback) {
+        m_ep_cb = epCallback;
+        m_stream_cb = streamCallback;
 
         String json = new Gson().toJson(config);
         LogUtil.i(EPConst.TAG, "epInit: " + json);
@@ -159,31 +181,22 @@ public class Endpoint3 {
         return jniEpUninit();
     }
 
+    // @brief Set callbacks for calling.
+    // @param callback [IN] callback for calling
+    public void setCallingCallback(CallingCallback callback) {
+        LogUtil.i(EPConst.TAG, "setCallingCallback");
+        m_call_cb = callback;
+    }
+
+    // @brief Set callbacks for signal registering.
+    // @param callback [IN] callback for registering
+    public void setRegisteringCallback(RegisteringCallback callback) {
+        LogUtil.i(EPConst.TAG, "setRegisteringCallback");
+        m_reg_cb = callback;
+    }
+
     // @brief Configures endpoint properties, like bandwidth, capabilities and so on.
     // @return 0 is suc, or failed.
-
-    @Deprecated
-    public int epSetBandwidth(Bandwidth bandwidth) {
-        int ret = jniEpConfigure(EPConst.EP_PROPERTY_BAND_WIDTH, String.valueOf(bandwidth.bps));
-        EPConst.logAction("epSetBandwidth", ret, bandwidth.bps);
-        return ret;
-    }
-
-    @Deprecated
-    public int epSetAudioCapabilities(AudioCapabilities capabilities) {
-        String caps = new Gson().toJson(capabilities);
-        int ret = jniEpConfigure(EPConst.EP_PROPERTY_AUDIO_CAPABILITIES, caps);
-        EPConst.logAction("epSetAudioCapabilities", ret, caps);
-        return ret;
-    }
-
-    @Deprecated
-    public int epSetVideoCapabilities(VideoCapabilities capabilities) {
-        String caps = new Gson().toJson(capabilities);
-        int ret = jniEpConfigure(EPConst.EP_PROPERTY_VIDEO_CAPABILITIES, caps);
-        EPConst.logAction("epSetVideoCapabilities", ret, caps);
-        return ret;
-    }
 
     public int epSwitchAGC(boolean enabled) {
         int ret = jniEpConfigure(EPConst.EP_PROPERTY_AGC_SWITCH, String.valueOf(enabled));
@@ -797,7 +810,7 @@ public class Endpoint3 {
     // @param split [IN] strategy of file splitting
     // @param oe [IN] config for OE(opening and ending)
     // @return output id, or < 0 failed.
-    public int epCreateFileOutput(String target_path, RecSplitStrategy split, @NonNull RecOEConfig oe) {
+    public int epCreateFileOutput(String target_path, RecSplitStrategy split, @Nullable RecOEConfig oe) {
         JsonObject json = new JsonObject();
         json.add("split", new Gson().toJsonTree(split));
         if (oe != null)
@@ -901,51 +914,78 @@ public class Endpoint3 {
         return ret;
     }
 
-    /////////////////////////////// callback for libep
-
-    public void onRegistering(int result, String protocol) {
-        LogUtil.i(EPConst.TAG, String.format("onRegistering, result:%d protocol:%s", result, protocol));
-        if (m_cb != null)
-            m_cb.onRegistering(result, CallingProtocol.fromName(protocol));
-    }
-
-    public void onUnRegistering(int result, String protocol) {
-        LogUtil.i(EPConst.TAG, String.format("onUnRegistering, result:%d protocol:%s", result, protocol));
-        if (m_cb != null)
-            m_cb.onUnRegistering(result, CallingProtocol.fromName(protocol));
-    }
-
-    public void onNotifyRegisterStatus(int result, String protocol) {
-        LogUtil.d(EPConst.TAG, String.format("onNotifyRegisterStatus, result:%d protocol:%s", result, protocol));
-        if (m_cb != null)
-            m_cb.onNotifyRegisterStatus(result, CallingProtocol.fromName(protocol));
-    }
+    /////////////////////////////// callbacks for ep
 
     public void onError(int errcode, String error) {
         LogUtil.i(EPConst.TAG, String.format("onError, error:%s errcode:%d", error, errcode));
-        if (m_cb != null)
-            m_cb.onError(errcode, error);
+        if (m_ep_cb == null)
+            throw new RuntimeException("NOT set ep callback to ep3");
+
+        m_ep_cb.onError(errcode, error);
     }
 
-    public void onIncomingCall(int call_id, String number, String call_url, String protocol) {
-        LogUtil.i(EPConst.TAG, String.format("onIncomingCall, call_id:%d number:%s call_url:%s protocol:%s",
-                call_id, number, call_url, protocol));
-        if (m_cb != null)
-            m_cb.onIncomingCall(call_id, number, call_url, CallingProtocol.fromName(protocol));
+    public void onEvent(int obj_type, int obj_id, int event, String params) {
+        EPObjectType type = EPObjectType.fromId(obj_type);
+        if (type == null) {
+            LogUtil.w(EPConst.TAG, String.format("onEvent got invalid params, obj_type:%d obj_id:%d event:%d params:%s",
+                    obj_type, obj_id, event, params));
+            return;
+        }
+
+        if (event >= 0) {
+
+            EPEvent evt = EPEvent.fromValue(event);
+            if (evt == null) {
+                LogUtil.w(EPConst.TAG, String.format("onEvent got invalid params, obj_type:%s obj_id:%d event:%d params:%s",
+                        type.name(), obj_id, event, params));
+                return;
+            }
+
+            LogUtil.i(EPConst.TAG, String.format("onEvent, obj_type:%s obj_id:%d event:%s params:%s",
+                    type.name(), obj_id, evt.name(), params));
+
+            if (m_ep_cb == null)
+                throw new RuntimeException("NOT set ep callback to ep3");
+
+            m_ep_cb.onEvent(type, obj_id, evt, params);
+
+        } else {
+            // re-calc event id
+            event *= -1;
+
+            MediaEventId evt = MediaEventId.fromValue(event);
+            if (evt == MediaEventId.UNKNOWN) {
+                LogUtil.w(EPConst.TAG, String.format("onEvent got invalid params, obj_type:%s obj_id:%d event:%d params:%s",
+                        type.name(), obj_id, event, params));
+                return;
+            }
+
+            LogUtil.i(EPConst.TAG, String.format("onMediaEvent, obj_type:%s obj_id:%d event:%s params:%s",
+                    type.name(), obj_id, evt.name(), params));
+
+            switch (evt) {
+                case SOURCE_DECODING_STATE_CHANGED:
+                    if (m_stream_cb == null)
+                        throw new RuntimeException("NOT set stream callback to ep3");
+
+                    try {
+                        JsonObject json = new Gson().fromJson(params, JsonObject.class);
+                        boolean ready = json.get("ready").getAsBoolean();
+                        int mediaSourceId = json.get("media_source_id").getAsInt();
+
+                        m_stream_cb.onRxVideoStreamAvailabilityChanged(type, obj_id, mediaSourceId, ready);
+                    } catch (Exception e) {
+                        LogUtil.w(EPConst.TAG, "SOURCE_DECODING_STATE_CHANGED error", e);
+                    }
+
+                    break;
+                default:
+                    return;
+            }
+        }
     }
 
-    public void onRemoteRinging(int call_id) {
-        LogUtil.i(EPConst.TAG, String.format("onRemoteRinging, call_id:%d", call_id));
-        if (m_cb != null)
-            m_cb.onRemoteRinging(call_id);
-    }
-
-    public void onEstablished(int call_id, String vendor, String display_name) {
-        LogUtil.i(EPConst.TAG, String.format("onEstablished, call_id:%d vendor:%s display_name:%s",
-                call_id, vendor, display_name));
-        if (m_cb != null)
-            m_cb.onEstablished(call_id, vendor, display_name);
-    }
+    /////////////////////////////// callbacks for stream
 
     public void onStreamOpen(int parent_type, int parent_id, int stream_id, String desc, String format) {
         EPObjectType type = EPObjectType.fromId(parent_type);
@@ -969,8 +1009,10 @@ public class Endpoint3 {
             avFormat = format;
         }
 
-        if (m_cb != null)
-            m_cb.onStreamOpen(type, parent_id, stream_id, description, avFormat);
+        if (m_stream_cb == null)
+            throw new RuntimeException("NOT set stream callback to ep3");
+
+        m_stream_cb.onStreamOpen(type, parent_id, stream_id, description, avFormat);
     }
 
     public void onStreamClose(int parent_type, int parent_id, int stream_id, String desc) {
@@ -986,37 +1028,82 @@ public class Endpoint3 {
         LogUtil.i(EPConst.TAG, String.format("onStreamClose, parent_type:%s parent_id:%d stream_id:%d desc:%s",
                 type.name(), parent_id, stream_id, desc));
 
-        if (m_cb != null)
-            m_cb.onStreamClose(type, parent_id, stream_id, description);
+        if (m_stream_cb == null)
+            throw new RuntimeException("NOT set stream callback to ep3");
+
+        m_stream_cb.onStreamClose(type, parent_id, stream_id, description);
+    }
+
+    /////////////////////////////// callbacks for calling
+
+    public void onIncomingCall(int call_id, String number, String call_url, String protocol) {
+        LogUtil.i(EPConst.TAG, String.format("onIncomingCall, call_id:%d number:%s call_url:%s protocol:%s",
+                call_id, number, call_url, protocol));
+        if (m_call_cb == null)
+            throw new RuntimeException("NOT set calling callback to ep3");
+
+        m_call_cb.onIncomingCall(call_id, number, call_url, CallingProtocol.fromName(protocol));
+    }
+
+    public void onRemoteRinging(int call_id) {
+        LogUtil.i(EPConst.TAG, String.format("onRemoteRinging, call_id:%d", call_id));
+        if (m_call_cb == null)
+            throw new RuntimeException("NOT set calling callback to ep3");
+
+        m_call_cb.onRemoteRinging(call_id);
+    }
+
+    public void onEstablished(int call_id, String vendor, String display_name) {
+        LogUtil.i(EPConst.TAG, String.format("onEstablished, call_id:%d vendor:%s display_name:%s",
+                call_id, vendor, display_name));
+        if (m_call_cb == null)
+            throw new RuntimeException("NOT set calling callback to ep3");
+
+        m_call_cb.onEstablished(call_id, vendor, display_name);
     }
 
     public void onFinished(int call_id, int errcode, String reason) {
         LogUtil.i(EPConst.TAG, String.format("onFinished, call_id:%d reason:%s errcode:%d", call_id, reason, errcode));
 
-        if (m_cb != null)
-            m_cb.onFinished(call_id, errcode, reason);
+        if (m_call_cb == null)
+            throw new RuntimeException("NOT set calling callback to ep3");
+
+        m_call_cb.onFinished(call_id, errcode, reason);
     }
 
     public void onCallerError(int call_id, int errcode, String error) {
         LogUtil.i(EPConst.TAG, String.format("onCallerError, call_id:%d error:%s errcode:%d", call_id, error, errcode));
 
-        if (m_cb != null)
-            m_cb.onCallerError(call_id, errcode, error);
+        if (m_call_cb == null)
+            throw new RuntimeException("NOT set calling callback to ep3");
+
+        m_call_cb.onCallerError(call_id, errcode, error);
     }
 
-    public void onEvent(int obj_type, int obj_id, int event, String params) {
-        EPObjectType type = EPObjectType.fromId(obj_type);
-        EPEvent evt = EPEvent.fromValue(event);
-        if (type == null || evt == null) {
-            LogUtil.w(EPConst.TAG, String.format("onEvent got invalid params, obj_type:%s obj_id:%d event:%d params:%s",
-                    type.name(), obj_id, event, params));
-            return;
-        }
+    /////////////////////////////// callbacks for registering
 
-        LogUtil.i(EPConst.TAG, String.format("onEvent, obj_type:%s obj_id:%d event:%d params:%s",
-                type.name(), obj_id, event, params));
-        if (m_cb != null)
-            m_cb.onEvent(type, obj_id, evt, params);
+    public void onRegistering(int result, String protocol) {
+        LogUtil.i(EPConst.TAG, String.format("onRegistering, result:%d protocol:%s", result, protocol));
+        if (m_reg_cb == null)
+            throw new RuntimeException("NOT set registering callback to ep3");
+
+        m_reg_cb.onRegistering(result, CallingProtocol.fromName(protocol));
+    }
+
+    public void onUnRegistering(int result, String protocol) {
+        LogUtil.i(EPConst.TAG, String.format("onUnRegistering, result:%d protocol:%s", result, protocol));
+        if (m_reg_cb == null)
+            throw new RuntimeException("NOT set registering callback to ep3");
+
+        m_reg_cb.onUnRegistering(result, CallingProtocol.fromName(protocol));
+    }
+
+    public void onNotifyRegisterStatus(int result, String protocol) {
+        LogUtil.d(EPConst.TAG, String.format("onNotifyRegisterStatus, result:%d protocol:%s", result, protocol));
+        if (m_reg_cb == null)
+            throw new RuntimeException("NOT set registering callback to ep3");
+
+        m_reg_cb.onNotifyRegisterStatus(result, CallingProtocol.fromName(protocol));
     }
 
     /////////////////////////////// init and configure native interfaces
@@ -1024,7 +1111,7 @@ public class Endpoint3 {
     // Inits jni environment
     // NOTE: ONLY this method is called ONCE in single instance constuctor function.
     // private static native int jniEnvInit();
-    public native int jniEnvInit();
+    private native int jniEnvInit();
 
     /// Endpoint
     // Inits endpoint

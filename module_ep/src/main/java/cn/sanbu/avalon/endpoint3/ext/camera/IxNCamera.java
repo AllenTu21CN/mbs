@@ -268,7 +268,7 @@ public class IxNCamera {
 
         Callback callback = mConnectingCallback;
         mConnectingCallback = null;
-        mState = State.None;
+        mState = State.Doing;
         if (callback != null)
             callback.done(new Result(BaseError.INTERNAL_ERROR, "connect failed: " + error));
     }

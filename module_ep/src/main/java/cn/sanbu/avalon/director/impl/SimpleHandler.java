@@ -1,4 +1,4 @@
-package cn.sanbu.avalon.endpoint3.director.impl;
+package cn.sanbu.avalon.director.impl;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -9,13 +9,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import cn.sanbu.avalon.endpoint3.director.structures.Event;
-import cn.sanbu.avalon.endpoint3.director.structures.LogicParam;
-import cn.sanbu.avalon.endpoint3.director.structures.Value;
-import cn.sanbu.avalon.endpoint3.director.structures.StateObserver;
-import cn.sanbu.avalon.endpoint3.director.structures.StaticEvent;
-import cn.sanbu.avalon.endpoint3.director.structures.TokenType;
-import cn.sanbu.avalon.endpoint3.director.structures.ValueType;
+import cn.sanbu.avalon.director.structures.Event;
+import cn.sanbu.avalon.director.structures.LogicParam;
+import cn.sanbu.avalon.director.structures.Value;
+import cn.sanbu.avalon.director.structures.StateObserver;
+import cn.sanbu.avalon.director.structures.StaticEvent;
+import cn.sanbu.avalon.director.structures.TokenType;
+import cn.sanbu.avalon.director.structures.ValueType;
 
 /* 简单状态处理模型:
 *  . logicId: BI_SIMPLE

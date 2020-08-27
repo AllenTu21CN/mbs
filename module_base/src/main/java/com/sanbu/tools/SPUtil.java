@@ -32,7 +32,7 @@ public class SPUtil {
         try {
             File spPath = new File(path);
             if (!spPath.exists())
-                spPath.mkdir();
+                spPath.mkdirs();
 
             Field field = ContextWrapper.class.getDeclaredField("mBase");
             field.setAccessible(true);

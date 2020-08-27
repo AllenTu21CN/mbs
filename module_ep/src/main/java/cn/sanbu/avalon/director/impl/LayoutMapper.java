@@ -1,4 +1,4 @@
-package cn.sanbu.avalon.endpoint3.director.impl;
+package cn.sanbu.avalon.director.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -20,11 +20,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import cn.sanbu.avalon.endpoint3.director.structures.Event;
-import cn.sanbu.avalon.endpoint3.director.structures.Layout;
-import cn.sanbu.avalon.endpoint3.director.structures.StaticEvent;
-import cn.sanbu.avalon.endpoint3.director.structures.Value;
-import cn.sanbu.avalon.endpoint3.director.structures.StateObserver;
+import cn.sanbu.avalon.director.structures.Event;
+import cn.sanbu.avalon.director.structures.Layout;
+import cn.sanbu.avalon.director.structures.StaticEvent;
+import cn.sanbu.avalon.director.structures.Value;
+import cn.sanbu.avalon.director.structures.StateObserver;
 
 public class LayoutMapper implements LogicHandler, StateObserver {
 

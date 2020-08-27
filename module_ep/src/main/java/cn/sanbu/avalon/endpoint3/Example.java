@@ -36,7 +36,8 @@ import cn.sanbu.avalon.endpoint3.structures.jni.VideoCapability;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 import cn.sanbu.avalon.media.MediaJni;
 
-public class Example implements Endpoint3.Callback {
+public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
+        Endpoint3.CallingCallback, Endpoint3.RegisteringCallback {
 
     private static final Region SINGLE_SCREEN_REGION = new Region(0.0f, 0.0f, 1.0f, 1.0f);
 
@@ -159,7 +160,9 @@ public class Example implements Endpoint3.Callback {
 
         // init endpoint3
         EPFixedConfig config = buildEPFixedConfig();
-        endpoint3.epInit(this, config);
+        endpoint3.setCallingCallback(this);
+        endpoint3.setCallingCallback(this);
+        endpoint3.epInit(config, this, this);
 
         // config other properties
         endpoint3.epSwitchAGC(true);
@@ -215,30 +218,30 @@ public class Example implements Endpoint3.Callback {
     /////////////////////////////// implementation of Endpoint3.Callback
 
     @Override
-    public void onStreamOpen(EPObjectType parent_type, int parent_id, int stream_id, StreamDesc desc, Object format) {
-        if (parent_type == EPObjectType.Source) {
-            if (parent_id == micSource) {
-                micStream = stream_id;
+    public void onStreamOpen(EPObjectType parentType, int parentId, int streamId, StreamDesc desc, Object format) {
+        if (parentType == EPObjectType.Source) {
+            if (parentId == micSource) {
+                micStream = streamId;
                 // this is not necessary for mic stream
-                int decId = endpoint3.epStartSrcStreamDecoding(parent_id, stream_id);
+                int decId = endpoint3.epStartSrcStreamDecoding(parentId, streamId);
 
                 MixerTracks.Track track = new MixerTracks.Track(decId, 1.0f);
                 MixerTracks tracks = new MixerTracks(Arrays.asList(track));
                 endpoint3.epSetMixer(caller1.mixer, 1.0f, tracks);
                 endpoint3.epSetMixer(caller2.mixer, 1.0f, tracks);
                 endpoint3.epSetMixer(lrMixer, 1.0f, tracks);
-            } else if (parent_id == hdmiSouce) {
-                hdmiStream = stream_id;
+            } else if (parentId == hdmiSouce) {
+                hdmiStream = streamId;
                 // this is not necessary for hdmi stream
-                int decId = endpoint3.epStartSrcStreamDecoding(parent_id, stream_id);
+                int decId = endpoint3.epStartSrcStreamDecoding(parentId, streamId);
 
                 DisplayCell cell = DisplayCell.buildStream(0, decId);
                 DisplayConfig config = DisplayConfig.buildOverlays(Arrays.asList(SINGLE_SCREEN_REGION), Arrays.asList(cell));
                 endpoint3.epConfigureDisplay(txDisplayExt, config);
                 endpoint3.epConfigureDisplay(lrDisplay, config);
-            } else if (parent_id == ipcSource) {
-                ipcStream = stream_id;
-                int decId = endpoint3.epStartSrcStreamDecoding(parent_id, stream_id);
+            } else if (parentId == ipcSource) {
+                ipcStream = streamId;
+                int decId = endpoint3.epStartSrcStreamDecoding(parentId, streamId);
 
                 DisplayCell cell = DisplayCell.buildStream(0, decId);
                 DisplayConfig config = DisplayConfig.buildOverlays(Arrays.asList(SINGLE_SCREEN_REGION), Arrays.asList(cell));
@@ -246,31 +249,31 @@ public class Example implements Endpoint3.Callback {
                 endpoint3.epConfigureDisplay(lrDisplay, config);
             }
 
-        } else if (parent_type == EPObjectType.Caller) {
-            Caller caller = parent_id == caller1.id ? caller1 : caller2;
+        } else if (parentType == EPObjectType.Caller) {
+            Caller caller = parentId == caller1.id ? caller1 : caller2;
 
             if (desc.direction == EPDir.Outgoing) {
                 if (desc.type == DataType.AUDIO) {
                     AudioFormat aFormat = (AudioFormat) format;
-                    caller.aTxStreams.add(stream_id);
-                    endpoint3.epStartTxStream(caller.id, stream_id, aFormat, EPObjectType.Mixer, caller.mixer);
+                    caller.aTxStreams.add(streamId);
+                    endpoint3.epStartTxStream(caller.id, streamId, aFormat, EPObjectType.Mixer, caller.mixer);
                 } else if (desc.type == DataType.VIDEO || desc.type == DataType.VIDEO_EXT) {
                     VideoFormat vFormat = (VideoFormat) format;
-                    caller.vTxStreams.add(stream_id);
+                    caller.vTxStreams.add(streamId);
                     int display = CompareHelper.isEqual(desc.name, DataType.VIDEO_EXT.name) ? txDisplay : txDisplayExt;
-                    endpoint3.epStartTxStream(caller.id, stream_id, vFormat, EPObjectType.Display, display);
+                    endpoint3.epStartTxStream(caller.id, streamId, vFormat, EPObjectType.Display, display);
                 }
             } else if (desc.direction == EPDir.Incoming) {
                 if (desc.type == DataType.AUDIO) {
-                    caller.aRxStreams.add(stream_id);
-                    int decId = endpoint3.epStartRxStreamDecoding(caller.id, stream_id);
+                    caller.aRxStreams.add(streamId);
+                    int decId = endpoint3.epStartRxStreamDecoding(caller.id, streamId);
 
                     MixerTracks.Track track = new MixerTracks.Track(decId, 1.0f);
                     MixerTracks tracks = new MixerTracks(Arrays.asList(track));
                     endpoint3.epSetMixer(localMixer, 1.0f, tracks);
                 } else if (desc.type == DataType.VIDEO || desc.type == DataType.VIDEO_EXT) {
-                    caller.vRxStreams.add(stream_id);
-                    int decId = endpoint3.epStartRxStreamDecoding(caller.id, stream_id);
+                    caller.vRxStreams.add(streamId);
+                    int decId = endpoint3.epStartRxStreamDecoding(caller.id, streamId);
 
                     DisplayCell cell = DisplayCell.buildStream(0, decId);
                     DisplayConfig config = DisplayConfig.buildOverlays(Arrays.asList(SINGLE_SCREEN_REGION), Arrays.asList(cell));
@@ -284,18 +287,23 @@ public class Example implements Endpoint3.Callback {
     }
 
     @Override
-    public void onStreamClose(EPObjectType parent_type, int parent_id, int stream_id, StreamDesc desc) {
+    public void onStreamClose(EPObjectType parentType, int parentId, int streamId, StreamDesc desc) {
 
     }
 
     @Override
-    public void onIncomingCall(int call_id, String number, String call_url, CallingProtocol protocol) {
+    public void onRxVideoStreamAvailabilityChanged(EPObjectType parentType, int parentId, int decId, boolean ready) {
 
     }
 
     @Override
-    public void onFinished(int call_id, int errcode, String reason) {
-        Caller caller = call_id == caller1.id ? caller1 : caller2;
+    public void onIncomingCall(int callId, String number, String callUrl, CallingProtocol protocol) {
+
+    }
+
+    @Override
+    public void onFinished(int callId, int errCode, String reason) {
+        Caller caller = callId == caller1.id ? caller1 : caller2;
 
         endpoint3.epRemoveMixer(caller.mixer);
         endpoint3.epReleaseCaller(caller.id);
@@ -305,8 +313,8 @@ public class Example implements Endpoint3.Callback {
     }
 
     @Override
-    public void onEstablished(int call_id, String vendor, String name) {
-        endpoint3.epOpenExtTxStream(call_id, new StreamDesc(DataType.VIDEO, DataType.VIDEO_EXT.name, "辅流", EPDir.Outgoing));
+    public void onEstablished(int callId, String vendor, String name) {
+        endpoint3.epOpenExtTxStream(callId, new StreamDesc(DataType.VIDEO, DataType.VIDEO_EXT.name, "辅流", EPDir.Outgoing));
     }
 
     /////////////////////////////// static private utils
@@ -323,7 +331,7 @@ public class Example implements Endpoint3.Callback {
     ///////////////////// ignore callbacks
 
     @Override
-    public void onError(int errcode, String error) {
+    public void onError(int errCode, String reason) {
 
     }
 
@@ -343,17 +351,17 @@ public class Example implements Endpoint3.Callback {
     }
 
     @Override
-    public void onRemoteRinging(int call_id) {
+    public void onRemoteRinging(int callId) {
 
     }
 
     @Override
-    public void onCallerError(int call_id, int errcode, String error) {
+    public void onCallerError(int callId, int errCode, String reason) {
 
     }
 
     @Override
-    public void onEvent(EPObjectType obj_type, int obj_id, EPEvent event, String params) {
+    public void onEvent(EPObjectType objType, int objId, EPEvent event, String params) {
 
     }
 }

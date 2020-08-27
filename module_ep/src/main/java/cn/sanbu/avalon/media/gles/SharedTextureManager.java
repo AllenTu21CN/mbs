@@ -31,6 +31,8 @@ public class SharedTextureManager {
     public SharedTextureManager(int maxTextureSize) {
         int rowCount = maxTextureSize > 0 ? (maxTextureSize / SINGLE_IMAGE_MAXIMUM_HEIGHT) : 1;
         int columnCount = maxTextureSize > 0 ? (maxTextureSize / SINGLE_IMAGE_MAXIMUM_WIDTH) : 1;
+        rowCount = Math.min(rowCount, 4);
+        columnCount = Math.min(columnCount, 4);
 
         mGridRowCount = rowCount;
         mGridColumnCount = columnCount;

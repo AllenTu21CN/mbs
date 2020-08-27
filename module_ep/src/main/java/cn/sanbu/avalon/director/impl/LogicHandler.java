@@ -1,11 +1,11 @@
-package cn.sanbu.avalon.endpoint3.director.impl;
+package cn.sanbu.avalon.director.impl;
 
 import com.google.gson.JsonObject;
 
 import java.util.List;
 
-import cn.sanbu.avalon.endpoint3.director.structures.Event;
-import cn.sanbu.avalon.endpoint3.director.structures.StateObserver;
+import cn.sanbu.avalon.director.structures.Event;
+import cn.sanbu.avalon.director.structures.StateObserver;
 
 public interface LogicHandler {
     int init(String owner, JsonObject config,

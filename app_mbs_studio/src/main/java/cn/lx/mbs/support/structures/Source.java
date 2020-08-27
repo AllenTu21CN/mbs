@@ -2,19 +2,18 @@ package cn.lx.mbs.support.structures;
 
 import com.sanbu.tools.StringUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import cn.lx.mbs.LXConst;
 import cn.sanbu.avalon.endpoint3.structures.Resolution;
-import cn.sanbu.avalon.endpoint3.structures.SourceType;
+import cn.sanbu.avalon.endpoint3.structures.InputType;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 
 public class Source {
     public final int id;              // 源ID
     public final String name;         // 源名称
-    public final SourceType type;     // 源类型
+    public final InputType type;     // 源类型
     public final String url;          // 源URL
     public final boolean useAudio;    // 是否使用源的音频流
 
@@ -43,8 +42,8 @@ public class Source {
         if (StringUtil.isEmpty(deviceId) || resolution == null)
             throw new RuntimeException("invalid params");
 
-        String url = SourceType.VideoCapture.prefix + deviceId;
-        Source source = new Source(id, name, SourceType.VideoCapture, url);
+        String url = InputType.VideoCapture.prefix + deviceId;
+        Source source = new Source(id, name, InputType.VideoCapture, url);
         source.resolution = resolution;
         return source;
     }
@@ -53,8 +52,8 @@ public class Source {
         if (deviceId < 0)
             throw new RuntimeException("invalid params");
 
-        String url = SourceType.AudioCapture.prefix + deviceId;
-        return new Source(-1, name, SourceType.AudioCapture, url);
+        String url = InputType.AudioCapture.prefix + deviceId;
+        return new Source(-1, name, InputType.AudioCapture, url);
     }
 
     public static Source buildRTSP(String name, String url, boolean useAudio,
@@ -64,10 +63,10 @@ public class Source {
 
     public static Source buildRTSP(int id, String name, String url, boolean useAudio,
                                    boolean rtspOverTCP, String extraOptions) {
-        if (StringUtil.isEmpty(url) || !url.startsWith(SourceType.RTSP.prefix))
+        if (StringUtil.isEmpty(url) || !url.startsWith(InputType.RTSP.prefix))
             throw new RuntimeException("invalid params");
 
-        Source source = new Source(id, name, SourceType.RTSP, url, useAudio);
+        Source source = new Source(id, name, InputType.RTSP, url, useAudio);
         source.overTCP = rtspOverTCP;
         source.extraOptions = extraOptions;
         return source;
@@ -78,10 +77,10 @@ public class Source {
     }
 
     public static Source buildRTMP(int id, String name, String url) {
-        if (StringUtil.isEmpty(url) || !url.startsWith(SourceType.RTMP.prefix))
+        if (StringUtil.isEmpty(url) || !url.startsWith(InputType.RTMP.prefix))
             throw new RuntimeException("invalid params");
 
-        return new Source(id, name, SourceType.RTMP, url);
+        return new Source(id, name, InputType.RTMP, url);
     }
 
     public static Source buildRMSP(String name, String url,
@@ -91,10 +90,10 @@ public class Source {
 
     public static Source buildRMSP(int id, String name, String url,
                                    VideoFormat videoFormat, AudioFormat audioFormat) {
-        if (StringUtil.isEmpty(url) || !url.startsWith(SourceType.RMSP.prefix))
+        if (StringUtil.isEmpty(url) || !url.startsWith(InputType.RMSP.prefix))
             throw new RuntimeException("invalid params");
 
-        Source source = new Source(id, name, SourceType.RMSP, url);
+        Source source = new Source(id, name, InputType.RMSP, url);
         source.videoFormat = videoFormat;
         source.audioFormat = audioFormat;
         return source;
@@ -108,8 +107,8 @@ public class Source {
         if (StringUtil.isEmpty(path) || !path.startsWith("/"))
             throw new RuntimeException("invalid params");
 
-        String url = SourceType.File.prefix + path;
-        Source source = new Source(id, name, SourceType.File, url);
+        String url = InputType.File.prefix + path;
+        Source source = new Source(id, name, InputType.File, url);
         source.loop = loop;
         return source;
     }
@@ -124,10 +123,10 @@ public class Source {
 
     public static Source buildCaller(int id, String name, String url, List<AudioCodec> audioCodecs) {
         if (StringUtil.isEmpty(url) ||
-                SourceType.fromUrl(url) != SourceType.Caller)
+                InputType.fromUrl(url) != InputType.Caller)
             throw new RuntimeException("invalid params");
 
-        Source source = new Source(id, name, SourceType.Caller, url);
+        Source source = new Source(id, name, InputType.Caller, url);
         source.audioCodecs = audioCodecs;
         return source;
     }
@@ -140,11 +139,11 @@ public class Source {
                 other.loop, other.audioCodecs);
     }
 
-    private Source(int id, String name, SourceType type, String url) {
+    private Source(int id, String name, InputType type, String url) {
         this(id, name, type, url, true);
     }
 
-    private Source(int id, String name, SourceType type, String url, boolean useAudio) {
+    private Source(int id, String name, InputType type, String url, boolean useAudio) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -152,7 +151,7 @@ public class Source {
         this.useAudio = useAudio;
     }
 
-    public Source(int id, String name, SourceType type, String url, boolean useAudio,
+    public Source(int id, String name, InputType type, String url, boolean useAudio,
                   Resolution resolution, boolean overTCP, String extraOptions,
                   VideoFormat videoFormat, AudioFormat audioFormat, boolean loop,
                   List<AudioCodec> audioCodecs) {

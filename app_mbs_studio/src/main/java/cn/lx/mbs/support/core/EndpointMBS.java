@@ -51,7 +51,7 @@ import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
 import cn.sanbu.avalon.endpoint3.structures.CallingProtocol;
 import cn.sanbu.avalon.endpoint3.structures.EPObjectType;
 import cn.sanbu.avalon.endpoint3.structures.Region;
-import cn.sanbu.avalon.endpoint3.structures.SourceType;
+import cn.sanbu.avalon.endpoint3.structures.InputType;
 import cn.sanbu.avalon.endpoint3.structures.TransProtocol;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapability;
@@ -81,7 +81,8 @@ import cn.sanbu.avalon.media.VideoEngine;
 *   . 除了初始化类接口和查询类接口, 其他操作类接口为非阻塞异步调用,且线程安全
 *   . 没有事件概念
 * */
-public class EndpointMBS implements Endpoint3.Callback {
+public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
+        Endpoint3.CallingCallback, Endpoint3.RegisteringCallback {
 
     private static final String TAG = EndpointMBS.class.getSimpleName();
 
@@ -533,16 +534,16 @@ public class EndpointMBS implements Endpoint3.Callback {
 
             int epId;
             Caller caller = null;
-            if (source.type == SourceType.VideoCapture) {
+            if (source.type == InputType.VideoCapture) {
                 epId = mEndpoint.epAddVideoCapture(source.url, source.resolution);
-            } else if (source.type == SourceType.RTSP) {
+            } else if (source.type == InputType.RTSP) {
                 TransProtocol protocol = source.overTCP ? TransProtocol.TCP : TransProtocol.RTP;
                 epId = mEndpoint.epAddRTSPSource(source.url, protocol, LXConst.SOURCE_RECONNECTING);
-            } else if (source.type == SourceType.RTMP) {
+            } else if (source.type == InputType.RTMP) {
                 epId = mEndpoint.epAddNetSource(source.url, LXConst.SOURCE_RECONNECTING);
-            } else if (source.type == SourceType.RMSP) {
+            } else if (source.type == InputType.RMSP) {
                 epId = mEndpoint.epAddRMSPSource(source.url, source.videoFormat, source.audioFormat);
-            } else if (source.type == SourceType.Caller) {
+            } else if (source.type == InputType.Caller) {
                 Result result = makeCall(source, id);
                 if (!result.isSuccessful())
                     return result;
@@ -765,12 +766,32 @@ public class EndpointMBS implements Endpoint3.Callback {
         });
     }
 
-    /////////////////////////////// implementation of Endpoint3.Callback
+    /////////////////////////////// implementation of Endpoint3.EPCallback
 
     @Override
-    public void onError(int errcode, String error) {
-        LogUtil.w(CoreUtils.TAG, TAG, "onError(EP): " + errcode + ", " + error);
+    public void onError(int errCode, String reason) {
+        LogUtil.w(CoreUtils.TAG, TAG, "onError(EP): " + errCode + ", " + reason);
     }
+
+    @Override
+    public void onEvent(EPObjectType objType, int objId, EPEvent event, String params) {
+        asyncCall(() -> {
+            switch (event) {
+                case RecvReqOpenVideoExt:
+                    // TODO
+                    break;
+                case FileWrittenCompleted:
+                    // notify outside observer
+                    if (mObserver != null)
+                        mObserver.onRecordingFinished(params);
+                    break;
+                default:
+                    break;
+            }
+        });
+    }
+
+    /////////////////////////////// implementation of Endpoint3.StreamCallback
 
     @Override
     public void onStreamOpen(EPObjectType parent_type, int parent_id, int stream_id, StreamDesc desc, Object format) {
@@ -840,19 +861,33 @@ public class EndpointMBS implements Endpoint3.Callback {
     }
 
     @Override
-    public void onRegistering(int result, CallingProtocol protocol) {
-        LogUtil.w(CoreUtils.TAG, TAG, "onRegistering");
+    public void onRxVideoStreamAvailabilityChanged(EPObjectType parentType, int parentId,
+                                                   int decId, boolean ready) {
+        String name = (parentType == EPObjectType.Source ? "source#" : "caller#") + parentId;
+        Input input = parentType == EPObjectType.Source ? getSourceByEPId(parentId) : getCallerByEPId(parentId);
+
+        if (input == null) {
+            LogUtil.w(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, from unknown " + name);
+            return;
+        }
+        if (input.connState == State.None) {
+            LogUtil.w(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, " + name + " is not connected");
+            return;
+        }
+
+        AVStream stream = input.findStreamByDecId(DataType.VIDEO, decId);
+        if (stream == null) {
+            LogUtil.w(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, from " + name + " and can not find the stream by mediaSourceId#" + decId);
+            return;
+        }
+
+        LogUtil.i(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, video of " + name + " is ready: " + ready);
+        stream.setDecReady(ready);
+
+        onVideoStreamStateChanged(input, true);
     }
 
-    @Override
-    public void onUnRegistering(int result, CallingProtocol protocol) {
-        LogUtil.w(CoreUtils.TAG, TAG, "onUnRegistering");
-    }
-
-    @Override
-    public void onNotifyRegisterStatus(int result, CallingProtocol protocol) {
-        LogUtil.w(CoreUtils.TAG, TAG, "onNotifyRegisterStatus");
-    }
+    /////////////////////////////// implementation of Endpoint3.CallingCallback
 
     @Override
     public void onIncomingCall(int call_id, String number, String call_url, CallingProtocol protocol) {
@@ -919,32 +954,21 @@ public class EndpointMBS implements Endpoint3.Callback {
         });
     }
 
+    /////////////////////////////// implementation of Endpoint3.RegisteringCallback
+
     @Override
-    public void onEvent(EPObjectType obj_type, int obj_id, EPEvent event, String params) {
-        asyncCall(() -> {
-            switch (event) {
-                case RecvReqOpenVideoExt:
-                    // TODO
-                    break;
-                case FileWrittenCompleted:
-                    // notify outside observer
-                    if (mObserver != null)
-                        mObserver.onRecordingFinished(params);
-                    break;
-                case SourceDecodingStateChanged:
-                    try {
-                        JsonObject json = new Gson().fromJson(params, JsonObject.class);
-                        boolean ready = json.get("ready").getAsBoolean();
-                        int mediaSourceId = json.get("media_source_id").getAsInt();
-                        onVideoStreamDecodingReady(obj_type, obj_id, mediaSourceId, ready);
-                    } catch (Exception e) {
-                        LogUtil.w(CoreUtils.TAG, TAG, "SourceStateChanged, parse params error", e);
-                    }
-                    break;
-                default:
-                    break;
-            }
-        });
+    public void onRegistering(int result, CallingProtocol protocol) {
+        LogUtil.w(CoreUtils.TAG, TAG, "onRegistering");
+    }
+
+    @Override
+    public void onUnRegistering(int result, CallingProtocol protocol) {
+        LogUtil.w(CoreUtils.TAG, TAG, "onUnRegistering");
+    }
+
+    @Override
+    public void onNotifyRegisterStatus(int result, CallingProtocol protocol) {
+        LogUtil.w(CoreUtils.TAG, TAG, "onNotifyRegisterStatus");
     }
 
     /////////////////////////////// private functions
@@ -999,9 +1023,12 @@ public class EndpointMBS implements Endpoint3.Callback {
     }
 
     private int initEP() {
-        int ret = mEndpoint.epInit(this, mEPFixedConfig);
+        int ret = mEndpoint.epInit(mEPFixedConfig, this, this);
         if (ret != 0)
             return ret;
+
+        mEndpoint.setCallingCallback(this);
+        mEndpoint.setRegisteringCallback(this);
 
         mEndpoint.epSwitchAGC(true);
         return 0;
@@ -1128,7 +1155,7 @@ public class EndpointMBS implements Endpoint3.Callback {
         logAction("unloadInput", id);
 
         if (input.epId >= 0) {
-            if (input.config.type == SourceType.Caller)
+            if (input.config.type == InputType.Caller)
                 releaseCaller((Caller) input);
             else
                 mEndpoint.epRemoveSource(input.epId);
@@ -1225,7 +1252,7 @@ public class EndpointMBS implements Endpoint3.Callback {
             return Result.SUCCESS;
 
         for (Input input: mInputs.values()) {
-            if (input.config.type != SourceType.Caller)
+            if (input.config.type != InputType.Caller)
                 continue;
 
             flushCallerMixer((Caller) input);
@@ -1269,7 +1296,7 @@ public class EndpointMBS implements Endpoint3.Callback {
             return Result.SUCCESS;
 
         for (Input input: mInputs.values()) {
-            if (input.config.type != SourceType.Caller)
+            if (input.config.type != InputType.Caller)
                 continue;
 
             Caller caller = (Caller) input;
@@ -1609,7 +1636,7 @@ public class EndpointMBS implements Endpoint3.Callback {
 
     private Input getSourceByEPId(int epId) {
         for (Input input: mInputs.values()) {
-            if (input.config.type != SourceType.Caller && input.epId == epId)
+            if (input.config.type != InputType.Caller && input.epId == epId)
                 return input;
         }
         return null;
@@ -1617,7 +1644,7 @@ public class EndpointMBS implements Endpoint3.Callback {
 
     private Caller getCallerByEPId(int epId) {
         for (Input input: mInputs.values()) {
-            if (input.config.type == SourceType.Caller && input.epId == epId)
+            if (input.config.type == InputType.Caller && input.epId == epId)
                 return (Caller) input;
         }
         return null;
@@ -1795,7 +1822,7 @@ public class EndpointMBS implements Endpoint3.Callback {
     private void startDecodingStream(Input input, AVStream stream) {
         // start decoding rx stream
         int decId;
-        if (input.config.type == SourceType.Caller)
+        if (input.config.type == InputType.Caller)
             decId = mEndpoint.epStartRxStreamDecoding(input.epId, stream.id);
         else
             decId = mEndpoint.epStartSrcStreamDecoding(input.epId, stream.id);
@@ -1891,7 +1918,7 @@ public class EndpointMBS implements Endpoint3.Callback {
 
     private void onRxStreamClose(Input input, int streamId, StreamDesc desc) {
         // stop decoding rx stream
-        if (input.config.type == SourceType.Caller)
+        if (input.config.type == InputType.Caller)
             mEndpoint.epStopRxStreamDecoding(input.epId, streamId);
         else
             mEndpoint.epStopSrcStreamDecoding(input.epId, streamId);
@@ -1937,7 +1964,7 @@ public class EndpointMBS implements Endpoint3.Callback {
             int displayId = mDisplays.get(SurfaceId.PGM).epId;
 
             for (Input input: mInputs.values()) {
-                if (input.config.type == SourceType.Caller) {
+                if (input.config.type == InputType.Caller) {
                     Caller caller = (Caller) input;
                     for (AVStream stream: caller.vTxStreams) {
                         if (!stream.isEncoding()) {
@@ -2009,31 +2036,6 @@ public class EndpointMBS implements Endpoint3.Callback {
                     Layout.buildEmpty();
             switchLayout(surfaceId, layout, TransitionDesc.buildEmpty());
         }
-    }
-
-    private void onVideoStreamDecodingReady(EPObjectType parentType, int parentId, int mediaSourceId, boolean ready) {
-        String name = (parentType == EPObjectType.Source ? "source#" : "caller#") + parentId;
-        Input input = parentType == EPObjectType.Source ? getSourceByEPId(parentId) : getCallerByEPId(parentId);
-
-        if (input == null) {
-            LogUtil.w(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, from unknown " + name);
-            return;
-        }
-        if (input.connState == State.None) {
-            LogUtil.w(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, " + name + " is not connected");
-            return;
-        }
-
-        AVStream stream = input.findStreamByDecId(DataType.VIDEO, mediaSourceId);
-        if (stream == null) {
-            LogUtil.w(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, from " + name + " and can not find the stream by mediaSourceId#" + mediaSourceId);
-            return;
-        }
-
-        LogUtil.i(CoreUtils.TAG, TAG, "onVideoStreamDecodingReady, video of " + name + " is ready: " + ready);
-        stream.setDecReady(ready);
-
-        onVideoStreamStateChanged(input, true);
     }
 
     ///////////////// static utils

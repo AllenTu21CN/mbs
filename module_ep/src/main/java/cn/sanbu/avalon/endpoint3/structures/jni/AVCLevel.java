@@ -3,7 +3,7 @@ package cn.sanbu.avalon.endpoint3.structures.jni;
 import android.media.MediaCodecInfo;
 
 public enum AVCLevel {
-    UNSPECIFIED("", 0, 0),
+    UNSPECIFIED("N/A", 0, -1),
     _1("1", 10, MediaCodecInfo.CodecProfileLevel.AVCLevel1),
     _1b("1b", 9, MediaCodecInfo.CodecProfileLevel.AVCLevel1b),
     _1_1("1.1", 11, MediaCodecInfo.CodecProfileLevel.AVCLevel11),

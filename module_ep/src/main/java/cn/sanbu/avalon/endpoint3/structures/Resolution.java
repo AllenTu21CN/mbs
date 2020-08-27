@@ -59,7 +59,7 @@ public enum Resolution {
     }
 
     static public Resolution fromRes(int width, int height) {
-        if (width == 0 || height == 0)
+        if (width <= 0 || height <= 0)
             return RES_UNKNOWN;
         for (Resolution resolution: Resolution.values()) {
             if (width == resolution.width &&

@@ -65,6 +65,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.sanbu.avalon.endpoint3.structures.H264Profile;
 import cn.sanbu.avalon.endpoint3.structures.jni.AVCLevel;
 import cn.sanbu.avalon.media.gles.Drawable2d;
 import cn.sanbu.avalon.media.gles.EglCore;
@@ -3308,29 +3309,31 @@ public class VideoEngine {
                     }
                 }
 
-                // Profile and level
-                if (profile != -1 || level != AVCLevel.UNSPECIFIED) {
+                // Profile(MUST) and level
+                if (!Rockchip.is3BUVersion() && profile != -1) {
                     MediaCodecInfo.CodecCapabilities capabilities = codec.getCodecInfo().getCapabilitiesForType(mimeType);
-                    MediaFormat defaultFormat = capabilities.getDefaultFormat();
-
-                    profile = profile != -1 ? profile : defaultFormat.getInteger(MediaFormat.KEY_PROFILE);
-                    int lvl = level != AVCLevel.UNSPECIFIED ? level.android : defaultFormat.getInteger(MediaFormat.KEY_LEVEL);
+                    int level = mConfig.level.android;
 
                     boolean setup = false;
                     MediaCodecInfo.CodecProfileLevel[] levels = capabilities.profileLevels;
                     for (MediaCodecInfo.CodecProfileLevel supported: levels) {
-                        if (supported.profile == profile && supported.level == lvl) {
-                            if (!Rockchip.is3BUVersion()) {
-                                format.setInteger(MediaFormat.KEY_PROFILE, profile);
-                                format.setInteger(MediaFormat.KEY_LEVEL, lvl);
-                                setup = true;
-                            }
+                        if (supported.profile == profile && level <= supported.level) {
+                            format.setInteger(MediaFormat.KEY_PROFILE, profile);
+                            if (level > 0)
+                                format.setInteger(MediaFormat.KEY_LEVEL, level);
+                            setup = true;
                             break;
                         }
                     }
 
-                    if (!setup)
-                        LogUtil.w(TAG, "non-supported profile: " + mConfig.profile + ", level: " + level.name);
+                    if (!setup) {
+                        LogUtil.w(TAG, "non-supported profile: " + mConfig.profile + ", level: " + mConfig.level.name);
+                        LogUtil.i(TAG, "supported profiles: ");
+                        for (MediaCodecInfo.CodecProfileLevel supported: levels) {
+                            LogUtil.i(TAG, H264Profile.fromAndroidValue(supported.profile).name + "," +
+                                    AVCLevel.fromAndroidValue(supported.level).name);
+                        }
+                    }
                 }
 
                 // Bitrate

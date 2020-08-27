@@ -1,4 +1,4 @@
-package cn.sanbu.avalon.endpoint3.director;
+package cn.sanbu.avalon.director;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -10,13 +10,13 @@ import com.sanbu.base.BaseError;
 import java.util.LinkedList;
 import java.util.List;
 
-import cn.sanbu.avalon.endpoint3.director.structures.Event;
-import cn.sanbu.avalon.endpoint3.director.impl.LayoutMapper;
-import cn.sanbu.avalon.endpoint3.director.impl.FixedRoleListKeeper;
-import cn.sanbu.avalon.endpoint3.director.impl.LogicHandler;
-import cn.sanbu.avalon.endpoint3.director.impl.PriorityQueuer;
-import cn.sanbu.avalon.endpoint3.director.impl.SimpleHandler;
-import cn.sanbu.avalon.endpoint3.director.structures.Layout;
+import cn.sanbu.avalon.director.structures.Event;
+import cn.sanbu.avalon.director.impl.LayoutMapper;
+import cn.sanbu.avalon.director.impl.FixedRoleListKeeper;
+import cn.sanbu.avalon.director.impl.LogicHandler;
+import cn.sanbu.avalon.director.impl.PriorityQueuer;
+import cn.sanbu.avalon.director.impl.SimpleHandler;
+import cn.sanbu.avalon.director.structures.Layout;
 
 // 自动导播功能类
 public class Director {
