@@ -5,12 +5,12 @@ import com.sanbu.tools.EventPub;
 public class BaseEvents {
 
     //////////////////// events (0x000~0x0ff)
-
-    private static final int START = 0x000;
+    public static final int START = 0x000;
+    public static final int END = START + 0x0ff;
 
     // 应用层提示
     // params: arg1=important[1:true 0:false] obj=message
-    public static final int USER_HINT = START;
+    public static final int USER_HINT = START + 0;
 
     // 应用重启
     // params: obj=message(reason)
