@@ -17,6 +17,7 @@ import android.hardware.camera2.TotalCaptureResult;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
@@ -3342,12 +3343,9 @@ public class VideoEngine {
                 // Frame rate
                 format.setInteger(MediaFormat.KEY_FRAME_RATE, frameRate);
 
-                // I frame interval - DISABLE, self request instead.
-                if (HuaWei.isProduct()) {
-                    LogUtil.w(TAG, "TODO, to avoid blocking error to fix KEY_I_FRAME_INTERVAL as 24 hours");
-                    keyFrameInterval = 24 * 3600 * 60;
-                }
-                format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, keyFrameInterval);
+                // Key frame interval, in seconds
+                int keyFrameIntervalInSec = keyFrameInterval / frameRate;
+                format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, keyFrameIntervalInSec);
 
                 // Maximum number of B frames between I or P frames
                 // supported from API level 29
@@ -3452,16 +3450,18 @@ public class VideoEngine {
                 mEncodeThread = new Thread(this, "VideoEncoder-" + mId);
                 mEncodeThread.start();
 
-                // Request key frame periodically
-                LogUtil.i(TAG, "Create timer for request key frame periodically.");
-                mPeriodRequestKeyFrameTimer = new Timer();
-                int period = (int)Math.ceil(1000.0f * mConfig.keyFrameInterval / mConfig.frameRate);
-                mPeriodRequestKeyFrameTimer.scheduleAtFixedRate(new TimerTask() {
-                    @Override
-                    public void run() {
-                        requestKeyFrame();
-                    }
-                }, period, period);
+                // Request key frame periodically - RockChip series only
+                if (Rockchip.is3BUVersion()) {
+                    LogUtil.i(TAG, "Create timer for request key frame periodically.");
+                    mPeriodRequestKeyFrameTimer = new Timer();
+                    int period = (int) Math.ceil(1000.0f * mConfig.keyFrameInterval / mConfig.frameRate);
+                    mPeriodRequestKeyFrameTimer.scheduleAtFixedRate(new TimerTask() {
+                        @Override
+                        public void run() {
+                            requestKeyFrame();
+                        }
+                    }, period, period);
+                }
             } catch (IOException ioe) {
                 throw new RuntimeException(ioe);
             }
@@ -3743,6 +3743,10 @@ public class VideoEngine {
             packet.isEndOfFrame = true;
             packet.isAvccNal = false;
 
+            if (packet.isKeyFrame) {
+                LogUtil.d(TAG, "Video sink #" + mId + " got new key packet.");
+            }
+
             // Copy payload
             packet.size = mBufferInfo.size;
             packet.data = new byte[mBufferInfo.size];
@@ -3864,7 +3868,7 @@ public class VideoEngine {
             mDummySurface = new OffscreenSurface(mEglCore, 128, 128);
             mDummySurface.makeCurrent();
 
-            // Query OpenGL ES properties
+            // Query OpenGL ES properties and extensions
             int[] maxTextureUnits = new int[1];
             GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, maxTextureUnits, 0);
             LogUtil.i(TAG, "[GLES] Maximum texture image units: " + maxTextureUnits[0]);
@@ -3874,6 +3878,15 @@ public class VideoEngine {
                 GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_SIZE, maxTextureSize, 0);
                 LogUtil.i(TAG, "[GLES] Maximum texture size: " + maxTextureSize[0]);
                 mMaxTextureSize = maxTextureSize[0];
+            }
+
+            String glExts = GLES20.glGetString(GLES20.GL_EXTENSIONS);
+            LogUtil.i(TAG, "[GLES] Extensions:\n" + glExts);
+
+            if (glExts.contains("GL_EXT_texture_filter_anisotropic")) {
+                int[] maxAnisotropy = new int[1];
+                GLES20.glGetIntegerv(GLES11Ext.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, maxAnisotropy, 0);
+                LogUtil.i(TAG, "[GLES] Maximum anisotropy: " + maxAnisotropy[0]);
             }
 
             // Notify
