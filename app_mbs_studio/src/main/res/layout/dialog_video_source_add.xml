@@ -59,7 +59,7 @@
     </TableLayout>
 
     <Button
-        android:id="@+id/add_pip_button"
+        android:id="@+id/add_video_button"
         android:text="Add"
         android:textSize="24px"
         android:background="@drawable/common_button_bg"

@@ -45,7 +45,7 @@ public class VideoSourceAddDialog extends BaseDialog {
 
         mAliasEditText = mView.findViewById(R.id.alias);
         mTypeSpinner = mView.findViewById(R.id.type);
-        mAddButton = mView.findViewById(R.id.add_pip_button);
+        mAddButton = mView.findViewById(R.id.add_video_button);
 
         SimpleArrayAdapter<String> typeAdapter = new SimpleArrayAdapter<>(
                 mContext,

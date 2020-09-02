@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6px"
+        android:layout_marginBottom="6px">
+
+        <View android:id="@+id/selected_border"
+            android:background="@color/colorPrimaryOrange"
+            android:layout_width = "336px"
+            android:layout_height="196px"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:visibility="invisible"/>
+
+        <ImageView
+            android:id="@+id/thumbnail"
+            android:layout_width="320px"
+            android:layout_height="180px"
+            android:layout_marginTop="10px"
+            android:layout_marginLeft="10px"
+            android:layout_marginBottom="10px"
+            android:layout_marginRight="10px"
+            android:scaleType="fitXY"
+            app:layout_constraintLeft_toLeftOf="@id/selected_border"
+            app:layout_constraintTop_toTopOf="@id/selected_border"
+            app:layout_constraintBottom_toBottomOf="@id/selected_border"
+            app:layout_constraintRight_toRightOf="@id/selected_border"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

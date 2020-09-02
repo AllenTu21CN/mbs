@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp">
+
+    <!-- Guide lines -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/v_guideline"
+        app:layout_constraintGuide_percent="0.6"
+        android:orientation="vertical"/>
+
+    <!-- Left Column -->
+    <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:layout_marginBottom="18px"
+        android:background="@drawable/common_area_bg"
+        android:choiceMode="singleChoice"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/v_guideline"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:id="@+id/video_layouts_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10px"
+            android:layout_marginRight="10px"
+            android:orientation="vertical"
+            android:dividerHeight="1px"
+            android:layout_gravity="left"
+            android:dividerPadding="6px"/>
+
+    </ScrollView>
+
+    <!-- Right Column -->
+    <!-- TODO: -->
+    <LinearLayout
+        android:id="@+id/position_mapping"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:layout_marginRight="18px"
+        android:orientation="vertical"
+        app:layout_constraintLeft_toRightOf="@id/v_guideline"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <!--TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="top"
+            android:text="Select input for each position"
+            android:textSize="32px" />
+
+        <View
+            android:layout_marginTop="8px"
+            android:layout_marginBottom="8px"
+            android:background="#000000"
+            android:layout_width = "fill_parent"
+            android:layout_height="1px" /-->
+
+        <!--LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/position_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:text="Input for A"
+                android:textSize="28px" />
+
+            <View
+                android:layout_marginTop="8px"
+                android:layout_marginBottom="0px"
+                android:background="#000000"
+                android:layout_width = "fill_parent"
+                android:layout_height="1px" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <RadioButton android:id="@+id/input_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:text="1" />
+                <RadioButton android:id="@+id/input_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:text="2" />
+                <RadioButton android:id="@+id/input_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:text="3" />
+                <RadioButton android:id="@+id/input_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.8"
+                    android:scaleY="0.8"
+                    android:text="4" />
+            </RadioGroup>
+
+        </LinearLayout-->
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="180px"
+        android:layout_height="60px"
+        android:layout_margin="18px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/common_button_bg"
+        android:text="Save"
+        android:textSize="28px"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,13 +20,14 @@ public class OverlayArea {
     private Context mContext;
 
     private View mWrapperView;
-    private ImageButton mAddPipButton;
+    private ImageButton mAddVideoButton;
     private ImageButton mAddImageButton;
     private ImageButton mAddTextButton;
     private ListView mListView;
 
     private OverlayListViewAdapter mOverlayListViewAdapter;
 
+    private OverlayAddVideoDialog mAddVideoDialog;
     private OverlayAddImageDialog mAddImageDialog;
 
     public OverlayArea(Activity activity) {
@@ -35,6 +36,7 @@ public class OverlayArea {
 
     public void init() {
         mWrapperView = mActivity.findViewById(R.id.area_overlay);
+        mAddVideoButton = mWrapperView.findViewById(R.id.add_video_button);
         mAddImageButton = mWrapperView.findViewById(R.id.add_image_button);
         mListView = mWrapperView.findViewById(R.id.overlay_list);
 
@@ -64,8 +66,15 @@ public class OverlayArea {
             }
         });
 
+        mAddVideoDialog = new OverlayAddVideoDialog(mContext, Utils.PX(1200), Utils.PX(950));
         mAddImageDialog = new OverlayAddImageDialog(mContext, Utils.PX(1200), Utils.PX(1150));
 
+        mAddVideoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAddVideoDialog.showAtLocation(mWrapperView, Gravity.CENTER, 0, 0);
+            }
+        });
         mAddImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

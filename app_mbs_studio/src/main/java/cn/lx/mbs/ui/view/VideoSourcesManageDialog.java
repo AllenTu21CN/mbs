@@ -98,7 +98,7 @@ public class VideoSourcesManageDialog extends BaseDialog {
             }
         });
 
-        mAddSourceButton = mView.findViewById(R.id.add_pip_button);
+        mAddSourceButton = mView.findViewById(R.id.add_video_button);
         mAddSourceButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

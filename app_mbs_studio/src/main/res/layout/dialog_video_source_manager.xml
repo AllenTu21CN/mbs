@@ -25,10 +25,10 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@id/v_guideline"
-        app:layout_constraintBottom_toTopOf="@id/add_pip_button"/>
+        app:layout_constraintBottom_toTopOf="@id/add_video_button"/>
 
     <Button
-        android:id="@+id/add_pip_button"
+        android:id="@+id/add_video_button"
         android:layout_width="0dp"
         android:layout_height="60px"
         android:layout_marginBottom="18px"
@@ -44,10 +44,10 @@
         android:id="@+id/del_button"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintLeft_toRightOf="@id/add_pip_button"
-        app:layout_constraintTop_toTopOf="@id/add_pip_button"
+        app:layout_constraintLeft_toRightOf="@id/add_video_button"
+        app:layout_constraintTop_toTopOf="@id/add_video_button"
         app:layout_constraintRight_toRightOf="@id/sources_list"
-        app:layout_constraintBottom_toBottomOf="@id/add_pip_button"
+        app:layout_constraintBottom_toBottomOf="@id/add_video_button"
         android:background="@drawable/common_button_bg"
         android:text="Delete"
         android:textSize="24px" />
@@ -328,7 +328,7 @@
         android:layout_height="0dp"
         android:layout_marginBottom="18px"
         android:layout_marginRight="18px"
-        app:layout_constraintTop_toTopOf="@id/add_pip_button"
+        app:layout_constraintTop_toTopOf="@id/add_video_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
