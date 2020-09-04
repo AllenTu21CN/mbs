@@ -68,6 +68,7 @@ import java.util.regex.Pattern;
 
 import cn.sanbu.avalon.endpoint3.structures.H264Profile;
 import cn.sanbu.avalon.endpoint3.structures.jni.AVCLevel;
+import cn.sanbu.avalon.media.gles.CustomProgram;
 import cn.sanbu.avalon.media.gles.Drawable2d;
 import cn.sanbu.avalon.media.gles.EglCore;
 import cn.sanbu.avalon.media.gles.FullFrameRect;
@@ -227,6 +228,7 @@ public class VideoEngine {
         private Handler mCameraBackgroundHandler;
 
         private Texture2dProgram mTextureProgram;
+        private int mTextureId = -1;
         private ScaledDrawable2d mRectDrawable;
         private Sprite2d mRect;
         private FloatBuffer mTexCoordArray;
@@ -837,8 +839,8 @@ public class VideoEngine {
 
         private void createOutputSurface() {
             mTextureProgram = new Texture2dProgram(Texture2dProgram.ProgramType.TEXTURE_EXT);
-            int textureId = mTextureProgram.createTextureObject(mTextureFilteringMethod);
-            mOutputSurfaceTexture = new SurfaceTexture(textureId);
+            mTextureId = mTextureProgram.createTextureObject(mTextureFilteringMethod);
+            mOutputSurfaceTexture = new SurfaceTexture(mTextureId);
             mOutputSurfaceTexture.setOnFrameAvailableListener(
                     new SurfaceTexture.OnFrameAvailableListener() {
                         @Override
@@ -853,7 +855,7 @@ public class VideoEngine {
 
             mRectDrawable = new ScaledDrawable2d(Drawable2d.Prefab.RECTANGLE);
             mRect = new Sprite2d(mRectDrawable);
-            mRect.setTexture(textureId);
+            mRect.setTexture(mTextureId);
 
             // Orthographic Projection
             Matrix.orthoM(mDisplayProjectionMatrix, 0, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 1.0f);
@@ -892,6 +894,8 @@ public class VideoEngine {
                 }
 
                 mFrameRateStatist.incomingFrame(now);
+
+                // Dump realtime fps
                 /*if (mFrameRateStatist.totalFrameCount() % (int) mDisplayRefreshRate == 0) {
                     LogUtil.v(TAG, "Video source #" + mId
                             + ", type: " + (mType == SOURCE_TYPE_CAPTURE ? "capture" : "decoder")
@@ -952,6 +956,10 @@ public class VideoEngine {
 
                 //GLES20.glFinish();
             }
+        }
+
+        int getTextureId() {
+            return mTextureId;
         }
 
         boolean hasSignal() {
@@ -1358,7 +1366,7 @@ public class VideoEngine {
                 display_name_style_sheet = mCurrentConfig.getDisplayNameStyleSheet();
                 overlays = new LinkedList<>();
                 for (Overlay overlay : mCurrentOverlays) {
-                    if (overlay.mWeakRefSource != null) {
+                    if (overlay != null && overlay.mWeakRefSource != null) {
                         overlays.push(overlay.new Stats());
                     }
                 }
@@ -1369,6 +1377,7 @@ public class VideoEngine {
         private class Overlay {
             static final int OVERLAY_TYPE_STREAM = 0;
             static final int OVERLAY_TYPE_IMAGE = 1;
+            static final int OVERLAY_TYPE_CUSTOM = 2;
 
             private int mType;
 
@@ -1395,6 +1404,11 @@ public class VideoEngine {
             private Bitmap mDisplayNameImage;
             //private ByteBuffer mDisplayNameImageBuffer;
             private int mDisplayNameTexSlot = -1;
+
+            private CustomProgram mCustomProgram;
+            private WeakReference<Source>[] mCustomSources;
+            private float[] mCustomVariables;
+            private int[] mCustomSourceTextures;
 
             private class Stats {
                 private String      type;
@@ -1475,6 +1489,22 @@ public class VideoEngine {
                 }
             }
 
+            private Overlay(CustomProgram customProgram, Source[] sources, float[] variables) {
+                mType = OVERLAY_TYPE_CUSTOM;
+                mCustomProgram = customProgram;
+
+                mCustomSources = new WeakReference[sources.length];
+                mCustomSourceTextures = new int[sources.length];
+                for (int i = 0; i < sources.length; i++) {
+                    mCustomSources[i] = new WeakReference<>(sources[i]);
+                    if (sources[i] != null) {
+                        mCustomSourceTextures[i] = sources[i].getTextureId();
+                    }
+                }
+
+                mCustomVariables = variables;
+            }
+
             private void draw() {
                 if (OVERLAY_TYPE_STREAM == mType) {
                     // Draw source
@@ -1482,6 +1512,9 @@ public class VideoEngine {
                 } else if (OVERLAY_TYPE_IMAGE == mType) {
                     // Draw image
                     drawImage();
+                } else if (OVERLAY_TYPE_CUSTOM == mType) {
+                    // Draw custom
+                    drawCustom();
                 }
 
                 // Draw display name
@@ -1527,6 +1560,17 @@ public class VideoEngine {
 
                 mSharedImageRect.draw(mSharedImageTexPgm, mDisplayProjectionMatrix, mImageTexCoordArray);*/
                 mSharedTexMgr.draw(mImageTexSlot, mSrcRect, mDstRect);
+            }
+
+            private void drawCustom() {
+                for (int i = 0; i < mCustomSources.length; i++) {
+                    Source s = mCustomSources[i].get();
+                    mCustomSourceTextures[i] = (s != null) ? s.getTextureId() : -1;
+                }
+
+                if (mCustomProgram != null) {
+                    mCustomProgram.draw(mCustomSourceTextures, mCustomVariables);
+                }
             }
 
             private void drawDisplayName() {
@@ -2058,6 +2102,49 @@ public class VideoEngine {
                                     continue;
                                 }
                             }
+                        } else if (type.equals("custom")) {
+                            final String CONFIG_SHADER_KEY = "shader";
+                            if (overlayObject.has(CONFIG_SHADER_KEY)) {
+                                String shaderName = overlayObject.get(CONFIG_SHADER_KEY).getAsString();
+                                CustomProgram pgm = mMixer.getCustomProgram(shaderName);
+                                if (pgm == null) {
+                                    LogUtil.e(TAG, "Custom program(shaderName=" + shaderName + ") not exists.");
+                                    continue;
+                                }
+
+                                final String CONFIG_SOURCES_KEY = "sources";
+                                if (overlayObject.has(CONFIG_SOURCES_KEY)) {
+                                    JsonArray sourcesArray = overlayObject.get(CONFIG_SOURCES_KEY).getAsJsonArray();
+                                    Source[] sources = new Source[sourcesArray.size()];
+                                    for (int i = 0; i < sourcesArray.size(); i++) {
+                                        int source_id = sourcesArray.get(i).getAsInt();
+                                        Source source = mMixer.getSource(source_id);
+                                        if (source == null) {
+                                            LogUtil.e("Source id=" + source_id + " not exists.");
+                                            break;
+                                        }
+                                        sources[i] = source;
+                                    }
+
+                                    final String CONFIG_VARIABLES_KEY = "variables";
+                                    float[] variables = null;
+                                    if (overlayObject.has(CONFIG_VARIABLES_KEY)) {
+                                        JsonArray varArray = overlayObject.get(CONFIG_VARIABLES_KEY).getAsJsonArray();
+                                        variables = new float[sourcesArray.size()];
+                                        for (int i = 0; i < varArray.size(); i++) {
+                                            variables[i] = sourcesArray.get(i).getAsFloat();
+                                        }
+                                    }
+
+                                    o = new Overlay(pgm, sources, variables);
+                                } else {
+                                    LogUtil.e(TAG, "Overlay object(custom) without sources.");
+                                    continue;
+                                }
+                            } else {
+                                LogUtil.e(TAG, "Overlay object(custom) without shader.");
+                                continue;
+                            }
                         }
                     } else {
                         LogUtil.e(TAG, "Overlay object without type.");
@@ -2224,6 +2311,49 @@ public class VideoEngine {
                                     LogUtil.e(TAG, "Empty overlay image_path.");
                                     continue;
                                 }
+                            }
+                        } else if (type.equals("custom")) {
+                            final String CONFIG_SHADER_KEY = "shader";
+                            if (overlayObject.has(CONFIG_SHADER_KEY)) {
+                                String shaderName = overlayObject.get(CONFIG_SHADER_KEY).getAsString();
+                                CustomProgram pgm = mMixer.getCustomProgram(shaderName);
+                                if (pgm == null) {
+                                    LogUtil.e(TAG, "Custom program(shaderName=" + shaderName + ") not exists.");
+                                    continue;
+                                }
+
+                                final String CONFIG_SOURCES_KEY = "sources";
+                                if (overlayObject.has(CONFIG_SOURCES_KEY)) {
+                                    JsonArray sourcesArray = overlayObject.get(CONFIG_SOURCES_KEY).getAsJsonArray();
+                                    Source[] sources = new Source[sourcesArray.size()];
+                                    for (int i = 0; i < sourcesArray.size(); i++) {
+                                        int source_id = sourcesArray.get(i).getAsInt();
+                                        Source source = mMixer.getSource(source_id);
+                                        if (source == null) {
+                                            LogUtil.e("Source id=" + source_id + " not exists.");
+                                            break;
+                                        }
+                                        sources[i] = source;
+                                    }
+
+                                    final String CONFIG_VARIABLES_KEY = "variables";
+                                    float[] variables = null;
+                                    if (overlayObject.has(CONFIG_VARIABLES_KEY)) {
+                                        JsonArray varArray = overlayObject.get(CONFIG_VARIABLES_KEY).getAsJsonArray();
+                                        variables = new float[sourcesArray.size()];
+                                        for (int i = 0; i < varArray.size(); i++) {
+                                            variables[i] = sourcesArray.get(i).getAsFloat();
+                                        }
+                                    }
+
+                                    o = new Overlay(pgm, sources, variables);
+                                } else {
+                                    LogUtil.e(TAG, "Overlay object(custom) without sources.");
+                                    continue;
+                                }
+                            } else {
+                                LogUtil.e(TAG, "Overlay object(custom) without shader.");
+                                continue;
                             }
                         }
                     } else {
@@ -3848,6 +3978,7 @@ public class VideoEngine {
 
         private Map<Integer, Source> mSources   = new TreeMap<>();
         private Map<Integer, Scene> mScenes     = new TreeMap<>();
+        private Map<String, CustomProgram> mCustomPrograms = new HashMap<>();
 
         private FrameRateStatist mFrameRateStatist = new FrameRateStatist();
 
@@ -4171,7 +4302,27 @@ public class VideoEngine {
             sendReply(MixerHandler.MSG_DELETE_SINK);
 
             return true;
+        }
 
+        private CustomProgram getCustomProgram(String name) {
+            return mCustomPrograms.get(name);
+        }
+
+        private boolean registerCustomProgram(String name, String shaderFunc) {
+            if (mCustomPrograms.containsKey(name)) {
+                LogUtil.e(TAG, "registerCustomProgram: name duplicated!");
+                return false;
+            }
+
+            try {
+                CustomProgram p = new CustomProgram(name, shaderFunc);
+                mCustomPrograms.put(name, p);
+            } catch (RuntimeException e) {
+                LogUtil.e(TAG, "registerCustomProgram: create custom program failed!");
+                return false;
+            }
+
+            return true;
         }
     }
 
@@ -4188,6 +4339,7 @@ public class VideoEngine {
         private static final int MSG_ADD_SINK                   = 0x09;
         private static final int MSG_DELETE_SINK                = 0x0A;
         private static final int MSG_QUERY_SCENE                = 0x0B;
+        private static final int MSG_REGISTER_CUSTOM_PROGRAM    = 0x0C;
 
         private WeakReference<MixerThread> mMixerWeakRef;
 
@@ -4336,6 +4488,12 @@ public class VideoEngine {
                     break;
                 }
 
+                case MSG_REGISTER_CUSTOM_PROGRAM : {
+                    String[] s = (String[])msg.obj;
+                    mixer.registerCustomProgram(s[0], s[1]);
+                    break;
+                }
+
                 default : {
                     LogUtil.e(TAG, "Unknown message type!");
                 }
@@ -4390,6 +4548,10 @@ public class VideoEngine {
 
         private void sendDeleteSink(int sceneId, int sinkId) {
             sendMessage(obtainMessage(MSG_DELETE_SINK, sceneId, sinkId));
+        }
+
+        private void sendRegisterCustomProgram(String name, String shaderFunc) {
+            sendMessage(obtainMessage(MSG_REGISTER_CUSTOM_PROGRAM, new String[] { name, shaderFunc }));
         }
     }
 
@@ -4561,6 +4723,11 @@ public class VideoEngine {
         }
         LogUtil.e(TAG, "Can not unregister displayId" + surfaceId);
         return false;
+    }
+
+    public boolean registerCustomProgram(String name, String shaderFunc) {
+        mMixerHandler.sendRegisterCustomProgram(name, shaderFunc);
+        return true;
     }
 
     public boolean addSource(int id, int sourceType, String config) {
