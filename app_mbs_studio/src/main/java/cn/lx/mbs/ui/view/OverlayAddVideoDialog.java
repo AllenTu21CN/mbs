@@ -271,6 +271,7 @@ public class OverlayAddVideoDialog extends BaseDialog {
         mPositionMappingLayout = mView.findViewById(R.id.position_mapping);
         for (int i = 0; i < MAX_POSITIONS; i++) {
             View v = mInflater.inflate(R.layout.dialog_overlay_add_video_position_mapping, null);
+            v.setVisibility(View.INVISIBLE);
 
             TextView label = v.findViewById(R.id.position_label);
             label.setText("Input for " + POSITION_NAME[i]);
