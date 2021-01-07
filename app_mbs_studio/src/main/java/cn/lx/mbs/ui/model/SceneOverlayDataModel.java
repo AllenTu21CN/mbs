@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import cn.lx.mbs.support.structures.Layout;
 import cn.lx.mbs.ui.view.Utils;
 
 public class SceneOverlayDataModel {
@@ -136,5 +137,14 @@ public class SceneOverlayDataModel {
 
     public Overlay[] toArray() {
         return list.toArray(new Overlay[list.size()]);
+    }
+
+    public Layout toEpLayout() {
+        // TODO:
+        Layout layout = new Layout();
+
+        // TODO: Construct ep overlays here
+
+        return layout;
     }
 }

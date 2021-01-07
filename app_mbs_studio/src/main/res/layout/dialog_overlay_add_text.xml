@@ -1,6 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="0dp"
+    android:layout_height="0dp">
 
-</LinearLayout>
+    <ImageView
+        android:id="@+id/scene_editor_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="18px"
+        app:layout_constraintDimensionRatio="1.777777777777778"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+    <!-- For clip outbounded -->
+    <FrameLayout
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipChildren="true"
+        app:layout_constraintTop_toTopOf="@id/scene_editor_bg"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
+        app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
+        app:layout_constraintBottom_toBottomOf="@id/scene_editor_bg">
+
+        <cn.lx.mbs.ui.view.OverlayEditableView
+            android:id="@+id/scene_editor_overlay"
+            android:layout_width="500px"
+            android:layout_height="300px"
+            app:layout_constraintTop_toTopOf="@id/scene_editor_bg"
+            app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg" />
+
+    </FrameLayout>
+
+    <!-- Text -->
+    <TextView
+        android:id="@+id/text_label"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/text_value"
+        app:layout_constraintBottom_toBottomOf="@id/text_value"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
+        app:layout_constraintRight_toLeftOf="@id/text_value"
+        android:text="Text"
+        android:textSize="28px" />
+
+    <EditText
+        android:id="@+id/text_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18px"
+        app:layout_constraintTop_toBottomOf="@id/scene_editor_bg"
+        app:layout_constraintLeft_toRightOf="@id/text_label"
+        app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
+        android:text=""
+        android:textColor="@color/primaryTextColor"
+        android:textSize="28px" />
+
+    <!-- Font -->
+    <TextView
+        android:id="@+id/font_label"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/font_value"
+        app:layout_constraintBottom_toBottomOf="@id/font_value"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
+        app:layout_constraintRight_toLeftOf="@id/font_value"
+        android:text="Font"
+        android:textSize="28px" />
+
+    <Spinner
+        android:id="@+id/font_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="28px"
+        app:layout_constraintTop_toBottomOf="@id/text_value"
+        app:layout_constraintLeft_toRightOf="@id/font_label"
+        app:layout_constraintRight_toLeftOf="@id/text_color_label" />
+
+    <!-- Color -->
+    <TextView
+        android:id="@+id/text_color_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/font_value"
+        app:layout_constraintBottom_toBottomOf="@id/font_value"
+        app:layout_constraintLeft_toRightOf="@id/font_value"
+        app:layout_constraintRight_toLeftOf="@id/text_color_btn"
+        android:text="Color"
+        android:textSize="28px" />
+
+    <cn.lx.mbs.ui.view.ColorPickerButton
+        android:id="@+id/text_color_btn"
+        android:layout_width="120px"
+        android:layout_height="36px"
+        android:layout_marginLeft="15px"
+        android:layout_marginRight="15px"
+        app:layout_constraintTop_toTopOf="@id/text_color_label"
+        app:layout_constraintLeft_toRightOf="@id/text_color_label"
+        app:layout_constraintRight_toLeftOf="@id/format_bold_btn" />
+
+    <ImageButton
+        android:id="@+id/format_bold_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15px"
+        android:layout_marginRight="15px"
+        android:background="#00000000"
+        android:src="@drawable/ic_format_bold_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintLeft_toRightOf="@id/text_color_btn"
+        app:layout_constraintRight_toLeftOf="@id/format_italic_btn"
+        app:layout_constraintTop_toTopOf="@id/text_color_btn"
+        app:layout_constraintBottom_toBottomOf="@id/text_color_btn"
+        android:scaleType="fitXY" />
+
+    <ImageButton
+        android:id="@+id/format_italic_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15px"
+        android:layout_marginRight="15px"
+        android:background="#00000000"
+        android:src="@drawable/ic_format_italic_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintLeft_toRightOf="@id/format_bold_btn"
+        app:layout_constraintBottom_toBottomOf="@id/format_bold_btn"
+        app:layout_constraintRight_toLeftOf="@id/format_underlined_btn"
+        android:scaleType="fitXY" />
+
+    <ImageButton
+        android:id="@+id/format_underlined_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15px"
+        android:layout_marginRight="15px"
+        android:background="#00000000"
+        android:src="@drawable/ic_format_underlined_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintLeft_toRightOf="@id/format_italic_btn"
+        app:layout_constraintBottom_toBottomOf="@id/format_italic_btn"
+        app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
+        android:scaleType="fitXY" />
+
+    <!-- Background -->
+    <TextView
+        android:id="@+id/bg_color_label"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/bg_color_btn"
+        app:layout_constraintBottom_toBottomOf="@id/bg_color_btn"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
+        app:layout_constraintRight_toLeftOf="@id/bg_color_btn"
+        android:text="Bg Color"
+        android:textSize="28px" />
+
+    <cn.lx.mbs.ui.view.ColorPickerButton
+        android:id="@+id/bg_color_btn"
+        android:layout_width="120px"
+        android:layout_height="36px"
+        android:layout_marginLeft="15px"
+        android:layout_marginRight="15px"
+        app:layout_constraintTop_toBottomOf="@id/font_value"
+        app:layout_constraintLeft_toRightOf="@id/bg_color_label"
+         />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
