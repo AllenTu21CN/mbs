@@ -7,7 +7,7 @@ public class CompareHelper {
         boolean isEqual(T src, T dst);
     }
 
-    public static <T> boolean isEqual(T src, T dst, NotNullComparator comparator) {
+    public static <T> boolean isEqual(T src, T dst, NotNullComparator<T> comparator) {
         if (src == null && dst == null)
             return true;
         if (src == null && dst != null)
@@ -73,6 +73,49 @@ public class CompareHelper {
                 return true;
             }
         });
+    }
+
+    public static <T> boolean isEqual4BaseList(final List<T> src, final List<T> dst) {
+        return isEqual(src, dst, new NotNullComparator() {
+            @Override
+            public boolean isEqual(Object i1, Object i2) {
+                if (src.size() != dst.size())
+                    return false;
+
+                boolean checked = false;
+                for (int i = 0; i < src.size(); ++i) {
+                    if (!checked) {
+                        T obj = src.get(i);
+                        if (!(obj instanceof Number) && !(obj instanceof Boolean) &&
+                                !(obj instanceof Enum) && !(obj instanceof String))
+                            throw new UnsupportedOperationException("type of list item MUST be String/Number/Boolean/Enum");
+
+                        checked = true;
+                    }
+
+                    if (!CompareHelper.isEqual(src.get(i), dst.get(i), new NotNullComparator<T>() {
+                        @Override
+                        public boolean isEqual(T src, T dst) {
+                            return src.equals(dst);
+                        }
+                    })) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        });
+    }
+
+    public static <T> boolean equals(T src1, Object src2, NotNullComparator<T> comparator) {
+        if (src2 == null)
+            return false;
+        if (src1 == src2)
+            return true;
+        if (!src1.getClass().equals(src2.getClass()))
+            return false;
+        return comparator.isEqual(src1, (T) src2);
     }
 
     //// Testing

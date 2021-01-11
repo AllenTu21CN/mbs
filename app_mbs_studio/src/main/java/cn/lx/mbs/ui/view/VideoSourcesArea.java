@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.sanbu.media.Resolution;
 import com.sanbu.tools.LogUtil;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -22,7 +23,6 @@ import cn.lx.mbs.ui.MainActivity;
 import cn.lx.mbs.R;
 import cn.lx.mbs.ui.UIConst;
 import cn.lx.mbs.ui.model.VideoSourcesDataModel;
-import cn.sanbu.avalon.endpoint3.structures.Resolution;
 
 public class VideoSourcesArea {
 

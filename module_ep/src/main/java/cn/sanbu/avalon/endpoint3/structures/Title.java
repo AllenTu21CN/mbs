@@ -1,5 +1,7 @@
 package cn.sanbu.avalon.endpoint3.structures;
 
+import com.sanbu.media.Alignment;
+import com.sanbu.media.TextStyle;
 import com.sanbu.tools.CompareHelper;
 
 public class Title {

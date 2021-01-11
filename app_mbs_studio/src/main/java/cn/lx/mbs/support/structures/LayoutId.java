@@ -1,9 +1,9 @@
 package cn.lx.mbs.support.structures;
 
+import com.sanbu.media.Region;
+
 import java.util.Arrays;
 import java.util.List;
-
-import cn.sanbu.avalon.endpoint3.structures.Region;
 
 // 内置的布局
 public enum LayoutId {

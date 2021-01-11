@@ -6,10 +6,6 @@ import android.content.pm.PackageManager;
 
 import java.lang.reflect.Method;
 
-/**
- * Created by zhangxd on 2018/11/8.
- */
-
 public class PackageUtil {
 
     /**
@@ -96,5 +92,15 @@ public class PackageUtil {
             e.printStackTrace();
         }
         return serial;
+    }
+
+    public static boolean exists(Context context, String packageName) {
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo info = packageManager.getPackageInfo(packageName, PackageManager.GET_SERVICES);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

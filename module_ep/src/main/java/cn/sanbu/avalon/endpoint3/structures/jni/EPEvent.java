@@ -1,8 +1,10 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
 public enum EPEvent {
+    Unknown(-999),
     RecvReqOpenVideoExt(0),
-    FileWrittenCompleted(1);
+    FileWrittenCompleted(1),
+    OutputStatusChanged(2);
 
     public final int value;
 
@@ -15,6 +17,6 @@ public enum EPEvent {
             if (event.value == value)
                 return event;
         }
-        return null;
+        return Unknown;
     }
 }

@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
@@ -52,8 +51,10 @@ public class DBUtil {
     }
 
     public void release() {
-        if (mDbHelper != null)
+        if (mDbHelper != null) {
             mDbHelper.close();
+            mDbHelper = null;
+        }
 
         synchronized (mTableHelpers) {
             mTableHelpers.clear();
@@ -81,50 +82,58 @@ public class DBUtil {
     }
 
     public Throwable insert(String tableName, ContentValues values) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
+            db = mDbHelper.getWritableDatabase();
             db.insertOrThrow(tableName, null, values);
-            db.close();
             return null;
         } catch (Exception e) {
-            db.close();
             return e;
+        } finally {
+            if (db != null)
+                db.close();
         }
     }
 
     public Throwable delete(String tableName, String whereClause, String[] whereArgs) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
+            db = mDbHelper.getWritableDatabase();
             db.delete(tableName, whereClause, whereArgs);
-            db.close();
             return null;
         } catch (Exception e) {
-            db.close();
             return e;
+        } finally {
+            if (db != null)
+                db.close();
         }
     }
 
     public Throwable clearTable(String tableName) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
+            db = mDbHelper.getWritableDatabase();
             db.delete(tableName, null, null);
-            db.close();
             return null;
         } catch (Exception e) {
-            db.close();
             return e;
+        } finally {
+            if (db != null)
+                db.close();
         }
     }
 
     public Throwable update(String tableName, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        SQLiteDatabase db = null;
         try {
+            db = mDbHelper.getWritableDatabase();
             db.update(tableName, values, selection, selectionArgs);
-            db.close();
             return null;
         } catch (Exception e) {
-            db.close();
             return e;
+        } finally {
+            if (db != null)
+                db.close();
         }
     }
 
@@ -167,24 +176,74 @@ public class DBUtil {
     }
 
     public int countTableItem(String tableName, String field) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery(String.format("select count(%s) from %s", field, tableName),null);
-        cursor.moveToFirst();
-        int count = cursor.getInt(0);
-        cursor.close();
-        db.close();
-        return count;
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = mDbHelper.getReadableDatabase();
+            cursor = db.rawQuery(String.format("select count(%s) from %s", field, tableName),null);
+            if (cursor.moveToFirst())
+                return cursor.getInt(0);
+            else
+                return -1;
+        } catch (Exception e) {
+            LogUtil.w(TAG, "countTableItem error", e);
+            return -1;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (db != null)
+                db.close();
+        }
     }
 
     public int countTableItem(String tableName, String field, String... values) {
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery(String.format("select count(%s) from %s where %s in (%s)",
-                field, tableName, field, StringUtil.join(",", values)),null);
-        cursor.moveToFirst();
-        int count = cursor.getInt(0);
-        cursor.close();
-        db.close();
-        return count;
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = mDbHelper.getReadableDatabase();
+            cursor = db.rawQuery(String.format("select count(%s) from %s where %s in (%s)",
+                    field, tableName, field, StringUtil.join(",", values)),null);
+            if (cursor.moveToFirst())
+                return cursor.getInt(0);
+            else
+                return -1;
+        } catch (Exception e) {
+            LogUtil.w(TAG, "countTableItem error", e);
+            return -1;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (db != null)
+                db.close();
+        }
+    }
+
+    public ContentValues getFirstMatch(String sql, String[] selectionArgs) {
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+
+        try {
+            db = mDbHelper.getReadableDatabase();
+            cursor = db.rawQuery(sql, selectionArgs);
+
+            if (cursor.moveToFirst()) {
+                ContentValues values = new ContentValues();
+                for (int i = 0; i < cursor.getColumnCount(); ++i) {
+                    values.put(cursor.getColumnName(i), cursor.getString(i));
+                }
+                return values;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            LogUtil.w(TAG, "getFirstMatch failed", e);
+            return null;
+        } finally {
+            if (cursor != null)
+                cursor.close();
+            if (db != null)
+                db.close();
+        }
     }
 
     public static List<ContentValues> queryTable(SQLiteDatabase rDB, String tableName, String selection, String[] selectionArgs, String orderBy, int maxCount) {

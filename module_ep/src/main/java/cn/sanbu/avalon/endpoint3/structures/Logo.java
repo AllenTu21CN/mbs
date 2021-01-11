@@ -1,5 +1,7 @@
 package cn.sanbu.avalon.endpoint3.structures;
 
+import com.sanbu.media.Alignment;
+import com.sanbu.media.Region;
 import com.sanbu.tools.CompareHelper;
 
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayOverlay;
@@ -54,7 +56,7 @@ public class Logo {
         int logoHeight = this.logoHeight > 0 ? this.logoHeight : 30;
         Region dst = transformDst(sceneWidth, sceneHeight, logoWidth, logoHeight, alignment);
 
-        DisplayOverlay.Image image = new DisplayOverlay.Image(imagePath, dst);
+        DisplayOverlay image = DisplayOverlay.buildImage(imagePath, dst);
         image.setTransparency(transparency);
         image.setSrcRegion(srcRegion);
         return image;

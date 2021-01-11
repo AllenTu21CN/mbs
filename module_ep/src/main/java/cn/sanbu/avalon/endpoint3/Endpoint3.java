@@ -1,30 +1,34 @@
 package cn.sanbu.avalon.endpoint3;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.Surface;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.sanbu.base.BaseError;
+import com.sanbu.android.annotation.NonNull;
+import com.sanbu.android.annotation.Nullable;
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.Bandwidth;
+import com.sanbu.network.CallingProtocol;
+import com.sanbu.media.DataType;
+import com.sanbu.media.Resolution;
+import com.sanbu.media.VideoFormat;
 import com.sanbu.tools.LogUtil;
 
 import java.util.Arrays;
 import java.util.List;
 
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapabilities;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
 import cn.sanbu.avalon.endpoint3.structures.AudioInputDevice;
 import cn.sanbu.avalon.endpoint3.structures.AudioOutputDevice;
-import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
-import cn.sanbu.avalon.endpoint3.structures.CallingProtocol;
 import cn.sanbu.avalon.endpoint3.structures.CallingStatistics;
-import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
+import com.sanbu.media.EPObjectType;
+import com.sanbu.network.TransProtocol;
+
+import cn.sanbu.avalon.endpoint3.structures.OutputStatus;
+import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
-import cn.sanbu.avalon.endpoint3.structures.EPObjectType;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPEvent;
-import cn.sanbu.avalon.endpoint3.structures.jni.StreamDesc;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.MediaStatistics;
 import cn.sanbu.avalon.endpoint3.structures.jni.MixerTracks;
@@ -32,10 +36,8 @@ import cn.sanbu.avalon.endpoint3.structures.jni.RecOEConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.RecSplitStrategy;
 import cn.sanbu.avalon.endpoint3.structures.jni.Reconnecting;
 import cn.sanbu.avalon.endpoint3.structures.jni.RegConfig;
-import cn.sanbu.avalon.endpoint3.structures.Resolution;
-import cn.sanbu.avalon.endpoint3.structures.TransProtocol;
+import cn.sanbu.avalon.endpoint3.structures.jni.StreamDesc;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoCapabilities;
-import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 import cn.sanbu.avalon.media.MediaEventId;
 import cn.sanbu.avalon.media.VideoEngine;
 
@@ -72,8 +74,10 @@ public class Endpoint3 {
         // @param obj_type [IN] type of object
         // @param obj_id [IN] id of object
         // @param event [IN] value of event
-        // @param params [IN] params of event
-        void onEvent(EPObjectType objType, int objId, EPEvent event, String params);
+        // @param params [IN] params of event:
+        //      if event = FileWrittenCompleted, params is file-path(String)
+        //      if event = OutputStatusChanged, params is error-code(OutputStatus)
+        void onEvent(EPObjectType objType, int objId, EPEvent event, Object params);
     }
 
     // Terminal stream callbacks
@@ -83,7 +87,7 @@ public class Endpoint3 {
         // @param parent_id [IN] id of stream parent
         // @param stream_id [IN] id of stream
         // @param desc [IN] description of stream
-        // @param format [IN] format of stream, @see cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat and AudioFormat
+        // @param format [IN] format of stream, @see VideoFormat and AudioFormat
         void onStreamOpen(EPObjectType parentType, int parentId, int streamId, StreamDesc desc, Object format);
 
         void onStreamClose(EPObjectType parentType, int parentId, int streamId, StreamDesc desc);
@@ -171,7 +175,12 @@ public class Endpoint3 {
 
         String json = new Gson().toJson(config);
         LogUtil.i(EPConst.TAG, "epInit: " + json);
-        return jniEpInit(json);
+        int ret = jniEpInit(json);
+
+        LogUtil.w(EPConst.TAG, "TODO: fix RTSP_TRANS_PROTO as RTP/AVP/TCP");
+        jniEpConfigure(EPConst.EP_PROPERTY_RTSP_TRANS_PROTO, TransProtocol.RTP_TCP.name);
+
+        return ret;
     }
 
     // @brief Uninits endpoint, release resources.
@@ -437,11 +446,11 @@ public class Endpoint3 {
 
     /////////////////////////////// source(rtsp/rtmp/file/capture) interfaces
 
-    // @brief Adds video capture source(HDMI, Camera ..).
-    // @param url [IN] source url, e.g. "device://video/0"
+    // @brief Adds origin camera.
+    // @param url [IN] source url, e.g. "device://video/0" (camera id)
     // @param resolution [IN] source resolution, RES_UNKNOWN means auto
     // @return source_id
-    public int epAddVideoCapture(String url, @NonNull Resolution resolution) {
+    public int epAddOriginCamera(String url, @NonNull Resolution resolution) {
         String json;
 
         JsonObject properties = new JsonObject();
@@ -450,7 +459,7 @@ public class Endpoint3 {
         json = properties.toString();
 
         int ret = jniEpAddSource(url, json);
-        EPConst.logAction("epAddSource(VideoCapture)", ret, url, json);
+        EPConst.logAction("epAddSource(OriginCamera)", ret, url, json);
         return ret;
     }
 
@@ -474,6 +483,8 @@ public class Endpoint3 {
             properties.addProperty("protocol", trans_protocol.value);
         properties.add("reconnect", new Gson().toJsonTree(reconnecting));
         String json = properties.toString();
+
+        LogUtil.w(EPConst.TAG, "TODO: rtsp trans protocol is not used: " + trans_protocol);
 
         int ret = jniEpAddSource(url, json);
         EPConst.logAction("epAddSource(RTSP)", ret, url, json);
@@ -753,7 +764,7 @@ public class Endpoint3 {
 
         cn.sanbu.avalon.endpoint3.structures.jni.CallingStatistics statis = new Gson().fromJson(statistics,
                 cn.sanbu.avalon.endpoint3.structures.jni.CallingStatistics.class);
-        return CallingStatistics.build(statis);
+        return CallingStatistics.build(statis).update();
     }
 
     /////////////////////////////// register gk and sip-server interfaces
@@ -933,7 +944,6 @@ public class Endpoint3 {
         }
 
         if (event >= 0) {
-
             EPEvent evt = EPEvent.fromValue(event);
             if (evt == null) {
                 LogUtil.w(EPConst.TAG, String.format("onEvent got invalid params, obj_type:%s obj_id:%d event:%d params:%s",
@@ -947,7 +957,14 @@ public class Endpoint3 {
             if (m_ep_cb == null)
                 throw new RuntimeException("NOT set ep callback to ep3");
 
-            m_ep_cb.onEvent(type, obj_id, evt, params);
+            try {
+                if (evt == EPEvent.OutputStatusChanged)
+                    m_ep_cb.onEvent(type, obj_id, evt, OutputStatus.fromCode(Integer.valueOf(params)));
+                else
+                    m_ep_cb.onEvent(type, obj_id, evt, params);
+            } catch (Exception e) {
+                LogUtil.w(EPConst.TAG, "onEvent error", e);
+            }
 
         } else {
             // re-calc event id

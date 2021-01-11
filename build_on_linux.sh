@@ -10,8 +10,8 @@ PATH=$2:${PATH}
 
 export ANDROID_HOME PATH
 
-APPS=$3
-[ -z "$APPS" ] && APPS=$APP_LIST
+APPS="$3"
+[ -z "$APPS" ] && APPS="$APP_LIST"
 
 # jdk
 [ ! -z "$4" ] && export JAVA_HOME=$4
@@ -40,5 +40,7 @@ done
 # build
 sed -i "s/^org.gradle.jvmargs=.*$/org.gradle.jvmargs=-Xmx16384M -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8/g" gradle.properties
 sed -i "s/^org.gradle.parallel=.*$/org.gradle.parallel=true/g" gradle.properties
+mkdir -p /cache/${CI_PROJECT_NAME}/.gradle
+export GRADLE_USER_HOME=/cache/${CI_PROJECT_NAME}/.gradle
 
 LC_ALL=en_US.UTF-8 gradle build

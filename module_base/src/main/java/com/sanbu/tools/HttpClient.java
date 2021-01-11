@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,13 +21,16 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
 import okhttp3.Call;
+import okhttp3.ConnectionSpec;
 import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import okhttp3.TlsVersion;
 
 public class HttpClient {
 
@@ -82,11 +86,19 @@ public class HttpClient {
         return getInstance(gDefaultSSLConfig);
     }
 
+    public static HttpClient getSpecsSSL() {
+        return getInstance(gDefaultSSLConfig, true);
+    }
+
     public static HttpClient getDefault(boolean useSSL) {
         return useSSL?getInstance(gDefaultConfig):getInstance(gDefaultConfig);
     }
 
     public static HttpClient getInstance(Config config) {
+        return getInstance(config, false);
+    }
+
+    public static HttpClient getInstance(Config config, boolean specs) {
         if (config == null)
             config = gDefaultConfig;
 
@@ -95,8 +107,11 @@ public class HttpClient {
                 if (pair.first.isEqual(config))
                     return pair.second;
             }
-
-            HttpClient instance = new HttpClient(config);
+            HttpClient instance;
+            if (specs)
+                instance = new HttpClient(config, true);
+            else
+                instance = new HttpClient(config);
             gConfigedClients.add(new Tuple(config, instance));
             return instance;
         }
@@ -114,6 +129,10 @@ public class HttpClient {
 
     private HttpClient(Config config) {
         mClient = buildHttpClient(config);
+    }
+
+    private HttpClient(Config config, boolean specs) {
+        mClient = buildHttpClient(config, specs);
     }
 
     public OkHttpClient getClient() {
@@ -265,6 +284,10 @@ public class HttpClient {
     }
 
     private static OkHttpClient buildHttpClient(Config config) {
+        return buildHttpClient(config, false);
+    }
+
+    private static OkHttpClient buildHttpClient(Config config, boolean specs) {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         if (config != null) {
             if (config.usingHTTPS)
@@ -277,6 +300,12 @@ public class HttpClient {
                 builder.writeTimeout(config.writeTimeoutMS, TimeUnit.MILLISECONDS);
             if (config.pingIntervalMS >= 0)
                 builder.pingInterval(config.pingIntervalMS, TimeUnit.MILLISECONDS);
+        }
+        if (specs) {
+            ConnectionSpec spec = new ConnectionSpec.Builder(ConnectionSpec.COMPATIBLE_TLS)
+                    .tlsVersions(TlsVersion.TLS_1_1, TlsVersion.TLS_1_0)
+                    .build();
+            builder.connectionSpecs(Collections.singletonList(spec));
         }
         return builder.build();
     }

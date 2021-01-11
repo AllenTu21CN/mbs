@@ -499,7 +499,7 @@ public interface DataImpExp {
                         Result result = helper.exec(item, value);
                         if (!result.isSuccessful())
                             onError(hints, "extract4Others failed: " + result.getMessage(),
-                                    "内部错误,导出失败:" + item.name);
+                                    "内部错误,导入失败:" + item.name);
                         break;
                     }
                     default:

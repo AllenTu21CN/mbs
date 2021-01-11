@@ -27,7 +27,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import androidx.annotation.NonNull;
 import android.util.Size;
 import android.view.Choreographer;
 import android.view.Display;
@@ -39,9 +38,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
+import com.sanbu.android.annotation.NonNull;
 import com.sanbu.board.HuaWei;
 import com.sanbu.board.Rockchip;
+import com.sanbu.media.H264Profile;
 import com.sanbu.tools.LogUtil;
 import com.sanbu.tools.StringUtil;
 
@@ -66,19 +66,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.sanbu.avalon.endpoint3.structures.H264Profile;
 import cn.sanbu.avalon.endpoint3.structures.jni.AVCLevel;
 import cn.sanbu.avalon.media.gles.CustomProgram;
 import cn.sanbu.avalon.media.gles.Drawable2d;
 import cn.sanbu.avalon.media.gles.EglCore;
-import cn.sanbu.avalon.media.gles.FullFrameRect;
 import cn.sanbu.avalon.media.gles.FlatShadedProgram;
+import cn.sanbu.avalon.media.gles.FullFrameRect;
+import cn.sanbu.avalon.media.gles.GlUtil;
+import cn.sanbu.avalon.media.gles.OffscreenSurface;
+import cn.sanbu.avalon.media.gles.ScaledDrawable2d;
 import cn.sanbu.avalon.media.gles.SharedTextureManager;
 import cn.sanbu.avalon.media.gles.Sprite2d;
 import cn.sanbu.avalon.media.gles.Texture2dProgram;
-import cn.sanbu.avalon.media.gles.GlUtil;
-import cn.sanbu.avalon.media.gles.ScaledDrawable2d;
-import cn.sanbu.avalon.media.gles.OffscreenSurface;
 import cn.sanbu.avalon.media.gles.TransitionProgram;
 import cn.sanbu.avalon.media.gles.WindowSurface;
 
@@ -1499,6 +1498,8 @@ public class VideoEngine {
                     mCustomSources[i] = new WeakReference<>(sources[i]);
                     if (sources[i] != null) {
                         mCustomSourceTextures[i] = sources[i].getTextureId();
+                    } else {
+                        mCustomSourceTextures[i] = -1;
                     }
                 }
 
@@ -1563,10 +1564,12 @@ public class VideoEngine {
             }
 
             private void drawCustom() {
+                /*
                 for (int i = 0; i < mCustomSources.length; i++) {
                     Source s = mCustomSources[i].get();
                     mCustomSourceTextures[i] = (s != null) ? s.getTextureId() : -1;
                 }
+                */
 
                 if (mCustomProgram != null) {
                     mCustomProgram.draw(mCustomSourceTextures, mCustomVariables);
@@ -2014,7 +2017,7 @@ public class VideoEngine {
         }
 
         @Deprecated
-        private boolean reconfig(String config) {
+        private boolean reconfig_Deprecated(String config) {
             // Clone current configurations and overlays as previous for transition
             try {
                 if (mPreviousConfig != null) {
@@ -2210,7 +2213,7 @@ public class VideoEngine {
             return true;
         }
 
-        private boolean reconfig2(String config) {
+        private boolean reconfig(String config) {
             boolean updateTrans = false;
 
             // Clone current configurations and overlays as previous for transition
@@ -3303,7 +3306,7 @@ public class VideoEngine {
             public int      width = 1920;
             public int      height = 1080;
             public int      frameRate = 30;
-            public int      keyFrameInterval;
+            public int      keyFrameInterval = frameRate * 3600;
             // the maximum number of B frames between I or P frames
             public int      maxBFrames = 0;
 
@@ -3582,12 +3585,16 @@ public class VideoEngine {
 
                 // Request key frame periodically - RockChip series only
                 if (Rockchip.is3BUVersion()) {
-                    LogUtil.i(TAG, "Create timer for request key frame periodically.");
+                    LogUtil.i(TAG, "Create timer (fps=" + mConfig.frameRate
+                            + "/int=" + mConfig.keyFrameInterval + ") for request key frame periodically.");
                     mPeriodRequestKeyFrameTimer = new Timer();
                     int period = (int) Math.ceil(1000.0f * mConfig.keyFrameInterval / mConfig.frameRate);
                     mPeriodRequestKeyFrameTimer.scheduleAtFixedRate(new TimerTask() {
                         @Override
                         public void run() {
+                            LogUtil.d(TAG, "Request key frame for video sink(id=" + mId
+                                    + "/fps=" + mConfig.frameRate
+                                    + "/int=" + mConfig.keyFrameInterval + ") periodically.");
                             requestKeyFrame();
                         }
                     }, period, period);
@@ -3748,6 +3755,12 @@ public class VideoEngine {
 
         private void handleRequestKeyFrame() {
             LogUtil.d(TAG, "Video sink id=" + mId + " requestKeyFrame.");
+
+            // TODO: Need more investigate
+            if (HuaWei.isProduct()) {
+                LogUtil.w(TAG, "Ignore key frame request on HuaWei devices.");
+                return;
+            }
 
             long now = System.currentTimeMillis();
             if (now >= mLastKeyFrameTimeStamp + MIN_KEY_FRAME_INTERVAL) {
@@ -4230,7 +4243,7 @@ public class VideoEngine {
             }
             //LogUtil.i(TAG, "Reconfig video scene#" + sceneId + ", config: " + config);
 
-            return mScenes.get(sceneId).reconfig2(config);
+            return mScenes.get(sceneId).reconfig(config);
         }
 
         private void queryScene(int sceneId) {
@@ -4317,8 +4330,9 @@ public class VideoEngine {
             try {
                 CustomProgram p = new CustomProgram(name, shaderFunc);
                 mCustomPrograms.put(name, p);
+                LogUtil.i(TAG, "registerCustomProgram: " + name);
             } catch (RuntimeException e) {
-                LogUtil.e(TAG, "registerCustomProgram: create custom program failed!");
+                LogUtil.e(TAG, "registerCustomProgram: create custom program failed!", e);
                 return false;
             }
 

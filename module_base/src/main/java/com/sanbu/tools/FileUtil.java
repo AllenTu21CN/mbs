@@ -3,7 +3,6 @@ package com.sanbu.tools;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -122,6 +121,7 @@ public class FileUtil {
                 for (int i = 0; i < children.length; i++) {
                     boolean success = deleteDir(new File(dir, children[i]));
                     if (!success) {
+                        LogUtil.w("delete target failed: " + dir.getPath());
                         return false;
                     }
                 }

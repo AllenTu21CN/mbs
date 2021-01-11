@@ -8,7 +8,7 @@ import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.os.Build;
 import android.os.Looper;
-import androidx.annotation.NonNull;
+import com.sanbu.android.annotation.NonNull;
 import android.util.Size;
 
 import com.sanbu.board.BoardSupportClient;

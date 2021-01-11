@@ -1,226 +1,211 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
+import com.sanbu.media.Alignment;
+import com.sanbu.media.Region;
+import com.sanbu.media.TextStyle;
 import com.sanbu.tools.CompareHelper;
 
-import cn.sanbu.avalon.endpoint3.structures.Alignment;
-import cn.sanbu.avalon.endpoint3.structures.Region;
-import cn.sanbu.avalon.endpoint3.structures.TextStyle;
+import java.util.List;
+
 import cn.sanbu.avalon.endpoint3.structures.Title;
 
-public interface DisplayOverlay {
+public class DisplayOverlay {
 
-    boolean isStream();
-    Region getSrcRegion();
-    void setSrcRegion(Region region);
-    Region getDstRegion();
-    void setDstRegion(Region region);
-    int getZIndex();
-    void setZIndex(int index);
-    float getTransparency();
-    void setTransparency(float transparency);
-    boolean isEqual(DisplayOverlay other);
+    public enum Type {
+        stream,
+        image,
+        custom
+    }
 
-    class Stream implements DisplayOverlay {
-        private final String type;
-        private final int source_id;
+    private final Type type;
+    // only for stream overlay
+    private final Integer source_id;
+    // only for image overlay
+    private final String image_path;
+    // only for custom overlay
+    private final String shader;
 
-        private String src_rect; // <left:top:width:height>, float: 0.0~1.0
-        private String dst_rect; // <left:top:width:height>, float: 0.0~1.0
-        private int z_index;     // (int: 0~9999)
-        private float opacity;   // is transparency (float: 0.0~1.0)
+    // regions for stream or image
+    private String src_rect;  // <left:top:width:height>, float: 0.0~1.0
+    private String dst_rect;  // <left:top:width:height>, float: 0.0~1.0
+    private int z_index;      // (int: 0~9999)
+    private float opacity;    // is transparency (float: 0.0~1.0)
 
-        // display name
-        private Boolean display_name_visible;
-        private String display_name;
-        private String display_name_alignment;
-        private String display_name_style_sheet;
+    // display name
+    private Boolean display_name_visible;
+    private String display_name;
+    private String display_name_alignment;
+    private String display_name_style_sheet;
 
-        public Stream(int id, Region dst) {
-            this.type = "stream";
-            this.source_id = id;
-            this.src_rect = Region.buildFull().toString();
-            this.dst_rect = dst.toString();
-            this.z_index = 0;
-            this.opacity = 0.0f;
-        }
+    // values for custom
+    private List<Integer> sources;
+    private List<Float> variables;
 
-        @Override
-        public boolean isStream() {
-            return true;
-        }
+    private DisplayOverlay(Type type, Integer streamId, String imagePath, String shaderName) {
+        this.type = type;
+        this.source_id = streamId;
+        this.image_path = imagePath;
+        this.shader = shaderName;
+        this.z_index = 0;
+        this.opacity = 0.0f;
+    }
 
-        @Override
-        public Region getSrcRegion() {
-            return Region.fromString(src_rect);
-        }
+    public static DisplayOverlay buildStream(int streamId, Region dst) {
+        DisplayOverlay overlay = new DisplayOverlay(Type.stream, streamId, null, null);
+        overlay.setSrcRegion(Region.buildFull());
+        overlay.setDstRegion(dst);
+        return overlay;
+    }
 
-        @Override
-        public void setSrcRegion(Region region) {
-            this.src_rect = region.toString();
-        }
+    public static DisplayOverlay buildImage(String imagePath, Region dst) {
+        DisplayOverlay overlay = new DisplayOverlay(Type.image, null, imagePath, null);
+        overlay.setSrcRegion(Region.buildFull());
+        overlay.setDstRegion(dst);
+        return overlay;
+    }
 
-        @Override
-        public Region getDstRegion() {
-            return Region.fromString(dst_rect);
-        }
+    public static DisplayOverlay buildCustom(String shaderName) {
+        return new DisplayOverlay(Type.custom, null, null, shaderName);
+    }
 
-        @Override
-        public void setDstRegion(Region region) {
-            this.dst_rect = region.toString();
-        }
+    public Type getType() {
+        return type;
+    }
 
-        @Override
-        public int getZIndex() {
-            return z_index;
-        }
+    public int getStreamId() {
+        return source_id == null ? -1 : source_id;
+    }
 
-        @Override
-        public void setZIndex(int index) {
-            this.z_index = index;
-        }
+    public String getImagePath() {
+        return image_path;
+    }
 
-        @Override
-        public float getTransparency() {
-            return opacity;
-        }
+    public String getShaderName() {
+        return shader;
+    }
 
-        @Override
-        public void setTransparency(float transparency) {
-            this.opacity = transparency;
-        }
+    public Region getSrcRegion() {
+        return Region.fromString(src_rect);
+    }
 
-        @Override
-        public boolean isEqual(DisplayOverlay other) {
-            if (other == null || !other.isStream())
-                return false;
+    public void setSrcRegion(Region region) {
+        if (type == Type.custom)
+            throw new UnsupportedOperationException("custom overlay non-supports this action");
 
-            Stream o = (Stream) other;
-            return (source_id == o.source_id &&
-                    CompareHelper.isEqual(src_rect, o.src_rect) &&
-                    CompareHelper.isEqual(dst_rect, o.dst_rect) &&
-                    z_index == o.z_index && opacity == o.opacity &&
-                    CompareHelper.isEqual(display_name_visible, o.display_name_visible) &&
-                    CompareHelper.isEqual(display_name, o.display_name) &&
-                    CompareHelper.isEqual(display_name_alignment, o.display_name_alignment) &&
-                    CompareHelper.isEqual(display_name_style_sheet, o.display_name_style_sheet)
-            );
-        }
+        this.src_rect = region.toString();
+    }
 
-        public int getStreamId() {
-            return source_id;
-        }
+    public Region getDstRegion() {
+        return Region.fromString(dst_rect);
+    }
 
-        public Title getTitle() {
-            return display_name_visible == null ? null : new Title(display_name,
-                    Alignment.fromString(display_name_alignment),
-                    TextStyle.fromSheet(display_name_style_sheet),
-                    display_name_visible);
-        }
+    public void setDstRegion(Region region) {
+        if (type == Type.custom)
+            throw new UnsupportedOperationException("custom overlay non-supports this action");
 
-        public Stream setTitle(Title title) {
-            if (title != null) {
-                display_name = title.content;
-                display_name_alignment = title.alignment.toString();
-                display_name_style_sheet = title.textStyle.toSheet();
-                display_name_visible = title.visible;
+        this.dst_rect = region.toString();
+    }
 
-                if (!display_name_visible)
-                    display_name = "";
-            }
-            return this;
-        }
+    public int getZIndex() {
+        return z_index;
+    }
 
-        public Stream setTitle(boolean visible, String content,
-                               String alignment, String style_sheet) {
-            display_name = content;
-            display_name_alignment = alignment;
-            display_name_style_sheet = style_sheet;
-            display_name_visible = visible;
+    public void setZIndex(int index) {
+        if (type == Type.custom)
+            throw new UnsupportedOperationException("custom overlay non-supports this action");
+
+        this.z_index = index;
+    }
+
+    public float getTransparency() {
+        return opacity;
+    }
+
+    public void setTransparency(float transparency) {
+        if (type == Type.custom)
+            throw new UnsupportedOperationException("custom overlay non-supports this action");
+
+        this.opacity = transparency;
+    }
+
+    public Title getTitle() {
+        return display_name_visible == null ? null : new Title(display_name,
+                Alignment.fromString(display_name_alignment),
+                TextStyle.fromSheet(display_name_style_sheet),
+                display_name_visible);
+    }
+
+    public DisplayOverlay setTitle(Title title) {
+        if (title != null) {
+            display_name = title.content;
+            display_name_alignment = title.alignment.toString();
+            display_name_style_sheet = title.textStyle.toSheet();
+            display_name_visible = title.visible;
 
             if (!display_name_visible)
                 display_name = "";
-            return this;
+        } else {
+            display_name = "";
+            display_name_alignment = null;
+            display_name_style_sheet = null;
+            display_name_visible = false;
         }
+        return this;
     }
 
-    class Image implements DisplayOverlay {
-        private final String type;
-        private final String image_path;
+    public DisplayOverlay setTitle(boolean visible, String content,
+                           String alignment, String style_sheet) {
+        display_name = content;
+        display_name_alignment = alignment;
+        display_name_style_sheet = style_sheet;
+        display_name_visible = visible;
 
-        private String src_rect;  // <left:top:width:height>, float: 0.0~1.0
-        private String dst_rect;  // <left:top:width:height>, float: 0.0~1.0
-        private int z_index;      // (int: 0~9999)
-        private float opacity;    // is transparency, (float: 0.0~1.0)
+        if (!display_name_visible)
+            display_name = "";
+        return this;
+    }
 
-        public Image(String imagePath, Region dst) {
-            this.type = "image";
-            this.image_path = imagePath;
-            this.src_rect = Region.buildFull().toString();
-            this.dst_rect = dst.toString();
-            this.z_index = 0;
-            this.opacity = 0.0f;
-        }
+    public List<Integer> getCustomStreams() {
+        return sources;
+    }
 
-        @Override
-        public boolean isStream() {
+    public DisplayOverlay setCustomStreams(List<Integer> streamIds) {
+        if (type != Type.custom)
+            throw new UnsupportedOperationException("just custom overlay supports this action");
+
+        this.sources = streamIds;
+        return this;
+    }
+
+    public List<Float> getCustomVariables() {
+        return variables;
+    }
+
+    public DisplayOverlay setCustomVariables(List<Float> variables) {
+        if (type != Type.custom)
+            throw new UnsupportedOperationException("just custom overlay supports this action");
+
+        this.variables = variables;
+        return this;
+    }
+
+    public boolean isEqual(DisplayOverlay other) {
+        if (other == null)
             return false;
-        }
 
-        @Override
-        public Region getSrcRegion() {
-            return Region.fromString(src_rect);
-        }
-
-        @Override
-        public void setSrcRegion(Region region) {
-            this.src_rect = region.toString();
-        }
-
-        @Override
-        public Region getDstRegion() {
-            return Region.fromString(dst_rect);
-        }
-
-        @Override
-        public void setDstRegion(Region region) {
-            this.dst_rect = region.toString();
-        }
-
-        @Override
-        public int getZIndex() {
-            return z_index;
-        }
-
-        @Override
-        public void setZIndex(int index) {
-            this.z_index = index;
-        }
-
-        @Override
-        public float getTransparency() {
-            return opacity;
-        }
-
-        @Override
-        public void setTransparency(float transparency) {
-            this.opacity = transparency;
-        }
-
-        @Override
-        public boolean isEqual(DisplayOverlay other) {
-            if (other == null || other.isStream())
-                return false;
-
-            Image o = (Image) other;
-            return (CompareHelper.isEqual(image_path, o.image_path) &&
-                    CompareHelper.isEqual(src_rect, o.src_rect) &&
-                    CompareHelper.isEqual(dst_rect, o.dst_rect) &&
-                    z_index == o.z_index && opacity == o.opacity
-            );
-        }
-
-        public String getImagePath() {
-            return image_path;
-        }
+        return (CompareHelper.isEqual(type, other.type) &&
+                CompareHelper.isEqual(source_id, other.source_id) &&
+                CompareHelper.isEqual(image_path, other.image_path) &&
+                CompareHelper.isEqual(shader, other.shader) &&
+                CompareHelper.isEqual(src_rect, other.src_rect) &&
+                CompareHelper.isEqual(dst_rect, other.dst_rect) &&
+                z_index == other.z_index && opacity == other.opacity &&
+                CompareHelper.isEqual(display_name_visible, other.display_name_visible) &&
+                CompareHelper.isEqual(display_name, other.display_name) &&
+                CompareHelper.isEqual(display_name_alignment, other.display_name_alignment) &&
+                CompareHelper.isEqual(display_name_style_sheet, other.display_name_style_sheet) &&
+                CompareHelper.isEqual4BaseList(sources, other.sources) &&
+                CompareHelper.isEqual4BaseList(variables, other.variables)
+        );
     }
 }

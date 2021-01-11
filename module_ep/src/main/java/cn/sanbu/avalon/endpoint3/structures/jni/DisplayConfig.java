@@ -1,17 +1,16 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
+import com.sanbu.media.Alignment;
+import com.sanbu.media.Region;
+import com.sanbu.media.TextStyle;
 import com.sanbu.tools.CompareHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import cn.sanbu.avalon.endpoint3.structures.Alignment;
 import cn.sanbu.avalon.endpoint3.structures.DisplayCell;
 import cn.sanbu.avalon.endpoint3.structures.Logo;
-import cn.sanbu.avalon.endpoint3.structures.Region;
-import cn.sanbu.avalon.endpoint3.structures.TextStyle;
 import cn.sanbu.avalon.endpoint3.structures.Title;
 
 // 与VideoEngine::Scene re-config对应
@@ -42,8 +41,9 @@ public class DisplayConfig {
 
     }
 
-    public DisplayConfig setOverlays(List<Region> layout, List<DisplayCell> cells, Logo logo) {
-        overlays = new LinkedList<>();
+    public DisplayConfig addOverlays(List<Region> layout, List<DisplayCell> cells, Logo logo) {
+        if (overlays == null)
+            overlays = new LinkedList<>();
 
         for (DisplayCell cell: cells) {
             if (cell.index >= layout.size())
@@ -52,11 +52,12 @@ public class DisplayConfig {
             Region dstRegion = layout.get(cell.index);
             DisplayOverlay overlay;
             if (cell.isStream) {
-                overlay = new DisplayOverlay.Stream(cell.streamId, dstRegion).setTitle(cell.title);
+                overlay = DisplayOverlay.buildStream(cell.streamId, dstRegion);
             } else {
-                overlay = new DisplayOverlay.Image(cell.imagePath, dstRegion);
+                overlay = DisplayOverlay.buildImage(cell.imagePath, dstRegion);
             }
 
+            overlay.setTitle(cell.title);
             overlay.setZIndex(cell.index);
             overlay.setTransparency(cell.transparency);
             overlay.setSrcRegion(cell.srcRegion);
@@ -69,6 +70,17 @@ public class DisplayConfig {
             overlays.add(overlay);
         }
 
+        return this;
+    }
+
+    public DisplayConfig addOverlays(String shaderName, List<Integer> streamIds, List<Float> variables) {
+        if (overlays == null)
+            overlays = new LinkedList<>();
+
+        DisplayOverlay overlay = DisplayOverlay.buildCustom(shaderName);
+        overlay.setCustomStreams(streamIds);
+        overlay.setCustomVariables(variables);
+        overlays.add(overlay);
         return this;
     }
 
@@ -157,7 +169,15 @@ public class DisplayConfig {
     }
 
     public static DisplayConfig buildOverlays(List<Region> layout, List<DisplayCell> cells, Logo logo) {
-        return new DisplayConfig().setOverlays(layout, cells, logo);
+        return new DisplayConfig().addOverlays(layout, cells, logo);
+    }
+
+    public static DisplayConfig buildOverlays(String shaderName, List<Integer> streamIds) {
+        return buildOverlays(shaderName, streamIds, null);
+    }
+
+    public static DisplayConfig buildOverlays(String shaderName, List<Integer> streamIds, List<Float> variables) {
+        return new DisplayConfig().addOverlays(shaderName, streamIds, variables);
     }
 
     public static DisplayConfig buildEmptyOverlays() {

@@ -1,6 +1,6 @@
 package cn.lx.mbs.support.structures;
 
-import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
+import com.sanbu.media.DataType;
 
 public class StreamState {
     public ChannelId channelId;

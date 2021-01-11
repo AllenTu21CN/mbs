@@ -1,5 +1,6 @@
 package cn.sanbu.avalon.endpoint3.structures;
 
+import com.sanbu.media.Region;
 import com.sanbu.tools.CompareHelper;
 
 public class DisplayCell {
@@ -9,22 +10,21 @@ public class DisplayCell {
     // optional
     public float transparency;
     public Region srcRegion;
+    public Title title;
 
     // for stream
     public int streamId;
-    public Title title;
-
     // for image
     public String imagePath;
 
     private DisplayCell(boolean isStream, int index, float transparency, Region srcRegion,
-                        int streamId, Title title, String imagePath) {
+                        Title title, int streamId, String imagePath) {
         this.isStream = isStream;
         this.index = index;
         this.transparency = transparency;
         this.srcRegion = srcRegion;
-        this.streamId = streamId;
         this.title = title;
+        this.streamId = streamId;
         this.imagePath = imagePath;
     }
 
@@ -44,22 +44,24 @@ public class DisplayCell {
                 index == other.index &&
                 transparency == other.transparency &&
                 CompareHelper.isEqual(srcRegion, other.srcRegion, (src, dst) -> srcRegion.isEqual(other.srcRegion)) &&
-
-                streamId == other.streamId &&
                 CompareHelper.isEqual(title, other.title, (src, dst) -> title.isEqual(other.title)) &&
-
+                streamId == other.streamId &&
                 CompareHelper.isEqual(imagePath, other.imagePath);
     }
 
     public static DisplayCell buildStream(int index, int streamId) {
-        return new DisplayCell(true, index, 0.0f, Region.buildFull(), streamId, null, null);
+        return new DisplayCell(true, index, 0.0f, Region.buildFull(), null, streamId, null);
     }
 
     public static DisplayCell buildStream(int index, int streamId, Title title) {
-        return new DisplayCell(true, index, 0.0f, Region.buildFull(), streamId, title, null);
+        return new DisplayCell(true, index, 0.0f, Region.buildFull(), title, streamId, null);
     }
 
     public static DisplayCell buildImage(int index, String imagePath) {
-        return new DisplayCell(false, index, 0.0f, Region.buildFull(), -1, null, imagePath);
+        return new DisplayCell(false, index, 0.0f, Region.buildFull(), null, -1, imagePath);
+    }
+
+    public static DisplayCell buildImage(int index, String imagePath, Title title) {
+        return new DisplayCell(false, index, 0.0f, Region.buildFull(), title, -1, imagePath);
     }
 }

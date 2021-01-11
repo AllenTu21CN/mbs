@@ -12,6 +12,12 @@ public class Result {
     public String message;
     public Object data;
 
+    public Result() {
+        this.code = SUCCESS.code;
+        this.message = SUCCESS.message;
+        this.data = SUCCESS.data;
+    }
+
     public Result(int code, String message) {
         this.code = code;
         this.message = message;
@@ -22,6 +28,12 @@ public class Result {
         this.code = code;
         this.message = message;
         this.data = data;
+    }
+
+    public Result(Result other) {
+        this.code = other.code;
+        this.message = other.message;
+        this.data = other.data;
     }
 
     public boolean isSuccessful() {

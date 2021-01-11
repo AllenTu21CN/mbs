@@ -1,5 +1,7 @@
 package cn.sanbu.avalon.endpoint3.structures;
 
+import com.sanbu.media.Region;
+
 import java.util.Arrays;
 import java.util.List;
 
