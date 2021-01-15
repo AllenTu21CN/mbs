@@ -4328,9 +4328,10 @@ public class VideoEngine {
             }
 
             try {
+                // LogUtil.d(TAG, String.format("try to registerCustomProgram: |%s| |%s|", name, shaderFunc));
                 CustomProgram p = new CustomProgram(name, shaderFunc);
                 mCustomPrograms.put(name, p);
-                LogUtil.i(TAG, "registerCustomProgram: " + name);
+                LogUtil.i(TAG, "success to registerCustomProgram: " + name);
             } catch (RuntimeException e) {
                 LogUtil.e(TAG, "registerCustomProgram: create custom program failed!", e);
                 return false;

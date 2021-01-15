@@ -773,7 +773,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     }
 
     @Override
-    public void onEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
+    public void onObjEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
         asyncCall(() -> {
             switch (event) {
                 case RecvReqOpenVideoExt:
@@ -788,6 +788,11 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                     break;
             }
         });
+    }
+
+    @Override
+    public void onVolumeReport(String report) {
+        LogUtil.d(CoreUtils.TAG, TAG, "onVolumeReport: " + report);
     }
 
     /////////////////////////////// implementation of Endpoint3.StreamCallback

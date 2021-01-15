@@ -2,7 +2,8 @@ package cn.sanbu.avalon.media;
 
 public enum MediaEventId {
     UNKNOWN(0),
-    SOURCE_DECODING_STATE_CHANGED(1);
+    SOURCE_DECODING_STATE_CHANGED(1),
+    AUDIO_VOLUME_REPORT(2);
 
     public final int value;
 

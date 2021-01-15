@@ -34,13 +34,21 @@ public enum TSLayout {
     ), Arrays.asList("A_B_RB")),
 
     AB_OUT_RT("右上画外画", Arrays.asList(
+            /*
             new Region(0.0f, 0.1111f, 0.75f, 0.75f),
             new Region(0.75f, 0.1111f, 0.25f, 0.25f)
+            */
+            new Region(0.0094f, 0.1352f, 0.7353f, 0.7353f),
+            new Region(0.7553f, 0.1352f, 0.2353f, 0.2353f)
     ), Arrays.asList("A_B_LT", "A_B_LT2")),
 
     AB_OUT_RB("右下画外画", Arrays.asList(
+            /*
             new Region(0.0f, 0.1111f, 0.75f, 0.75f),
             new Region(0.75f, 0.61f, 0.25f, 0.25f)
+            */
+            new Region(0.0094f, 0.1352f, 0.7353f, 0.7353f),
+            new Region(0.7553f, 0.6352f, 0.2353f, 0.2353f)
     ), Arrays.asList("A_B_LB", "A_B_LB2")),
 
     // 三分屏
@@ -89,7 +97,7 @@ public enum TSLayout {
             new Region(0.6667f,0.6667f,0.3333f,0.3333f)
     ), Arrays.asList("A_F")),
 
-    AB_C1("我也不知道", Arrays.asList(
+    AB_ZYTX("左右梯形拼接", Arrays.asList(
             new Region(-1, -1, -1, -1),
             new Region(-1, -1, -1, -1)
     ), null, "vec4 custom(vec2 uv) {\n" +
@@ -98,12 +106,13 @@ public enum TSLayout {
             "  } else {\n" +
             "    return texture2D(texArray[1], vec2(uv.x - 0.25, uv.y));\n" +
             "  }\n" +
-            "};");
+            "}\n");
 
     public final String desc;
     public final List<Region> regions;
     private final List<String> TS5000Name;
     public final String customProgram;
+    public final int regionCount;
 
     TSLayout(String desc, List<Region> regions) {
         this(desc, regions, null);
@@ -118,6 +127,7 @@ public enum TSLayout {
         this.regions = regions;
         this.TS5000Name = TS5000Name;
         this.customProgram = customProgram;
+        this.regionCount = regions.size();
     }
 
     public String getTS5000Name() {
@@ -145,5 +155,14 @@ public enum TSLayout {
         }
 
         return None;
+    }
+
+    public static TSLayout getMaxLayout() {
+        TSLayout tmp = null;
+        for (TSLayout layout : values()) {
+            if (tmp == null || tmp.regionCount < layout.regionCount)
+                tmp = layout;
+        }
+        return tmp;
     }
 }
