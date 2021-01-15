@@ -11,7 +11,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import com.sanbu.board.Qualcomm;
 import com.sanbu.board.Rockchip;
 import com.sanbu.tools.LogUtil;
 import com.sanbu.tools.R;
@@ -144,7 +143,7 @@ public class MultiScreenPresentation extends Presentation {
         ///*
         if (Rockchip.is3BUVersion())
             getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);
-        else if (Qualcomm.isVT6105())
+        /*else if (Qualcomm.isVT6105())
             getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
         //*/
         super.show();

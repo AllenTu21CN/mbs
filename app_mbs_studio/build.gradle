@@ -1,10 +1,6 @@
 apply plugin: 'com.android.application'
 
-int majorVersion = 1    //主版本(0~41)   发布版本迭代,重要功能新增,0-未发布
-int minorVersion = 0    //次版本(0~99)   内部版本迭代,功能新增
-int microVersion = 0    //小版本(0~99)   Bug修复
-String stage = "Alpha"  //版本阶段: Alpha Beta RC Release
-int stageNo = 1
+String vName = "1.0.0-a1"
 
 android {
     // signingConfigs {
@@ -25,17 +21,15 @@ android {
     //         v2SigningEnabled true
     //     }
     // }
+
+    // buildToolsVersion = '28.0.3'
     compileSdkVersion 28
-
-    // 获取当前的git的commit_id
-    GIT_COMMIT_ID = "git rev-parse --short HEAD".execute().text.trim()
-
     defaultConfig {
         applicationId "cn.lx.app_mbs_studio"
         minSdkVersion 26
         targetSdkVersion 26
-        versionCode getVersionCode(majorVersion, minorVersion, microVersion)
-        versionName getVersionName(stage, stageNo, majorVersion, minorVersion, microVersion)
+        versionCode genTSVersionCode()
+        versionName vName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -44,9 +38,9 @@ android {
         variant.outputs.all { output ->
             def type = variant.buildType.name
             if (type.equals('release')) {
-                outputFileName = "app_mbs_studio-" + versionName + ".apk"
+                outputFileName = "app_mbs_studio-" + versionName + '-' + versionCode + ".apk"
             } else if (type.equals('debug')) {
-                outputFileName = "app_mbs_studio-debug.apk"
+                outputFileName = "app_mbs_studio-" + versionName + '-' + versionCode + "-debug.apk"
             }
         }
     }
@@ -56,25 +50,29 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // signingConfig signingConfigs.release
-            buildConfigField "String", "gitCommitId", "\"${GIT_COMMIT_ID}\""
+            buildConfigField "String", "VERSION_GIT_ID", '"' + getGitCommitId() + '"'
+            buildConfigField 'String', 'BUILD_DATE', '"' + new Date().format("yyyyMMdd HH:mm:ss", TimeZone.getTimeZone("GMT+08:00")) + '"'
+            buildConfigField 'String', 'BUILD_HOST', '"' + InetAddress.getLocalHost().getCanonicalHostName() + '"'
+            buildConfigField 'String', 'jniLibs', '"' + getJniLibsInfo(project.name) + '"'
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // signingConfig signingConfigs.release
-            buildConfigField "String", "gitCommitId", "\"${GIT_COMMIT_ID}\""
+            buildConfigField "String", "VERSION_GIT_ID", '"' + getGitCommitId() + '"'
+            buildConfigField 'String', 'BUILD_DATE', '"' + new Date().format("yyyyMMdd HH:mm:ss", TimeZone.getTimeZone("GMT+08:00")) + '"'
+            buildConfigField 'String', 'BUILD_HOST', '"' + InetAddress.getLocalHost().getCanonicalHostName() + '"'
+            buildConfigField 'String', 'jniLibs', '"' + getJniLibsInfo(project.name) + '"'
         }
     }
 
     lintOptions {
         abortOnError false
     }
-    
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
     defaultConfig {
         multiDexEnabled true
     }
@@ -82,39 +80,6 @@ android {
     packagingOptions {
         exclude 'lib/armeabi-v7a'
         exclude 'lib/x86_64'
-    }
-}
-
-def getVCSNumber() {
-    try {
-        Process process = "git rev-list --count HEAD".execute()
-        process.waitFor()
-        String content = process.getText()
-        if (!content.isEmpty())
-            return content.toInteger() % 10000
-    } catch (Exception e) {
-
-    }
-    return 0
-}
-
-def getVersionCode(majorVersion, minorVersion, microVersion) {
-    int VCSNumber = getVCSNumber()
-    return majorVersion * 100000000 + minorVersion * 1000000 + microVersion * 10000 + VCSNumber
-}
-
-def getVersionName(stage, stageNo, majorVersion, minorVersion, microVersion) {
-    String name = "$majorVersion.$minorVersion.$microVersion"
-
-    stage = stage.toLowerCase()
-    if (stage.equals("alpha")) {
-        return name + '-a' + stageNo
-    } else if (stage.equals("beta")) {
-        return name + '-b' + stageNo
-    } else if (stage.equals("rc")) {
-        return name + '-rc' + stageNo
-    } else {
-        return name
     }
 }
 

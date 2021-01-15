@@ -56,6 +56,17 @@ public class MediaJni {
         gEnableVENDK = enable;
     }
 
+    public static boolean registerCustomProgram(String name, String shaderFunc) {
+        if (true) {
+            if (gVideoEngine == null)
+                throw new RuntimeException("init MediaJni first");
+            return gVideoEngine.registerCustomProgram(name, shaderFunc);
+        } else {
+            // TODO: call jni method to register CustomProgram to mp
+            return false;
+        }
+    }
+
     private static native int jniEnvInit(float refreshRate, boolean enable_ndk);
 
     protected static native int jniOnError(String tag, String msg);

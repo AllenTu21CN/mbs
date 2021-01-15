@@ -1,10 +1,10 @@
 package cn.lx.mbs.support.structures;
 
-import cn.sanbu.avalon.endpoint3.structures.AACProfile;
-import cn.sanbu.avalon.endpoint3.structures.AudioSamplerate;
-import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
-import cn.sanbu.avalon.endpoint3.structures.jni.CodecType;
+import com.sanbu.media.AACProfile;
+import com.sanbu.media.AudioSamplerate;
+import com.sanbu.media.Bandwidth;
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.CodecType;
 
 // 业务场景
 public enum AudioCodec {

@@ -3,7 +3,7 @@ package cn.lx.mbs.support.structures;
 import com.sanbu.tools.CompareHelper;
 import com.sanbu.tools.StringUtil;
 
-import cn.sanbu.avalon.endpoint3.structures.Region;
+import com.sanbu.media.Region;
 
 public abstract class Overlay {
 

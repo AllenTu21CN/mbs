@@ -18,7 +18,7 @@ public class EPFixedConfig {
     public String sbs_over_protocol;    // SBS传输协议
     public int crash_print_num;         // C/C++(Native)层崩溃处理机制: 崩溃栈日志打印(0: 不打印, -1: 一直打印, >0: 打印次数)
     public boolean crash_exit;          // C/C++(Native)层崩溃处理机制: 崩溃后应用是否自动退出
-    public String log_level;            // Native层日志可输出最低基本("FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE")
+    public String log_level;            // Native层日志的最低输出等级("FATAL", "ERROR", "WARNING", "INFO", "DEBUG", "VERBOSE")
     public String background_color;     // 绘制的背景颜色(RGB码或颜色英文名)
 
     public EPFixedConfig(boolean sip_enable, boolean h323_enable, boolean sbs_enable, int sip_port,

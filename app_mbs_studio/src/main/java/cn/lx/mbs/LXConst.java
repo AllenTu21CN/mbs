@@ -5,6 +5,14 @@ import android.os.Handler;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.sanbu.media.AACProfile;
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.AudioSamplerate;
+import com.sanbu.media.Bandwidth;
+import com.sanbu.media.CodecType;
+import com.sanbu.media.H264Profile;
+import com.sanbu.media.Resolution;
+import com.sanbu.media.VideoFormat;
 import com.sanbu.tools.MessageBox;
 
 import com.sanbu.base.Callback;
@@ -22,18 +30,10 @@ import cn.lx.mbs.support.structures.AudioCodec;
 import cn.lx.mbs.support.structures.MixMode;
 import cn.lx.mbs.support.structures.RecProp;
 import cn.sanbu.avalon.endpoint3.EPConst;
-import cn.sanbu.avalon.endpoint3.structures.AACProfile;
-import cn.sanbu.avalon.endpoint3.structures.AudioSamplerate;
-import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
-import cn.sanbu.avalon.endpoint3.structures.H264Profile;
 import cn.sanbu.avalon.endpoint3.structures.RecFileFormat;
-import cn.sanbu.avalon.endpoint3.structures.Resolution;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
-import cn.sanbu.avalon.endpoint3.structures.jni.CodecType;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.RecSplitMode;
 import cn.sanbu.avalon.endpoint3.structures.jni.Reconnecting;
-import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 import cn.sanbu.avalon.endpoint3.utils.SysResChecking;
 
 public class LXConst {

@@ -16,9 +16,10 @@ public class EPConst {
     public static final String EP_PROPERTY_AUDIO_CAPABILITIES    = "audio_capabilities";
     public static final String EP_PROPERTY_VIDEO_CAPABILITIES    = "video_capabilities";
     public static final String EP_PROPERTY_AGC_SWITCH            = "agc_switch";
+    public static final String EP_PROPERTY_RTSP_TRANS_PROTO      = "rtsp_trans_proto";
 
-    public static final String LOCAL_VIDEO_CAPTURE0   = "device://video/0";
-    public static final String LOCAL_VIDEO_CAPTURE1   = "device://video/1";
+    public static final String ORIGIN_CAMERA1 = "device://video/0";
+    public static final String ORIGIN_CAMERA2 = "device://video/1";
 
     public static final AudioInputDevice LOCAL_DEFAULT_AUDIO_CAPTURE  = new AudioInputDevice(0, "device://audio/0",
             "Default Microphone", "默认的麦克风");

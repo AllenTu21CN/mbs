@@ -15,6 +15,22 @@ public class CallingStatistics {
     public NetStatistics.VideoTx videoExtTx; // 辅流发送统计
     public NetStatistics.VideoRx videoExtRx; // 辅流接收统计
 
+    public CallingStatistics update() {
+        if (audioTx != null)
+            audioTx.update();
+        if (audioRx != null)
+            audioRx.update();
+        if (videoTx != null)
+            videoTx.update();
+        if (videoRx != null)
+            videoRx.update();
+        if (videoExtTx != null)
+            videoExtTx.update();
+        if (videoExtRx != null)
+            videoExtRx.update();
+        return this;
+    }
+
     public static CallingStatistics buildEmpty() {
         CallingStatistics statistics = new CallingStatistics();
         statistics.protocol = "N/A";

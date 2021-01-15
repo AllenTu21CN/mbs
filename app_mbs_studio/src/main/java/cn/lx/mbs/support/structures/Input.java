@@ -1,16 +1,12 @@
 package cn.lx.mbs.support.structures;
 
 import com.sanbu.base.State;
+import com.sanbu.media.Region;
+import com.sanbu.media.DataType;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import cn.sanbu.avalon.endpoint3.EPConst;
-import cn.sanbu.avalon.endpoint3.structures.Region;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
-import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
-import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 
 public class Input {
     public final Source config;

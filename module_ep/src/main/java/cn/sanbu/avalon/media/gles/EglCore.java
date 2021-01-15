@@ -114,6 +114,7 @@ public final class EglCore {
                 }
             }
         }
+
         if (mEGLContext == EGL14.EGL_NO_CONTEXT) {  // GLES 2 only, or GLES 3 attempt failed
             //Log.d(TAG, "Trying GLES 2");
             EGLConfig config = getConfig(flags, 2);
@@ -164,6 +165,8 @@ public final class EglCore {
                     EGL14.EGL_GREEN_SIZE, 6,
                     EGL14.EGL_BLUE_SIZE, 5,
                     EGL14.EGL_RENDERABLE_TYPE, renderableType,
+                    //EGL14.EGL_SAMPLE_BUFFERS, 1,    // true,
+                    //EGL14.EGL_SAMPLES, 4,           // This is for 4x MSAA.
                     EGL14.EGL_NONE, 0,      // placeholder for recordable [@-3]
                     EGL14.EGL_NONE
             );
@@ -176,7 +179,9 @@ public final class EglCore {
                     //EGL14.EGL_DEPTH_SIZE, arm-v7a.16,
                     //EGL14.EGL_STENCIL_SIZE, 8,
                     EGL14.EGL_RENDERABLE_TYPE, renderableType,
-                    EGL14.EGL_NONE, 0,      // placeholder for recordable [@-3]
+                    //EGL14.EGL_SAMPLE_BUFFERS, 1,    // true,
+                    //EGL14.EGL_SAMPLES, 4,           // This is for 4x MSAA.
+                    EGL14.EGL_NONE, 0,              // placeholder for recordable [@-3]
                     EGL14.EGL_NONE
             );
         }
@@ -190,7 +195,7 @@ public final class EglCore {
         int[] numConfigs = new int[1];
         if (!EGL14.eglChooseConfig(mEGLDisplay, attribList, 0, configs, 0, configs.length,
                 numConfigs, 0)) {
-            Log.w(TAG, "unable to find RGB8888 / " + version + " EGLConfig");
+            Log.e(TAG, "Unable to find RGB8888 / " + version + " EGLConfig");
             return null;
         }
         return configs[0];

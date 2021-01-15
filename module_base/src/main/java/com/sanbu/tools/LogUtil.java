@@ -53,7 +53,12 @@ public class LogUtil {
     }
 
     public static void v(String tag, String subTag, String text) {
-        v(tag, subTag + ", " + text);
+        v(tag, subTag + ":: " + text);
+    }
+
+    public static void v(String tag, StringBuilder subTags, String text) {
+        subTags.append(":: ").append(text);
+        v(tag, subTags.toString());
     }
 
     public static void d(String text) {
@@ -69,7 +74,12 @@ public class LogUtil {
     }
 
     public static void d(String tag, String subTag, String text) {
-        d(tag, subTag + ", " + text);
+        d(tag, subTag + ":: " + text);
+    }
+
+    public static void d(String tag, StringBuilder subTags, String text) {
+        subTags.append(":: ").append(text);
+        d(tag, subTags.toString());
     }
 
     public static void i(String text) {
@@ -85,7 +95,12 @@ public class LogUtil {
     }
 
     public static void i(String tag, String subTag, String text) {
-        i(tag, subTag + ", " + text);
+        i(tag, subTag + ":: " + text);
+    }
+
+    public static void i(String tag, StringBuilder subTags, String text) {
+        subTags.append(":: ").append(text);
+        i(tag, subTags.toString());
     }
 
     public static void w(String text) {
@@ -101,7 +116,12 @@ public class LogUtil {
     }
 
     public static void w(String tag, String subTag, String text) {
-        w(tag, subTag + ", " + text);
+        w(tag, subTag + ":: " + text);
+    }
+
+    public static void w(String tag, StringBuilder subTags, String text) {
+        subTags.append(":: ").append(text);
+        w(tag, subTags.toString());
     }
 
     public static void w(Throwable tr) {
@@ -121,7 +141,12 @@ public class LogUtil {
     }
 
     public static void w(String tag, String subTag, String text, Throwable tr) {
-        w(tag, subTag + ", " + text, tr);
+        w(tag, subTag + ":: " + text, tr);
+    }
+
+    public static void w(String tag, StringBuilder subTags, String text, Throwable tr) {
+        subTags.append(":: ").append(text);
+        w(tag, subTags.toString(), tr);
     }
 
     public static void e(String text) {
@@ -137,7 +162,12 @@ public class LogUtil {
     }
 
     public static void e(String tag, String subTag, String text) {
-        e(tag, subTag + ", " + text);
+        e(tag, subTag + ":: " + text);
+    }
+
+    public static void e(String tag, StringBuilder subTags, String text) {
+        subTags.append(":: ").append(text);
+        e(tag, subTags.toString());
     }
 
     public static void e(Throwable tr) {
@@ -157,7 +187,12 @@ public class LogUtil {
     }
 
     public static void e(String tag, String subTag, String text, Throwable tr) {
-        e(tag, subTag + ", " + text, tr);
+        e(tag, subTag + ":: " + text, tr);
+    }
+
+    public static void e(String tag, StringBuilder subTags, String text, Throwable tr) {
+        subTags.append(":: ").append(text);
+        e(tag, subTags.toString(), tr);
     }
 
     public static void log(final int level, String tag, String text) {
@@ -204,6 +239,16 @@ public class LogUtil {
             info.setThrowable(tr);
             // EventBus.getDefault().post(info);
         }
+    }
+
+    public static StringBuilder Tags(String tag1, String... tags) {
+        StringBuilder builder = new StringBuilder(tag1);
+        builder.append("::");
+        for (String tag : tags) {
+            builder.append(tag);
+            builder.append("::");
+        }
+        return builder;
     }
 
     public static class LogMessage {

@@ -11,7 +11,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.TotalCaptureResult;
 import android.os.Handler;
 import android.os.HandlerThread;
-import androidx.annotation.NonNull;
+import com.sanbu.android.annotation.NonNull;
 import android.util.Log;
 import android.util.Size;
 import android.view.Surface;

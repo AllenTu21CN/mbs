@@ -1,7 +1,8 @@
 package cn.lx.mbs.support.structures;
 
-import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
-import cn.sanbu.avalon.endpoint3.structures.jni.EPDir;
+import com.sanbu.media.DataType;
+import com.sanbu.network.CallingDir;
+
 import cn.sanbu.avalon.endpoint3.structures.jni.StreamDesc;
 
 public class AVStream extends StreamDesc {
@@ -13,7 +14,7 @@ public class AVStream extends StreamDesc {
     // 解码器(source)id
     private int decId;
 
-    public AVStream(int id, DataType type, String name, String description, EPDir direction, Object format) {
+    public AVStream(int id, DataType type, String name, String description, CallingDir direction, Object format) {
         super(type, name, description, direction);
         this.id = id;
         this.format = format;

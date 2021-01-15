@@ -1,8 +1,10 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
-import cn.sanbu.avalon.endpoint3.structures.AACProfile;
-import cn.sanbu.avalon.endpoint3.structures.AudioSamplerate;
-import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
+import com.sanbu.media.AACProfile;
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.AudioSamplerate;
+import com.sanbu.media.Bandwidth;
+import com.sanbu.media.CodecType;
 
 public class AudioCapability {
     public CodecType codec;

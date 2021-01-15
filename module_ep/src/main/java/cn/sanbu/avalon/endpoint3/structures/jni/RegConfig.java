@@ -1,5 +1,6 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
+import com.sanbu.network.TransProtocol;
 import com.sanbu.tools.CompareHelper;
 import com.sanbu.tools.StringUtil;
 
@@ -62,36 +63,44 @@ public class RegConfig {
     }
 
     public static class SIP {
-        public String address;      // SIP信令服务器地址
-        public int port;            // 服务器端口
-        public String domain;       // SIP域
-        public String username;     // 用户名
-        public String password;     // 密码
-        public List<String> aliases;// 别名
+        public String address;          // SIP信令服务器地址
+        public int port;                // 服务器端口
+        public String domain;           // SIP域
+        public String username;         // 用户名
+        public String verifname;        // 认证名称
+        public String password;         // 密码
+        public List<String> aliases;    // 别名
+        public TransProtocol transport; // 传输协议
 
-        public SIP(String address, int port, String domain,
-                   String username, String password, List<String> aliases) {
+        public SIP(String address, int port, String domain, String username,
+                   String verifname, String password, List<String> aliases,
+                   TransProtocol transport) {
             this.address = address;
             this.port = port;
             this.domain = domain;
             this.username = username;
+            this.verifname = verifname;
             this.password = password;
             this.aliases = aliases;
+            this.transport = transport;
         }
 
         public SIP(SIP other) {
             this(other.address, other.port, other.domain,
-                    other.username, other.password, new ArrayList<>(other.aliases));
+                    other.username, other.verifname, other.password,
+                    new ArrayList<>(other.aliases), other.transport);
         }
 
         public boolean isValid() {
-            return (!StringUtil.isEmpty(address) && port > 0 && username != null);
+            return (!StringUtil.isEmpty(address) && port > 0 && username != null &&
+                    verifname != null && transport != null && transport != TransProtocol.UNSPECIFIED);
         }
 
         public boolean isEqual(SIP other) {
             return (CompareHelper.isEqual(address, other.address) && port == other.port &&
                     CompareHelper.isEqual(domain, other.domain) &&
                     CompareHelper.isEqual(username, other.username) &&
+                    CompareHelper.isEqual(verifname, other.verifname) &&
                     CompareHelper.isEqual(password, other.password) &&
                     CompareHelper.isEqual(aliases, other.aliases, (src, dst) -> {
                         List<String> listSrc = (List<String>) src;
@@ -103,7 +112,15 @@ public class RegConfig {
                                 return false;
                         }
                         return true;
-                    }));
+                    }) &&
+                    CompareHelper.isEqual(transport, other.transport));
+        }
+
+        public void fixNewItems() {
+            if (StringUtil.isEmpty(verifname))
+                verifname = username;
+            if (transport == null)
+                transport = TransProtocol.UDP;
         }
     }
 }

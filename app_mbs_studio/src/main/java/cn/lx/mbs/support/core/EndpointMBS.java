@@ -7,7 +7,6 @@ import android.util.Size;
 import android.view.Surface;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.sanbu.base.BaseError;
 import com.sanbu.base.Callback;
 import com.sanbu.base.Result;
@@ -16,6 +15,16 @@ import com.sanbu.base.State;
 import com.sanbu.base.Tuple;
 import com.sanbu.board.BoardSupportClient;
 import com.sanbu.board.EmptyBoardSupportClient;
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.Bandwidth;
+import com.sanbu.media.DataType;
+import com.sanbu.media.EPObjectType;
+import com.sanbu.media.InputType;
+import com.sanbu.media.Region;
+import com.sanbu.media.VideoFormat;
+import com.sanbu.network.CallingDir;
+import com.sanbu.network.CallingProtocol;
+import com.sanbu.network.TransProtocol;
 import com.sanbu.tools.AsyncResult;
 import com.sanbu.tools.CompareHelper;
 import com.sanbu.tools.LogUtil;
@@ -47,19 +56,10 @@ import cn.lx.mbs.support.utils.SPHelper;
 import cn.sanbu.avalon.endpoint3.Endpoint3;
 import cn.sanbu.avalon.endpoint3.structures.AudioInputDevice;
 import cn.sanbu.avalon.endpoint3.structures.AudioOutputDevice;
-import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
-import cn.sanbu.avalon.endpoint3.structures.CallingProtocol;
-import cn.sanbu.avalon.endpoint3.structures.EPObjectType;
-import cn.sanbu.avalon.endpoint3.structures.Region;
-import cn.sanbu.avalon.endpoint3.structures.InputType;
-import cn.sanbu.avalon.endpoint3.structures.TransProtocol;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapability;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
-import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayOverlay;
-import cn.sanbu.avalon.endpoint3.structures.jni.EPDir;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPEvent;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.MixerTracks;
@@ -69,7 +69,6 @@ import cn.sanbu.avalon.endpoint3.structures.jni.TransitionDesc;
 import cn.sanbu.avalon.endpoint3.structures.jni.TransitionMode;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoCapability;
-import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 import cn.sanbu.avalon.media.MediaJni;
 import cn.sanbu.avalon.media.VideoEngine;
 
@@ -535,7 +534,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
             int epId;
             Caller caller = null;
             if (source.type == InputType.VideoCapture) {
-                epId = mEndpoint.epAddVideoCapture(source.url, source.resolution);
+                epId = mEndpoint.epAddOriginCamera(source.url, source.resolution);
             } else if (source.type == InputType.RTSP) {
                 TransProtocol protocol = source.overTCP ? TransProtocol.TCP : TransProtocol.RTP;
                 epId = mEndpoint.epAddRTSPSource(source.url, protocol, LXConst.SOURCE_RECONNECTING);
@@ -774,7 +773,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     }
 
     @Override
-    public void onEvent(EPObjectType objType, int objId, EPEvent event, String params) {
+    public void onEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
         asyncCall(() -> {
             switch (event) {
                 case RecvReqOpenVideoExt:
@@ -783,7 +782,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                 case FileWrittenCompleted:
                     // notify outside observer
                     if (mObserver != null)
-                        mObserver.onRecordingFinished(params);
+                        mObserver.onRecordingFinished((String) params);
                     break;
                 default:
                     break;
@@ -811,7 +810,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                     return;
                 }
 
-                if (desc.direction == EPDir.Incoming)
+                if (desc.direction == CallingDir.Incoming)
                     onRxStreamOpen(caller, stream_id, desc, format);
                 else
                     onTxStreamOpen(caller, stream_id, desc, format);
@@ -841,14 +840,14 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                 if (caller == null) {
                     LogUtil.w(CoreUtils.TAG, TAG, "onStreamClose, got unknown caller#" + parent_id +
                             ", it may have been remove previously, force to release it");
-                    if (desc.direction == EPDir.Outgoing)
+                    if (desc.direction == CallingDir.Outgoing)
                         mEndpoint.epStopTxStream(parent_id, stream_id);
-                    else if (desc.direction == EPDir.Incoming)
+                    else if (desc.direction == CallingDir.Incoming)
                         mEndpoint.epStopRxStreamDecoding(parent_id, stream_id);
                     return;
                 }
 
-                if (desc.direction == EPDir.Incoming)
+                if (desc.direction == CallingDir.Incoming)
                     onRxStreamClose(caller, stream_id, desc);
                 else
                     onTxStreamClose(caller, stream_id, desc);
@@ -1420,7 +1419,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                     "内部错误(创建输出失败:" + sr.epId + "),无法开始" + type.desc);
 
         // set output audio stream
-        StreamDesc audio_tx_stream = new StreamDesc(DataType.AUDIO, "audio-1", "主音频", EPDir.Outgoing);
+        StreamDesc audio_tx_stream = new StreamDesc(DataType.AUDIO, "audio-1", "主音频", CallingDir.Outgoing);
         int ret = mEndpoint.epSetOutputStream(sr.epId, audio_tx_stream,
                 mSRAudioFormat, EPObjectType.Mixer, mOutputMixer.epId);
         if (ret != 0) {
@@ -1430,7 +1429,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         }
 
         // set output video stream
-        StreamDesc video_tx_stream = new StreamDesc(DataType.VIDEO, "video-1", "主视频", EPDir.Outgoing);
+        StreamDesc video_tx_stream = new StreamDesc(DataType.VIDEO, "video-1", "主视频", CallingDir.Outgoing);
         ret = mEndpoint.epSetOutputStream(sr.epId, video_tx_stream,
                 vFormat, EPObjectType.Display, mDisplays.get(SurfaceId.PGM).epId);
         if (ret != 0) {
@@ -1669,7 +1668,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
 
             if (inOverlay.type == Overlay.Type.Image) {
                 Overlay.Image in = (Overlay.Image) inOverlay;
-                DisplayOverlay.Image out = new DisplayOverlay.Image(in.imagePath, in.dst);
+                DisplayOverlay out = DisplayOverlay.buildImage(in.imagePath, in.dst);
                 out.setSrcRegion(in.src);
                 out.setZIndex(in.zIndex);
                 out.setTransparency(in.transparency);
@@ -1715,7 +1714,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                 }
 
                 // build overlay for this stream
-                DisplayOverlay.Stream out = new DisplayOverlay.Stream(decId, in.dst);
+                DisplayOverlay out = DisplayOverlay.buildStream(decId, in.dst);
                 out.setSrcRegion(input.srcRegion);
                 out.setZIndex(in.zIndex);
                 out.setTransparency(in.transparency);

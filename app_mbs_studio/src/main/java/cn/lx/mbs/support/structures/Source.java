@@ -1,14 +1,14 @@
 package cn.lx.mbs.support.structures;
 
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.InputType;
+import com.sanbu.media.Resolution;
+import com.sanbu.media.VideoFormat;
 import com.sanbu.tools.StringUtil;
 
 import java.util.List;
 
 import cn.lx.mbs.LXConst;
-import cn.sanbu.avalon.endpoint3.structures.Resolution;
-import cn.sanbu.avalon.endpoint3.structures.InputType;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
-import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 
 public class Source {
     public final int id;              // 源ID

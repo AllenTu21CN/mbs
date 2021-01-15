@@ -18,6 +18,7 @@ import android.view.WindowManager;
 
 
 import com.google.gson.Gson;
+import com.sanbu.media.Region;
 import com.sanbu.tools.EventPub;
 import com.sanbu.tools.LogUtil;
 import com.sanbu.tools.PermissionUtil;
@@ -47,8 +48,6 @@ import cn.lx.mbs.ui.view.SettingsFragment;
 import cn.lx.mbs.ui.view.Utils;
 import cn.lx.mbs.ui.view.VideoSourcesArea;
 import cn.lx.mbs.ui.view.VideoSourcesManageDialog;
-import cn.sanbu.avalon.endpoint3.structures.Region;
-import cn.sanbu.avalon.endpoint3.structures.Resolution;
 import cn.sanbu.avalon.endpoint3.utils.SysResChecking;
 import cn.sanbu.avalon.media.CameraHelper;
 

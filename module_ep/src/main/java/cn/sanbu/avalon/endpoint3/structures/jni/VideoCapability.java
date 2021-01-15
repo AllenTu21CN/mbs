@@ -1,9 +1,9 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
+import com.sanbu.media.CodecType;
+import com.sanbu.media.H264Profile;
+import com.sanbu.media.Resolution;
 import com.sanbu.tools.CompareHelper;
-
-import cn.sanbu.avalon.endpoint3.structures.H264Profile;
-import cn.sanbu.avalon.endpoint3.structures.Resolution;
 
 public class VideoCapability {
 

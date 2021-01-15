@@ -4,8 +4,6 @@ package com.sanbu.tools;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import androidx.annotation.ColorInt;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import com.google.zxing.BarcodeFormat;
@@ -13,6 +11,8 @@ import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+import com.sanbu.android.annotation.ColorInt;
+import com.sanbu.android.annotation.Nullable;
 
 import java.util.Hashtable;
 

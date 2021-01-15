@@ -1,10 +1,12 @@
+import com.google.gson.Gson
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
+
     repositories {
         google()
         jcenter()
-        
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
@@ -24,4 +26,69 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+def getJniLibsInfo(projectPath) {
+    List infos = new LinkedList()
+    String jniLibsDir = projectPath + '/src/main/jniLibs/'
+    final String[] abis = ["arm64-v8a", "armeabi-v7a", "x86_64"]
+
+    for (String abi : abis) {
+        File abiDir = new File(jniLibsDir + abi)
+        if (!abiDir.exists())
+            continue
+
+        // parse copy_from
+        Map<String, String> copies = new LinkedHashMap<>()
+        try {
+            File copyFrom = new File(abiDir, "copy_from")
+            if (copyFrom.exists() && copyFrom.isFile()) {
+                for (String line : copyFrom.readLines('UTF-8')) {
+                    copies.put(new File(line).getName(), line)
+                }
+            }
+        } catch (Exception e) {
+            infos.add(String.format("parse %s/copy_from failed: %s", abi, e.getMessage()))
+        }
+
+        // get libraries files
+        File[] files = abiDir.listFiles(new FilenameFilter() {
+            @Override
+            boolean accept(File dir, String name) {
+                return name.endsWith(".so")
+            }
+        })
+
+        // add libraries infos
+        if (files.length > 0) {
+            for (File file : files) {
+                String soName = file.getName()
+                String from = copies.get(soName)
+                String time = new Date(file.lastModified()).format("yyyyMMdd HH:mm:ss", TimeZone.getTimeZone("GMT+08:00"))
+                long size = file.length()
+
+                if (from == null) {
+                    infos.add(abi + "/" + soName + ": [" + time + "] [" + size + " bytes] [from unknown]")
+                } else {
+                    infos.add(abi + "/" + soName + ":")
+                    infos.add("|--file: [" + time + "] [" + size + " bytes]")
+                    infos.add("|--from: " + from)
+                }
+            }
+        }
+    }
+
+    if (infos.size() == 0)
+        infos.add("has no jni libs")
+
+    String info = new Gson().toJson(infos);
+    return info.replace("\"", "\\\"")
+}
+
+def genTSVersionCode() {
+    return Integer.parseInt(new Date().format("yyyyMMddHH", TimeZone.getTimeZone("GMT+08:00")))
+}
+
+def getGitCommitId() {
+    return "git rev-parse --short HEAD".execute().text.trim()
 }

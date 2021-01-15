@@ -8,7 +8,6 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.WindowManager;
 
 /**
  * Created by Tom on 2017/2/14.

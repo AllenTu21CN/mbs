@@ -4,36 +4,36 @@ import android.content.Context;
 import android.view.Surface;
 
 import com.sanbu.board.EmptyBoardSupportClient;
+import com.sanbu.media.AACProfile;
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.AudioSamplerate;
+import com.sanbu.media.Bandwidth;
+import com.sanbu.network.CallingProtocol;
+import com.sanbu.media.CodecType;
+import com.sanbu.media.DataType;
+import com.sanbu.media.H264Profile;
+import com.sanbu.media.Region;
+import com.sanbu.media.Resolution;
+import com.sanbu.media.VideoFormat;
 import com.sanbu.tools.CompareHelper;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-import cn.sanbu.avalon.endpoint3.structures.AACProfile;
-import cn.sanbu.avalon.endpoint3.structures.Region;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
 import cn.sanbu.avalon.endpoint3.structures.AudioInputDevice;
-import cn.sanbu.avalon.endpoint3.structures.AudioSamplerate;
-import cn.sanbu.avalon.endpoint3.structures.Bandwidth;
-import cn.sanbu.avalon.endpoint3.structures.CallingProtocol;
-import cn.sanbu.avalon.endpoint3.structures.jni.CodecType;
-import cn.sanbu.avalon.endpoint3.structures.jni.DataType;
 import cn.sanbu.avalon.endpoint3.structures.DisplayCell;
+import com.sanbu.media.EPObjectType;
+import com.sanbu.network.TransProtocol;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
-import cn.sanbu.avalon.endpoint3.structures.jni.EPDir;
+import com.sanbu.network.CallingDir;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPEvent;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
-import cn.sanbu.avalon.endpoint3.structures.EPObjectType;
-import cn.sanbu.avalon.endpoint3.structures.H264Profile;
 import cn.sanbu.avalon.endpoint3.structures.jni.MixerTracks;
 import cn.sanbu.avalon.endpoint3.structures.jni.Reconnecting;
-import cn.sanbu.avalon.endpoint3.structures.Resolution;
 import cn.sanbu.avalon.endpoint3.structures.jni.StreamDesc;
-import cn.sanbu.avalon.endpoint3.structures.TransProtocol;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.VideoCapability;
-import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 import cn.sanbu.avalon.media.MediaJni;
 
 public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
@@ -193,7 +193,7 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
         micSource = endpoint3.epAddAudioCapture(device.url);
 
         // add a hdmi video source, get its stream later
-        hdmiSouce = endpoint3.epAddVideoCapture(EPConst.LOCAL_VIDEO_CAPTURE1, Resolution.RES_1080P);
+        hdmiSouce = endpoint3.epAddOriginCamera(EPConst.ORIGIN_CAMERA2, Resolution.RES_1080P);
 
         // add a ipc video source, get its stream later
         String ipcUrl = "rtsp://10.10.10.10:554/ch3";
@@ -204,11 +204,11 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
     private void startLR() {
         live = endpoint3.epCreateNetOutput("rtmp://127.0.0.1:11935/live/test");
 
-        StreamDesc desc = new StreamDesc(DataType.AUDIO, DataType.AUDIO.name, DataType.AUDIO.name, EPDir.Outgoing);
+        StreamDesc desc = new StreamDesc(DataType.AUDIO, DataType.AUDIO.name, DataType.AUDIO.name, CallingDir.Outgoing);
         AudioFormat audioFormat = new AudioFormat(CodecType.AAC, AudioSamplerate.HZ_48K, 2, Bandwidth._32K, AACProfile.LD);
         endpoint3.epSetOutputStream(live, desc, audioFormat, EPObjectType.Mixer, lrMixer);
 
-        desc = new StreamDesc(DataType.VIDEO, DataType.VIDEO.name, DataType.VIDEO.name, EPDir.Outgoing);
+        desc = new StreamDesc(DataType.VIDEO, DataType.VIDEO.name, DataType.VIDEO.name, CallingDir.Outgoing);
         VideoFormat videoFormat = new VideoFormat(CodecType.H264, H264Profile.BaseLine, Resolution.RES_1080P, 30, Bandwidth._4M, 100);
         endpoint3.epSetOutputStream(live, desc, videoFormat, EPObjectType.Display, lrDisplay);
 
@@ -252,7 +252,7 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
         } else if (parentType == EPObjectType.Caller) {
             Caller caller = parentId == caller1.id ? caller1 : caller2;
 
-            if (desc.direction == EPDir.Outgoing) {
+            if (desc.direction == CallingDir.Outgoing) {
                 if (desc.type == DataType.AUDIO) {
                     AudioFormat aFormat = (AudioFormat) format;
                     caller.aTxStreams.add(streamId);
@@ -263,7 +263,7 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
                     int display = CompareHelper.isEqual(desc.name, DataType.VIDEO_EXT.name) ? txDisplay : txDisplayExt;
                     endpoint3.epStartTxStream(caller.id, streamId, vFormat, EPObjectType.Display, display);
                 }
-            } else if (desc.direction == EPDir.Incoming) {
+            } else if (desc.direction == CallingDir.Incoming) {
                 if (desc.type == DataType.AUDIO) {
                     caller.aRxStreams.add(streamId);
                     int decId = endpoint3.epStartRxStreamDecoding(caller.id, streamId);
@@ -314,7 +314,7 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
 
     @Override
     public void onEstablished(int callId, String vendor, String name) {
-        endpoint3.epOpenExtTxStream(callId, new StreamDesc(DataType.VIDEO, DataType.VIDEO_EXT.name, "辅流", EPDir.Outgoing));
+        endpoint3.epOpenExtTxStream(callId, new StreamDesc(DataType.VIDEO, DataType.VIDEO_EXT.name, "辅流", CallingDir.Outgoing));
     }
 
     /////////////////////////////// static private utils
@@ -361,7 +361,7 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
     }
 
     @Override
-    public void onEvent(EPObjectType objType, int objId, EPEvent event, String params) {
+    public void onEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
 
     }
 }

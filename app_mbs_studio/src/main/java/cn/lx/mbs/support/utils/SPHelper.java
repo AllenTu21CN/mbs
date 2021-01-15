@@ -1,6 +1,8 @@
 package cn.lx.mbs.support.utils;
 
 import com.google.gson.reflect.TypeToken;
+import com.sanbu.media.AudioFormat;
+import com.sanbu.media.VideoFormat;
 import com.sanbu.tools.SPUtil;
 
 import java.util.LinkedList;
@@ -10,9 +12,7 @@ import cn.lx.mbs.LXConst;
 import cn.lx.mbs.support.structures.RecProp;
 import cn.lx.mbs.support.structures.SRId;
 import cn.lx.mbs.support.structures.Source;
-import cn.sanbu.avalon.endpoint3.structures.jni.AudioFormat;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPFixedConfig;
-import cn.sanbu.avalon.endpoint3.structures.jni.VideoFormat;
 
 public class SPHelper {
 

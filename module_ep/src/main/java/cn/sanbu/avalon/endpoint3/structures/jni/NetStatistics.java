@@ -1,13 +1,21 @@
 package cn.sanbu.avalon.endpoint3.structures.jni;
 
+import com.sanbu.media.CodecType;
+
 public class NetStatistics {
     public static class Audio {
         public CodecType codec; // 协议:PCMA/AAC/...
+        public String codec2;   // 协议:G.711A
         public int bitrate;     // 码率:64000(bps)
 
         public Audio(CodecType codec, int bitrate) {
             this.codec = codec;
             this.bitrate = bitrate;
+            update();
+        }
+
+        public void update() {
+            codec2 = codec.name2;
         }
     }
 
@@ -30,6 +38,7 @@ public class NetStatistics {
 
     public static class Video {
         public CodecType codec;     // 协议:H264/H265/...
+        public String codec2;       // 协议:H.264
         public String resolution;   // 分辨率: 1920x1088
         public float framerate;     // 帧率: 30.0
         public int bitrate;         // 码率:2048000(bps)
@@ -43,6 +52,11 @@ public class NetStatistics {
             this.resolution = resolution;
             this.framerate = framerate;
             this.bitrate = bitrate;
+            update();
+        }
+
+        public void update() {
+            codec2 = codec.name2;
         }
     }
 
