@@ -70,7 +70,7 @@ public class OverlayArea {
 
         mAddVideoDialog = new OverlayAddVideoDialog(mContext, Utils.PX(1200), Utils.PX(950));
         mAddImageDialog = new OverlayAddImageDialog(mContext, Utils.PX(1200), Utils.PX(1150));
-        mAddTextDialog = new OverlayAddTextDialog(mContext, Utils.PX(1200), Utils.PX(1150));
+        mAddTextDialog = new OverlayAddTextDialog(mContext, Utils.PX(1200), Utils.PX(1200));
 
         mAddVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
