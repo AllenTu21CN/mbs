@@ -5,6 +5,14 @@
     android:layout_width="0dp"
     android:layout_height="0dp">
 
+    <!-- Guide lines -->
+    <androidx.constraintlayout.widget.Guideline
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/vcenter_guideline"
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="vertical"/>
+
     <ImageView
         android:id="@+id/scene_editor_bg"
         android:layout_width="0dp"
@@ -52,6 +60,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="18px"
+        android:layout_marginLeft="18px"
         app:layout_constraintTop_toBottomOf="@id/scene_editor_bg"
         app:layout_constraintLeft_toRightOf="@id/text_label"
         app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
@@ -76,33 +85,49 @@
         android:id="@+id/font_value"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="12px"
+        android:layout_marginLeft="18px"
         android:textColor="@color/primaryTextColor"
         android:textSize="28px"
         app:layout_constraintTop_toBottomOf="@id/text_value"
         app:layout_constraintLeft_toRightOf="@id/font_label"
-        app:layout_constraintRight_toLeftOf="@id/text_color_label" />
+        app:layout_constraintRight_toLeftOf="@id/vcenter_guideline"/>
 
     <!-- Color -->
     <TextView
         android:id="@+id/text_color_label"
-        android:layout_width="wrap_content"
+        android:layout_width="150px"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/font_value"
-        app:layout_constraintBottom_toBottomOf="@id/font_value"
-        app:layout_constraintLeft_toRightOf="@id/font_value"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/text_color_btn"
+        app:layout_constraintBottom_toBottomOf="@id/text_color_btn"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
         app:layout_constraintRight_toLeftOf="@id/text_color_btn"
         android:text="Color"
         android:textSize="28px" />
 
     <cn.lx.mbs.ui.view.ColorPickerButton
         android:id="@+id/text_color_btn"
-        android:layout_width="120px"
-        android:layout_height="36px"
-        android:layout_marginLeft="15px"
-        android:layout_marginRight="15px"
-        app:layout_constraintTop_toTopOf="@id/text_color_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18px"
+        android:layout_marginLeft="18px"
+        app:layout_constraintTop_toBottomOf="@id/font_value"
         app:layout_constraintLeft_toRightOf="@id/text_color_label"
-        app:layout_constraintRight_toLeftOf="@id/format_bold_btn" />
+        />
+
+    <!-- Style -->
+    <TextView
+        android:id="@+id/text_style_label"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
+        app:layout_constraintBottom_toBottomOf="@id/format_bold_btn"
+        app:layout_constraintLeft_toLeftOf="@id/vcenter_guideline"
+        app:layout_constraintRight_toLeftOf="@id/format_bold_btn"
+        android:text="Style"
+        android:textSize="28px" />
 
     <ImageButton
         android:id="@+id/format_bold_btn"
@@ -114,10 +139,10 @@
         android:src="@drawable/ic_format_bold_black_24dp"
         android:tint="@color/commonButtonNormalTextColor"
         android:tintMode="src_in"
-        app:layout_constraintLeft_toRightOf="@id/text_color_btn"
+        app:layout_constraintLeft_toRightOf="@id/text_style_label"
         app:layout_constraintRight_toLeftOf="@id/format_italic_btn"
-        app:layout_constraintTop_toTopOf="@id/text_color_btn"
-        app:layout_constraintBottom_toBottomOf="@id/text_color_btn"
+        app:layout_constraintTop_toTopOf="@id/font_value"
+        app:layout_constraintBottom_toBottomOf="@id/font_value"
         android:scaleType="fitXY" />
 
     <ImageButton
@@ -130,8 +155,8 @@
         android:src="@drawable/ic_format_italic_black_24dp"
         android:tint="@color/commonButtonNormalTextColor"
         android:tintMode="src_in"
+        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
         app:layout_constraintLeft_toRightOf="@id/format_bold_btn"
-        app:layout_constraintBottom_toBottomOf="@id/format_bold_btn"
         app:layout_constraintRight_toLeftOf="@id/format_underlined_btn"
         android:scaleType="fitXY" />
 
@@ -145,12 +170,11 @@
         android:src="@drawable/ic_format_underlined_black_24dp"
         android:tint="@color/commonButtonNormalTextColor"
         android:tintMode="src_in"
+        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
         app:layout_constraintLeft_toRightOf="@id/format_italic_btn"
-        app:layout_constraintBottom_toBottomOf="@id/format_italic_btn"
-        app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
         android:scaleType="fitXY" />
 
-    <!-- Background -->
+    <!-- Background Color -->
     <TextView
         android:id="@+id/bg_color_label"
         android:layout_width="150px"
@@ -165,12 +189,83 @@
 
     <cn.lx.mbs.ui.view.ColorPickerButton
         android:id="@+id/bg_color_btn"
-        android:layout_width="120px"
-        android:layout_height="36px"
-        android:layout_marginLeft="15px"
-        android:layout_marginRight="15px"
-        app:layout_constraintTop_toBottomOf="@id/font_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18px"
+        android:layout_marginLeft="18px"
+        app:layout_constraintTop_toBottomOf="@id/text_color_btn"
         app:layout_constraintLeft_toRightOf="@id/bg_color_label"
          />
+
+    <!-- Background Opacity -->
+    <TextView
+        android:id="@+id/bg_opacity_label"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintBottom_toBottomOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
+        app:layout_constraintRight_toLeftOf="@id/bg_opacity_seek_bar"
+        android:text="Bg Opacity"
+        android:textSize="28px" />
+
+    <cn.lx.mbs.ui.view.SeekBar
+        android:id="@+id/bg_opacity_seek_bar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24px"
+        android:layout_marginLeft="18px"
+        app:layout_constraintTop_toBottomOf="@id/bg_color_btn"
+        app:layout_constraintLeft_toRightOf="@id/bg_opacity_label"
+        app:layout_constraintRight_toLeftOf="@id/bg_opacity_value" />
+
+    <TextView
+        android:id="@+id/bg_opacity_value"
+        android:layout_width="100px"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        app:layout_constraintTop_toTopOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintBottom_toBottomOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintLeft_toRightOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintRight_toLeftOf="@id/vcenter_guideline"
+        android:text="100%"
+        android:textSize="28px" />
+
+    <!-- Background border radius -->
+    <TextView
+        android:id="@+id/bg_border_radius_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/bg_border_radius_value"
+        app:layout_constraintBottom_toBottomOf="@id/bg_border_radius_value"
+        app:layout_constraintLeft_toRightOf="@id/vcenter_guideline"
+        app:layout_constraintRight_toLeftOf="@id/bg_border_radius_value"
+        android:text="Border Radius"
+        android:textSize="28px" />
+
+    <EditText
+        android:id="@+id/bg_border_radius_value"
+        android:layout_width="80px"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18px"
+        app:layout_constraintTop_toTopOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintBottom_toBottomOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintLeft_toRightOf="@id/bg_border_radius_label"
+        android:text="5px"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="28px" />
+
+    <Button
+        android:id="@+id/save_button"
+        android:layout_width="180px"
+        android:layout_height="60px"
+        android:layout_margin="18px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@drawable/common_button_bg"
+        android:text="Save"
+        android:textSize="28px"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

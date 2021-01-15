@@ -26,7 +26,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "cn.lx.app_mbs_studio"
-        minSdkVersion 23
+        minSdkVersion 26
         targetSdkVersion 26
         versionCode genTSVersionCode()
         versionName vName
