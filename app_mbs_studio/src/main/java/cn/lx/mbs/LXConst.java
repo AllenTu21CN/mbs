@@ -107,7 +107,7 @@ public class LXConst {
     // 消息盒中最多记录数
     public static final int MAX_MESSAGE_BOX_SIZE = 100;
 
-    // 是否使用内部NoSignal替代图片
+    // 是否使用内部NoSignal
     public static final boolean USING_INTERNAL_NO_SIGNAL_IMG = false;
 
     // 网络重连参数

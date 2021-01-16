@@ -1405,7 +1405,7 @@ public class VideoEngine {
             private int mDisplayNameTexSlot = -1;
 
             private CustomProgram mCustomProgram;
-            private WeakReference<Source>[] mCustomSources;
+            // private WeakReference<Source>[] mCustomSources;
             private float[] mCustomVariables;
             private int[] mCustomSourceTextures;
 
@@ -1492,13 +1492,16 @@ public class VideoEngine {
                 mType = OVERLAY_TYPE_CUSTOM;
                 mCustomProgram = customProgram;
 
-                mCustomSources = new WeakReference[sources.length];
+                // mCustomSources = new WeakReference[sources.length];
                 mCustomSourceTextures = new int[sources.length];
+
                 for (int i = 0; i < sources.length; i++) {
-                    mCustomSources[i] = new WeakReference<>(sources[i]);
-                    if (sources[i] != null) {
-                        mCustomSourceTextures[i] = sources[i].getTextureId();
+                    Source source = sources[i];
+                    if (source != null) {
+                        // mCustomSources[i] = new WeakReference<>(source);
+                        mCustomSourceTextures[i] = source.getTextureId();
                     } else {
+                        // mCustomSources[i] = null;
                         mCustomSourceTextures[i] = -1;
                     }
                 }
@@ -2331,12 +2334,14 @@ public class VideoEngine {
                                     Source[] sources = new Source[sourcesArray.size()];
                                     for (int i = 0; i < sourcesArray.size(); i++) {
                                         int source_id = sourcesArray.get(i).getAsInt();
-                                        Source source = mMixer.getSource(source_id);
-                                        if (source == null) {
-                                            LogUtil.e("Source id=" + source_id + " not exists.");
-                                            break;
+                                        if (source_id < 0) {
+                                            sources[i] = null;
+                                        } else {
+                                            Source source = mMixer.getSource(source_id);
+                                            if (source == null)
+                                                LogUtil.w("Source id=" + source_id + " not exists.");
+                                            sources[i] = source;
                                         }
-                                        sources[i] = source;
                                     }
 
                                     final String CONFIG_VARIABLES_KEY = "variables";

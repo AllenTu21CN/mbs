@@ -18,7 +18,7 @@ import android.view.WindowManager;
 
 
 import com.google.gson.Gson;
-import com.sanbu.media.Region;
+import com.sanbu.media.TSLayout;
 import com.sanbu.tools.EventPub;
 import com.sanbu.tools.LogUtil;
 import com.sanbu.tools.PermissionUtil;
@@ -31,9 +31,10 @@ import cn.lx.mbs.R;
 import cn.lx.mbs.LXConst;
 import cn.lx.mbs.support.MBS;
 import cn.lx.mbs.support.structures.ChannelId;
+import cn.lx.mbs.support.structures.CommonOverlay;
 import cn.lx.mbs.support.structures.Layout;
-import cn.lx.mbs.support.structures.Overlay;
-import cn.lx.mbs.support.structures.Source;
+import cn.lx.mbs.support.structures.OverlayDst;
+import cn.lx.mbs.support.structures.OverlaySrc;
 import cn.lx.mbs.support.structures.SurfaceId;
 import cn.lx.mbs.ui.model.SceneOverlayDataModel;
 import cn.lx.mbs.ui.model.VideoSourcesDataModel;
@@ -270,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
     public SceneOverlayDataModel getSceneOverlayDataModel(int index) { return mSceneOverlayDataModel[index]; }
 
     public Layout getSceneLayout(int index) {
-        return mSceneLayouts.get(index % 3);
+        return mSceneLayouts.get(index % 6);
     }
 
     private void initViews() {
@@ -426,19 +427,41 @@ public class MainActivity extends AppCompatActivity {
             mSceneOverlayDataModel[0].add(textOverlay);
         }
 
-        Layout layout1 = new Layout().setOverlays(Arrays.asList(
-                new Overlay.Image(LXConst.BG_IMAGE_LOADING, new Region(0.0, 0.25, 0.5, 0.5)),
-                new Overlay.Image(LXConst.BG_IMAGE_LOADING, new Region(0.5, 0.25, 0.5, 0.5))));
+        Layout layout1 = new Layout().addOverlays(TSLayout.AB, Arrays.asList(
+                OverlaySrc.buildImage(LXConst.BG_IMAGE_LOADING),
+                OverlaySrc.buildImage(LXConst.BG_IMAGE_LOADING)
+        ));
 
-        Layout layout2 = new Layout().setOverlays(Arrays.asList(
-                new Overlay.Stream(ChannelId.IN1, new Region(0.0, 0.25, 0.5, 0.5)),
-                new Overlay.Image(LXConst.BG_IMAGE_LOADING, new Region(0.5, 0.25, 0.5, 0.5))));
+        Layout layout2 = new Layout().addOverlays(TSLayout.AB, Arrays.asList(
+                OverlaySrc.buildStream(ChannelId.IN1),
+                OverlaySrc.buildImage(LXConst.BG_IMAGE_LOADING)
+        ));
 
-        Layout layout3 = new Layout().setOverlays(Arrays.asList(
-                new Overlay.Stream(ChannelId.IN1, new Region(0.0, 0.25, 0.5, 0.5)),
-                new Overlay.Stream(ChannelId.IN2, new Region(0.5, 0.25, 0.5, 0.5))));
+        Layout layout3 = new Layout().addOverlays(TSLayout.AB, Arrays.asList(
+                OverlaySrc.buildStream(ChannelId.IN1),
+                OverlaySrc.buildStream(ChannelId.IN1)
+        ));
 
-        mSceneLayouts = Arrays.asList(layout1, layout2, layout3);
+        Layout layout4 = new Layout().addOverlays(TSLayout.AB_ZYTX, Arrays.asList(
+                OverlaySrc.buildStream(ChannelId.IN1),
+                OverlaySrc.buildEmpty()
+        ));
+
+        Layout layout5 = new Layout().addOverlays(TSLayout.AB_ZYTX, Arrays.asList(
+                OverlaySrc.buildStream(ChannelId.IN1),
+                OverlaySrc.buildStream(ChannelId.IN1)
+        ));
+
+        Layout layout6 = new Layout().addOverlays(TSLayout.AB_ZYTX, Arrays.asList(
+                OverlaySrc.buildStream(ChannelId.IN1),
+                OverlaySrc.buildStream(ChannelId.IN1)
+        )).addCommonOverlays(Arrays.asList(
+                new CommonOverlay(OverlaySrc.buildImage(LXConst.BG_IMAGE_LOADING),
+                        new OverlayDst(TSLayout.AB_IN_RT.regions.get(1))),
+                new CommonOverlay(OverlaySrc.buildStream(ChannelId.IN1),
+                        new OverlayDst(TSLayout.AB_IN_RB.regions.get(1)))));
+
+        mSceneLayouts = Arrays.asList(layout1, layout2, layout3, layout4, layout5, layout6);
 
         // TEST ENDS ///////////////////////////////////////////////////////////////////////////////
     }

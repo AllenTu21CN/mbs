@@ -24,7 +24,6 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 import cn.lx.mbs.R;
-import cn.lx.mbs.support.structures.Overlay;
 
 public class OverlayAddVideoDialog extends BaseDialog {
 

@@ -1,5 +1,6 @@
 package com.sanbu.media;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -164,5 +165,14 @@ public enum TSLayout {
                 tmp = layout;
         }
         return tmp;
+    }
+
+    public static List<TSLayout> getCustomLayouts() {
+        List<TSLayout> layouts = new ArrayList<>(values().length);
+        for (TSLayout layout : values()) {
+            if (layout.customProgram != null)
+                layouts.add(layout);
+        }
+        return layouts;
     }
 }
