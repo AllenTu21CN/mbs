@@ -108,6 +108,23 @@ public class CompareHelper {
         });
     }
 
+    public static <T> boolean isEqual4List(final List<T> src, final List<T> dst, final NotNullComparator<T> comparator) {
+        return isEqual(src, dst, new NotNullComparator() {
+            @Override
+            public boolean isEqual(Object i1, Object i2) {
+                if (src.size() != dst.size())
+                    return false;
+
+                for (int i = 0; i < src.size() ; ++i) {
+                    if (!comparator.isEqual(src.get(i), dst.get(i)))
+                        return false;
+                }
+
+                return true;
+            }
+        });
+    }
+
     public static <T> boolean equals(T src1, Object src2, NotNullComparator<T> comparator) {
         if (src2 == null)
             return false;

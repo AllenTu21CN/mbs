@@ -5,7 +5,6 @@ import com.sanbu.media.Region;
 import com.sanbu.media.TextStyle;
 import com.sanbu.tools.CompareHelper;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -81,6 +80,22 @@ public class DisplayConfig {
         overlay.setCustomStreams(streamIds);
         overlay.setCustomVariables(variables);
         overlays.add(overlay);
+        return this;
+    }
+
+    public DisplayConfig addOverlays(List<DisplayOverlay> overlays) {
+        if (this.overlays == null)
+            this.overlays = new LinkedList<>();
+
+        this.overlays.addAll(overlays);
+        return this;
+    }
+
+    public DisplayConfig addOverlay(DisplayOverlay overlay) {
+        if (overlays == null)
+            overlays = new LinkedList<>();
+
+        this.overlays.add(overlay);
         return this;
     }
 
@@ -182,7 +197,7 @@ public class DisplayConfig {
 
     public static DisplayConfig buildEmptyOverlays() {
         DisplayConfig config = new DisplayConfig();
-        config.overlays = new ArrayList<>();
+        config.overlays = new LinkedList<>();
         return config;
     }
 

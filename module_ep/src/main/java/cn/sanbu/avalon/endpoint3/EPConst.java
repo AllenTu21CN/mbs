@@ -17,6 +17,7 @@ public class EPConst {
     public static final String EP_PROPERTY_VIDEO_CAPABILITIES    = "video_capabilities";
     public static final String EP_PROPERTY_AGC_SWITCH            = "agc_switch";
     public static final String EP_PROPERTY_RTSP_TRANS_PROTO      = "rtsp_trans_proto";
+    public static final String EP_PROPERTY_VOLUME_REPORT_INTERVAL= "volume_report_interval";
 
     public static final String ORIGIN_CAMERA1 = "device://video/0";
     public static final String ORIGIN_CAMERA2 = "device://video/1";

@@ -70,14 +70,18 @@ public class Endpoint3 {
         // Internal error occurred
         void onError(int errCode, String reason);
 
-        // EP internal event
+        // Internal event for ep object
         // @param obj_type [IN] type of object
         // @param obj_id [IN] id of object
         // @param event [IN] value of event
         // @param params [IN] params of event:
         //      if event = FileWrittenCompleted, params is file-path(String)
         //      if event = OutputStatusChanged, params is error-code(OutputStatus)
-        void onEvent(EPObjectType objType, int objId, EPEvent event, Object params);
+        void onObjEvent(EPObjectType objType, int objId, EPEvent event, Object params);
+
+        // Volume report for audio mixers and sources
+        // @param report [IN] serialized string which can be parsed by VolumeReportParser
+        void onVolumeReport(String report);
     }
 
     // Terminal stream callbacks
@@ -210,6 +214,12 @@ public class Endpoint3 {
     public int epSwitchAGC(boolean enabled) {
         int ret = jniEpConfigure(EPConst.EP_PROPERTY_AGC_SWITCH, String.valueOf(enabled));
         EPConst.logAction("epSwitchAGC", ret, enabled);
+        return ret;
+    }
+
+    public int epSetVolumeReportInterval(int intervalInFrames) {
+        int ret = jniEpConfigure(EPConst.EP_PROPERTY_VOLUME_REPORT_INTERVAL, String.valueOf(intervalInFrames));
+        EPConst.logAction("epSetVolumeReportInterval", ret, intervalInFrames);
         return ret;
     }
 
@@ -959,9 +969,9 @@ public class Endpoint3 {
 
             try {
                 if (evt == EPEvent.OutputStatusChanged)
-                    m_ep_cb.onEvent(type, obj_id, evt, OutputStatus.fromCode(Integer.valueOf(params)));
+                    m_ep_cb.onObjEvent(type, obj_id, evt, OutputStatus.fromCode(Integer.valueOf(params)));
                 else
-                    m_ep_cb.onEvent(type, obj_id, evt, params);
+                    m_ep_cb.onObjEvent(type, obj_id, evt, params);
             } catch (Exception e) {
                 LogUtil.w(EPConst.TAG, "onEvent error", e);
             }
@@ -977,8 +987,10 @@ public class Endpoint3 {
                 return;
             }
 
-            LogUtil.i(EPConst.TAG, String.format("onMediaEvent, obj_type:%s obj_id:%d event:%s params:%s",
-                    type.name(), obj_id, evt.name(), params));
+            if (evt != MediaEventId.AUDIO_VOLUME_REPORT) {
+                LogUtil.i(EPConst.TAG, String.format("onMediaEvent, obj_type:%s obj_id:%d event:%s params:%s",
+                        type.name(), obj_id, evt.name(), params));
+            }
 
             switch (evt) {
                 case SOURCE_DECODING_STATE_CHANGED:
@@ -996,6 +1008,12 @@ public class Endpoint3 {
                     }
 
                     break;
+
+                case AUDIO_VOLUME_REPORT:
+                    if (m_ep_cb != null)
+                        m_ep_cb.onVolumeReport(params);
+                    break;
+
                 default:
                     return;
             }

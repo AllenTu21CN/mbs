@@ -20,7 +20,7 @@ import com.sanbu.media.Bandwidth;
 import com.sanbu.media.DataType;
 import com.sanbu.media.EPObjectType;
 import com.sanbu.media.InputType;
-import com.sanbu.media.Region;
+import com.sanbu.media.TSLayout;
 import com.sanbu.media.VideoFormat;
 import com.sanbu.network.CallingDir;
 import com.sanbu.network.CallingProtocol;
@@ -46,7 +46,9 @@ import cn.lx.mbs.support.structures.MixMode;
 import cn.lx.mbs.support.structures.ChannelId;
 import cn.lx.mbs.support.structures.Input;
 import cn.lx.mbs.support.structures.Layout;
-import cn.lx.mbs.support.structures.Overlay;
+import cn.lx.mbs.support.structures.CommonOverlay;
+import cn.lx.mbs.support.structures.OverlayDst;
+import cn.lx.mbs.support.structures.OverlaySrc;
 import cn.lx.mbs.support.structures.RecProp;
 import cn.lx.mbs.support.structures.SRId;
 import cn.lx.mbs.support.structures.SRState;
@@ -73,13 +75,13 @@ import cn.sanbu.avalon.media.MediaJni;
 import cn.sanbu.avalon.media.VideoEngine;
 
 /*
-* EndpointMBS: 因为EP3是更灵活的通用SDK，为降低应用层使用EP的复杂度,封装了EndpointMBS
-* 功能描述:
-*   . 根据MBS的业务场景，支持: 信号管理、输入管理、声音管理、推流录制、显示和切换
-*   . 封装了内部线程、配置读写、状态维护
-*   . 除了初始化类接口和查询类接口, 其他操作类接口为非阻塞异步调用,且线程安全
-*   . 没有事件概念
-* */
+ * EndpointMBS: 因为EP3是更灵活的通用SDK，为降低应用层使用EP的复杂度,封装了EndpointMBS
+ * 功能描述:
+ *   . 根据MBS的业务场景，支持: 信号管理、输入管理、声音管理、推流录制、显示和切换
+ *   . 封装了内部线程、配置读写、状态维护
+ *   . 除了初始化类接口和查询类接口, 其他操作类接口为非阻塞异步调用,且线程安全
+ *   . 没有事件概念
+ * */
 public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
         Endpoint3.CallingCallback, Endpoint3.RegisteringCallback {
 
@@ -116,6 +118,11 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
             // init media engine jni environment
             BoardSupportClient client = new EmptyBoardSupportClient();
             MediaJni.initEnv(context, client, LXConst.USING_INTERNAL_NO_SIGNAL_IMG);
+
+            // register custom programs
+            List<TSLayout> customLayouts = TSLayout.getCustomLayouts();
+            for (TSLayout layout : customLayouts)
+                MediaJni.registerCustomProgram(layout.name(), layout.customProgram);
 
             gInited = true;
         }
@@ -358,7 +365,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     public void addSource(Source source, Callback/*int sourceId*/ callback) {
         asyncCall("addSource", callback, () -> {
             int maxId = -1;
-            for (Source src: mAvailableSources) {
+            for (Source src : mAvailableSources) {
                 if (src.id == source.id ||
                         (src.type == source.type && src.url.equals(source.url)))
                     return genError("addSource", BaseError.ACTION_ILLEGAL,
@@ -379,7 +386,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     // @brief 删除信号源(不影响已加载的信号源)
     public void removeSource(int sourceId, Callback callback) {
         asyncCall("removeSource", callback, () -> {
-            for (int i = 0 ; i < mAvailableSources.size() ; ++i) {
+            for (int i = 0; i < mAvailableSources.size(); ++i) {
                 if (mAvailableSources.get(i).id == sourceId) {
                     logAction("removeSource", sourceId);
                     mAvailableSources.remove(i);
@@ -397,7 +404,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     // @brief 修改信号源(不影响已加载的信号源)
     public void updateSource(Source source, Callback callback) {
         asyncCall("updateSource", callback, () -> {
-            for (int i = 0 ; i < mAvailableSources.size() ; ++i) {
+            for (int i = 0; i < mAvailableSources.size(); ++i) {
                 if (mAvailableSources.get(i).id == source.id) {
                     logAction("updateSource", source);
                     mAvailableSources.remove(i);
@@ -579,7 +586,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     // @brief CUT输入通道(视频)
     public void cutInputVideo(ChannelId id, Callback callback) {
         asyncCall("cutInputVideo", callback, () -> {
-            Layout layout = new Layout().setOverlays(Arrays.asList(new Overlay.Stream(id, Region.buildFull())));
+            Layout layout = new Layout().addOverlays(TSLayout.A, Arrays.asList(OverlaySrc.buildStream(id)));
             return switchLayout(SurfaceId.PGM, layout, TransitionDesc.buildEmpty());
         });
     }
@@ -588,7 +595,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     public void pauseInputVideo(ChannelId id, Callback callback) {
         asyncCall("pauseInputVideo", callback, () ->
                 genError("pauseInputVideo", BaseError.ACTION_UNSUPPORTED,
-                    "not implement", "暂不支持")
+                        "not implement", "暂不支持")
         );
     }
 
@@ -697,7 +704,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
             return Collections.emptyMap();
 
         Map<ChannelId, Boolean> result = new HashMap<>(mEchoMixer.mixModes.size());
-        for (Map.Entry<ChannelId, MixMode> entry: mEchoMixer.mixModes.entrySet())
+        for (Map.Entry<ChannelId, MixMode> entry : mEchoMixer.mixModes.entrySet())
             result.put(entry.getKey(), entry.getValue() == MixMode.On ? true : false);
         return result;
     }
@@ -745,7 +752,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     // @brief 开关推流录制
     public void switchSRState(SRId id, SRState state, Callback callback) {
         asyncCall("switchSRState", callback, () ->
-            id == SRId.Streaming ? switchStreamingState(state) : switchRecordingState(state)
+                id == SRId.Streaming ? switchStreamingState(state) : switchRecordingState(state)
         );
     }
 
@@ -773,7 +780,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     }
 
     @Override
-    public void onEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
+    public void onObjEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
         asyncCall(() -> {
             switch (event) {
                 case RecvReqOpenVideoExt:
@@ -788,6 +795,11 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                     break;
             }
         });
+    }
+
+    @Override
+    public void onVolumeReport(String report) {
+        LogUtil.d(CoreUtils.TAG, TAG, "onVolumeReport: " + report);
     }
 
     /////////////////////////////// implementation of Endpoint3.StreamCallback
@@ -1052,7 +1064,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         if (mDisplays == null)
             return;
 
-        for (Display display: mDisplays.values()) {
+        for (Display display : mDisplays.values()) {
             if (display.epId >= 0) {
                 mEndpoint.epRemoveDisplay(display.epId);
                 display.epId = -1;
@@ -1139,7 +1151,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     private void unloadInputs() {
         if (mInputs != null) {
             List<ChannelId> channels = new ArrayList<>(mInputs.keySet());
-            for (ChannelId channel: channels)
+            for (ChannelId channel : channels)
                 unloadInputImpl(channel);
         }
     }
@@ -1250,7 +1262,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         if (!isReady())
             return Result.SUCCESS;
 
-        for (Input input: mInputs.values()) {
+        for (Input input : mInputs.values()) {
             if (input.config.type != InputType.Caller)
                 continue;
 
@@ -1294,7 +1306,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         if (!isReady())
             return Result.SUCCESS;
 
-        for (Input input: mInputs.values()) {
+        for (Input input : mInputs.values()) {
             if (input.config.type != InputType.Caller)
                 continue;
 
@@ -1347,7 +1359,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                 result.message = "";
                 Result tmp;
 
-                for (String url: mStreamingUrls) {
+                for (String url : mStreamingUrls) {
                     if (StringUtil.isEmpty(url))
                         continue;
 
@@ -1610,15 +1622,15 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     private Result hangupCaller(Caller caller) {
         // release all stream of the caller
         List<Tuple<Integer, StreamDesc>> streams = new LinkedList<>();
-        for (AVStream stream: caller.aStreams)
+        for (AVStream stream : caller.aStreams)
             streams.add(new Tuple<>(stream.id, stream));
-        for (AVStream stream: caller.vStreams)
+        for (AVStream stream : caller.vStreams)
             streams.add(new Tuple<>(stream.id, stream));
-        for (AVStream stream: caller.aTxStreams)
+        for (AVStream stream : caller.aTxStreams)
             streams.add(new Tuple<>(stream.id, stream));
-        for (AVStream stream: caller.vTxStreams)
+        for (AVStream stream : caller.vTxStreams)
             streams.add(new Tuple<>(stream.id, stream));
-        for (Tuple<Integer, StreamDesc> stream: streams)
+        for (Tuple<Integer, StreamDesc> stream : streams)
             onStreamClose(EPObjectType.Caller, caller.epId, stream.first, stream.second);
 
         // hangup
@@ -1634,7 +1646,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     }
 
     private Input getSourceByEPId(int epId) {
-        for (Input input: mInputs.values()) {
+        for (Input input : mInputs.values()) {
             if (input.config.type != InputType.Caller && input.epId == epId)
                 return input;
         }
@@ -1642,90 +1654,159 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     }
 
     private Caller getCallerByEPId(int epId) {
-        for (Input input: mInputs.values()) {
+        for (Input input : mInputs.values()) {
             if (input.config.type == InputType.Caller && input.epId == epId)
                 return (Caller) input;
         }
         return null;
     }
 
-    private DisplayConfig transLayout2Config(Layout layout, TransitionDesc transition) {
-        List<Overlay> inOverlays = layout.getOverlays();
+    private List<DisplayOverlay> genCommonOverlays(List<CommonOverlay> inOverlays) {
+        if (inOverlays == null)
+            return null;
+
         List<DisplayOverlay> outOverlays = new LinkedList<>();
-
-        // skip empty layout
-        if (inOverlays == null || inOverlays.size() == 0)
-            return DisplayConfig.buildOverlays(outOverlays);
-
-        // loop to fill overlay
-        for (Overlay inOverlay: inOverlays) {
+        for (CommonOverlay in : inOverlays) {
 
             // skip invalid overlay
-            if (!inOverlay.isValid()) {
-                LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config skip invalid overlay: " + new Gson().toJson(inOverlay));
+            if (!in.isValid()) {
+                LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config skip invalid overlay: " + new Gson().toJson(in));
                 continue;
             }
 
-            if (inOverlay.type == Overlay.Type.Image) {
-                Overlay.Image in = (Overlay.Image) inOverlay;
-                DisplayOverlay out = DisplayOverlay.buildImage(in.imagePath, in.dst);
-                out.setSrcRegion(in.src);
-                out.setZIndex(in.zIndex);
-                out.setTransparency(in.transparency);
-                outOverlays.add(out);
-            } else if (inOverlay.type == Overlay.Type.Bitmap) {
-                LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config skip Bitmap overlay");
-            } else if (inOverlay.type == Overlay.Type.Stream) {
-                Overlay.Stream in = (Overlay.Stream) inOverlay;
+            // gen overlay
+            DisplayOverlay overlay = genOverlay(in.src, in.dst);
+            if (overlay == null)
+                continue;
 
-                // check channel id
-                ChannelId channel = in.channel;
-                if (!channel.isRx || channel.onlyAudio) {
-                    LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config skip invalid overlay$2: " + new Gson().toJson(inOverlay));
-                    continue;
-                }
+            // add to out list
+            outOverlays.add(overlay);
+        }
 
-                // get the input by channel id
-                Input input = mInputs.get(channel);
-                if (input == null) {
-                    LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config, the input channel is empty: " + channel.name());
-                    continue;
-                }
-                if (input.vStreams.size() == 0) {
-                    LogUtil.d(CoreUtils.TAG, TAG, "transLayout2Config, the input channel has no video stream: " + channel.name());
-                    continue;
-                }
+        return outOverlays;
+    }
 
-                // find the first matched stream
-                int extId = -1;
-                int mainId = -1;
-                for (AVStream stream: input.vStreams) {
-                    if (stream.isDecReady()) {
-                        if (mainId < 0 && stream.type == DataType.VIDEO)
-                            mainId = stream.getDecId();
-                        else if (extId < 0 && stream.type == DataType.VIDEO_EXT)
-                            extId = stream.getDecId();
-                    }
-                }
-                int decId = mainId < 0 ? extId : mainId;
-                if (decId < 0) {
-                    LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config, the input channel's video stream is not ready: " + channel.name());
-                    continue;
-                }
+    private DisplayOverlay genCustomOverlay(TSLayout layout, List<OverlaySrc> srcList) {
+        if (layout == null || srcList == null)
+            return null;
 
-                // build overlay for this stream
-                DisplayOverlay out = DisplayOverlay.buildStream(decId, in.dst);
-                out.setSrcRegion(input.srcRegion);
-                out.setZIndex(in.zIndex);
-                out.setTransparency(in.transparency);
-                outOverlays.add(out);
+        List<Integer> streamIds = new LinkedList<>();
+        for (OverlaySrc src : srcList) {
+            if (!src.isValid() || src.type != OverlaySrc.Type.Stream) {
+                streamIds.add(-1);
             } else {
-                LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config skip unknown overlay: " + new Gson().toJson(inOverlay));
+                int decId = getChannelVideoDecId(src.channel);
+                streamIds.add(decId);
             }
         }
 
+        DisplayOverlay overlay = DisplayOverlay.buildCustom(layout.name());
+        overlay.setCustomStreams(streamIds);
+        return overlay;
+    }
+
+    private DisplayOverlay genOverlay(OverlaySrc src, OverlayDst dst) {
+        switch(src.type) {
+            case Stream:
+                return genStreamOverlay(src, dst);
+            case Image:
+                return genImageOverlay(src, dst);
+            case Bitmap:
+                return genBitmapOverlay(src, dst);
+            default:
+                throw new IllegalStateException("Unexpected value: " + src.type);
+        }
+    }
+
+    private DisplayOverlay genImageOverlay(OverlaySrc src, OverlayDst dst) {
+        DisplayOverlay overlay = DisplayOverlay.buildImage(src.imagePath, dst.region);
+        overlay.setSrcRegion(src.region);
+        overlay.setZIndex(dst.zIndex);
+        overlay.setTransparency(dst.transparency);
+        return overlay;
+    }
+
+    private DisplayOverlay genStreamOverlay(OverlaySrc src, OverlayDst dst) {
+        // get video decode id by channel
+        ChannelId channel = src.channel;
+        int decId = getChannelVideoDecId(channel);
+        if (decId < 0)
+            return null;
+
+        // get the input by channel id
+        Input input = mInputs.get(channel);
+
+        // build overlay for this stream
+        DisplayOverlay overlay = DisplayOverlay.buildStream(decId, dst.region);
+        overlay.setSrcRegion(input.srcRegion);
+        overlay.setZIndex(dst.zIndex);
+        overlay.setTransparency(dst.transparency);
+        return overlay;
+    }
+
+    private DisplayOverlay genBitmapOverlay(OverlaySrc src, OverlayDst dst) {
+        LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config skip Bitmap overlay");
+        return null;
+    }
+
+    private int getChannelVideoDecId(ChannelId channel) {
+        // check channel id
+        if (!channel.isRx || channel.onlyAudio) {
+            LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config, the channel has not input video stream: " + channel.name());
+            return -1;
+        }
+
+        // get the input by channel id
+        Input input = mInputs.get(channel);
+        if (input == null) {
+            LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config, the input channel is empty: " + channel.name());
+            return -1;
+        }
+        if (input.vStreams.size() == 0) {
+            LogUtil.d(CoreUtils.TAG, TAG, "transLayout2Config, the input channel has no video stream: " + channel.name());
+            return -1;
+        }
+
+        // find the first matched stream
+        int extId = -1;
+        int mainId = -1;
+        for (AVStream stream : input.vStreams) {
+            if (stream.isDecReady()) {
+                if (mainId < 0 && stream.type == DataType.VIDEO)
+                    mainId = stream.getDecId();
+                else if (extId < 0 && stream.type == DataType.VIDEO_EXT)
+                    extId = stream.getDecId();
+            }
+        }
+        int decId = mainId < 0 ? extId : mainId;
+        if (decId < 0) {
+            LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Config, the input channel's video stream is not ready: " + channel.name());
+            return -1;
+        }
+
+        return decId;
+    }
+
+    private DisplayConfig transLayout2Config(Layout layout, TransitionDesc transition) {
+        // gen common overlays
+        List<DisplayOverlay> commonOverlays = genCommonOverlays(layout.getCommonOverlays());
+
+        // gen custom overlay
+        DisplayOverlay customOverlay = genCustomOverlay(layout.getCustomLayout(), layout.getCustomSrcList());
+
         // build DisplayConfig with overlays
-        DisplayConfig config = DisplayConfig.buildOverlays(outOverlays);
+        DisplayConfig config = DisplayConfig.buildEmptyOverlays();
+        if (layout.isCommonAtHead()) {
+            if (commonOverlays != null)
+                config.addOverlays(commonOverlays);
+            if (customOverlay != null)
+                config.addOverlay(customOverlay);
+        } else {
+            if (customOverlay != null)
+                config.addOverlay(customOverlay);
+            if (commonOverlays != null)
+                config.addOverlays(commonOverlays);
+        }
 
         // set background color
         String bgColor = layout.getBackgroundColor();
@@ -1745,7 +1826,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         List<Input> inputs = new LinkedList<>();
 
         // find out all inputs which mixMode is ON
-        for (Map.Entry<ChannelId, MixMode> entry: mixModes.entrySet()) {
+        for (Map.Entry<ChannelId, MixMode> entry : mixModes.entrySet()) {
             if (entry.getValue() == MixMode.On) {
                 ChannelId channel = entry.getKey();
                 if (channel == ChannelId.Output) {
@@ -1762,33 +1843,37 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         }
 
         // find out all inputs which mixMode is AFV and contained by the layout
-        if (layout != null && layout.getOverlays() != null) {
-            List<Overlay> inOverlays = layout.getOverlays();
+        if (layout != null && layout.isValid()) {
+            List<OverlaySrc> srcList = new LinkedList<>();
 
-            for (Overlay inOverlay : inOverlays) {
+            // push src of common overlay
+            List<CommonOverlay> commonOverlays = layout.getCommonOverlays();
+            if (commonOverlays != null) {
+                for (CommonOverlay overlay : commonOverlays)
+                    srcList.add(overlay.src);
+            }
+
+            // push src of custom overlay
+            List<OverlaySrc> customSrcList = layout.getCustomSrcList();
+            if (customSrcList != null)
+                srcList.addAll(customSrcList);
+
+            for (OverlaySrc src : srcList) {
                 // skip invalid overlay
-                if (!inOverlay.isValid()) {
-                    LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Tracks skip invalid overlay: " + new Gson().toJson(inOverlay));
+                if (!src.isValid())
                     continue;
-                }
 
                 // just try to add track for stream overlay
-                if (inOverlay.type == Overlay.Type.Stream) {
-                    Overlay.Stream in = (Overlay.Stream) inOverlay;
-
+                if (src.type == OverlaySrc.Type.Stream) {
                     // get channel id
-                    ChannelId channel = in.channel;
-                    if (!channel.isRx || channel.onlyAudio) {
-                        LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Tracks skip invalid overlay': " + new Gson().toJson(inOverlay));
+                    ChannelId channel = src.channel;
+                    if (!channel.isRx || channel.onlyAudio)
                         continue;
-                    }
 
                     // get the input by channel id
                     Input input = mInputs.get(channel);
-                    if (input == null) {
-                        LogUtil.w(CoreUtils.TAG, TAG, "transLayout2Tracks, the input channel is empty': " + channel.name());
+                    if (input == null)
                         continue;
-                    }
 
                     // skip non-AFV or muted channel
                     MixMode mixMode = mixModes.get(channel);
@@ -1801,13 +1886,13 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         }
 
         // loop to fill tracks
-        for (Input input: inputs) {
+        for (Input input : inputs) {
             // skip empty audio streams
             if (input.connState != State.Done || input.aStreams.size() == 0)
                 continue;
 
             // add all matched stream
-            for (AVStream stream: input.aStreams) {
+            for (AVStream stream : input.aStreams) {
                 if (stream.isDecReady()) {
                     MixerTracks.Track track = new MixerTracks.Track(stream.getDecId(), input.volume);
                     tracks.add(track);
@@ -1876,7 +1961,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
             AudioFormat audio = (AudioFormat) format;
             int ret = mEndpoint.epStartTxStream(caller.epId, streamId, audio, EPObjectType.Mixer, caller.mixer.epId);
             if (ret != 0) {
-                LogUtil.w(CoreUtils.TAG, TAG,"onTxStreamOpen, epStartTxStream failed: " + ret);
+                LogUtil.w(CoreUtils.TAG, TAG, "onTxStreamOpen, epStartTxStream failed: " + ret);
                 return;
             }
             stream.onEncoding();
@@ -1901,14 +1986,14 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
             // check PGM display
             Display display = mDisplays.get(SurfaceId.PGM);
             if (display == null || display.state != State.Done) {
-                LogUtil.w(CoreUtils.TAG, TAG,"onTxStreamOpen, PGM display is not ready");
+                LogUtil.w(CoreUtils.TAG, TAG, "onTxStreamOpen, PGM display is not ready");
                 return;
             }
 
             // start this tx stream
             int ret = mEndpoint.epStartTxStream(caller.epId, streamId, caller.vFormat, EPObjectType.Display, display.epId);
             if (ret != 0) {
-                LogUtil.w(CoreUtils.TAG, TAG,"onTxStreamOpen, epStartTxStream failed: " + ret);
+                LogUtil.w(CoreUtils.TAG, TAG, "onTxStreamOpen, epStartTxStream failed: " + ret);
                 return;
             }
             stream.onEncoding();
@@ -1962,15 +2047,15 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         } else if (id == SurfaceId.PGM) {
             int displayId = mDisplays.get(SurfaceId.PGM).epId;
 
-            for (Input input: mInputs.values()) {
+            for (Input input : mInputs.values()) {
                 if (input.config.type == InputType.Caller) {
                     Caller caller = (Caller) input;
-                    for (AVStream stream: caller.vTxStreams) {
+                    for (AVStream stream : caller.vTxStreams) {
                         if (!stream.isEncoding()) {
                             int ret = mEndpoint.epStartTxStream(caller.epId, stream.id, caller.vFormat,
                                     EPObjectType.Display, displayId);
                             if (ret != 0)
-                                LogUtil.w(CoreUtils.TAG, TAG,"onSurfaceReady, epStartTxStream failed: " + ret);
+                                LogUtil.w(CoreUtils.TAG, TAG, "onSurfaceReady, epStartTxStream failed: " + ret);
                             else
                                 stream.onEncoding();
                         }
@@ -2030,8 +2115,8 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     private void flushInSurface(SurfaceId surfaceId, ChannelId channel, boolean videoReady) {
         Display display = mDisplays.get(surfaceId);
         if (display.state == State.Done) {
-            Layout layout = videoReady ? new Layout().setOverlays(
-                    Arrays.asList(new Overlay.Stream(channel, Region.buildFull()))) :
+            Layout layout = videoReady ?
+                    new Layout().addOverlays(TSLayout.A, Arrays.asList(OverlaySrc.buildStream(channel))) :
                     Layout.buildEmpty();
             switchLayout(surfaceId, layout, TransitionDesc.buildEmpty());
         }
@@ -2111,7 +2196,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
 
     private static AudioCapabilities getAudioCapability(List<AudioCodec> aCodecs) {
         List<AudioCapability> audio = new LinkedList<>();
-        for (AudioCodec codec: aCodecs) {
+        for (AudioCodec codec : aCodecs) {
             AudioCapability capability = new AudioCapability(codec.format);
             audio.add(capability);
         }
@@ -2123,13 +2208,13 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     private static VideoCapabilities getVideoCapability(List<VideoFormat> formats) {
         List<VideoCapability> video = new LinkedList<>();
 
-        for (VideoFormat format: formats) {
+        for (VideoFormat format : formats) {
             VideoCapability capability = new VideoCapability(format.codec, format.profile,
                     format.resolution, format.framerate);
             capability.setKeyFrameInterval(format.getKeyIntervalInFrames());
 
             boolean added = false;
-            for (VideoCapability cap: video) {
+            for (VideoCapability cap : video) {
                 if (cap.isEqual(capability)) {
                     added = true;
                     break;
@@ -2221,13 +2306,12 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         }
 
         public boolean contains(ChannelId channel) {
-            if (layout == null || layout.getOverlays() == null)
+            if (layout == null || layout.getCommonOverlays() == null)
                 return false;
-            for (Overlay overlay: layout.getOverlays()) {
-                if (overlay.type != Overlay.Type.Stream)
+            for (CommonOverlay overlay : layout.getCommonOverlays()) {
+                if (overlay.src.type != OverlaySrc.Type.Stream)
                     continue;
-                Overlay.Stream stream = (Overlay.Stream) overlay;
-                if (CompareHelper.isEqual(channel, stream.channel))
+                if (CompareHelper.isEqual(channel, overlay.src.channel))
                     return true;
             }
             return false;

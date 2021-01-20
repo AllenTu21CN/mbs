@@ -361,7 +361,12 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
     }
 
     @Override
-    public void onEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
+    public void onObjEvent(EPObjectType objType, int objId, EPEvent event, Object params) {
+
+    }
+
+    @Override
+    public void onVolumeReport(String report) {
 
     }
 }
