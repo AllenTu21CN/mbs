@@ -3,13 +3,17 @@ package cn.lx.mbs.ui.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.text.Layout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import cn.lx.mbs.R;
+import cn.sanbu.avalon.media.TextRenderer;
 
 public class OverlayAddTextDialog extends BaseDialog {
 
@@ -45,7 +49,7 @@ public class OverlayAddTextDialog extends BaseDialog {
             Color.valueOf(0xFF000000)
     };
 
-    private static final String[] SYSTEM_DFAULT_FONTS = new String[] {
+    private static final String[] SYSTEM_DEFAULT_FONTS = new String[] {
             "Sans serif",
             "Serif",
             "Monospace"
@@ -56,9 +60,14 @@ public class OverlayAddTextDialog extends BaseDialog {
     private View mView;
     private ImageView mSceneEditorBgImageView;
     private Bitmap mSceneEditorBgBitmap;
+    private EditText mTextEditText;
     private Spinner mFontSpinner;
+    private FontStyleButtonGroup mFontStyleButtonGroup;
     private ColorPickerButton mTextColorPicker;
     private ColorPickerButton mBgColorPicker;
+    private SeekBar mBgOpacitySeekBar;
+    private TextView mBgOpacityTextView;
+    private EditText mBgBorderRadiusEditText;
 
     public OverlayAddTextDialog(Context context, int width, int height) {
         super(context, width, height);
@@ -85,17 +94,65 @@ public class OverlayAddTextDialog extends BaseDialog {
                     }
         });
 
+        mTextEditText = mView.findViewById(R.id.text_value);
         mFontSpinner = mView.findViewById(R.id.font_value);
         SimpleArrayAdapter<String> fontListAdapter = new SimpleArrayAdapter<>(
                 mContext,
-                SYSTEM_DFAULT_FONTS);
+                SYSTEM_DEFAULT_FONTS);
         fontListAdapter.setTextSize(Utils.PX(28));
         mFontSpinner.setAdapter(fontListAdapter);
 
+        mFontStyleButtonGroup = mView.findViewById(R.id.text_style_button_group);
         mTextColorPicker = mView.findViewById(R.id.text_color_btn);
         mTextColorPicker.updateColorList(TEXT_COLORS);
 
         mBgColorPicker = mView.findViewById(R.id.bg_color_btn);
         mBgColorPicker.updateColorList(BACKGROUND_COLORS);
+
+        mBgOpacitySeekBar = mView.findViewById(R.id.bg_opacity_seek_bar);
+        mBgOpacitySeekBar.setMin(0);
+        mBgOpacitySeekBar.setMax(100);
+        mBgOpacitySeekBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                mBgOpacityTextView.setText(String.format("%d%%", progress));
+                // TODO:
+                updatePreview();
+            }
+
+            @Override
+            public void onStartTrackingTouch(android.widget.SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(android.widget.SeekBar seekBar) {
+
+            }
+        });
+        mBgOpacityTextView = mView.findViewById(R.id.bg_opacity_value);
+
+        mBgBorderRadiusEditText = mView.findViewById(R.id.bg_border_radius_value);
+    }
+
+    public void updatePreview() {
+        // TODO:
+        String text = mTextEditText.getText().toString();
+        String fontFamily = (String) mFontSpinner.getSelectedItem();
+        boolean isBold = mFontStyleButtonGroup.isBold();
+        boolean isItalic = mFontStyleButtonGroup.isItalic();
+        boolean isUnderlined = mFontStyleButtonGroup.isUnderlined();
+        Layout.Alignment alignment = mFontStyleButtonGroup.getAlignment();
+        Color textColor = mTextColorPicker.getSelectedColor();
+        Color bgColor = mBgColorPicker.getSelectedColor();
+        float bgOpacity = (float) mBgOpacitySeekBar.getProgress() / 100.f;
+        int bgBorderRadius = Integer.valueOf(mBgBorderRadiusEditText.getText().toString());
+
+        Bitmap img = TextRenderer.renderTextAsBitmap(
+                text,
+                fontFamily, textColor.toArgb(),
+                isBold, isItalic, isUnderlined, alignment,
+                bgColor.toArgb(), bgBorderRadius, 1920, 1080);
+        mSceneEditorBgImageView.setImageBitmap(img);
     }
 }

@@ -64,7 +64,7 @@
         app:layout_constraintTop_toBottomOf="@id/scene_editor_bg"
         app:layout_constraintLeft_toRightOf="@id/text_label"
         app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
-        android:text=""
+        android:text="abcdefgABCDEFG\n123456789\nHello, world!\nMobile Broadcast Studio"
         android:textColor="@color/primaryTextColor"
         android:textSize="28px" />
 
@@ -93,6 +93,72 @@
         app:layout_constraintLeft_toRightOf="@id/font_label"
         app:layout_constraintRight_toLeftOf="@id/vcenter_guideline"/>
 
+    <!-- Style -->
+    <TextView
+        android:id="@+id/text_style_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/text_style_button_group"
+        app:layout_constraintBottom_toBottomOf="@id/text_style_button_group"
+        app:layout_constraintLeft_toLeftOf="@id/vcenter_guideline"
+        app:layout_constraintRight_toLeftOf="@id/text_style_button_group"
+        android:text="Style"
+        android:textSize="28px" />
+
+    <cn.lx.mbs.ui.view.FontStyleButtonGroup
+        android:id="@+id/text_style_button_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18px"
+        app:layout_constraintLeft_toRightOf="@id/text_style_label"
+        app:layout_constraintTop_toTopOf="@id/font_value"
+        app:layout_constraintBottom_toBottomOf="@id/font_value" />
+    <!--ImageButton
+        android:id="@+id/format_bold_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18px"
+        android:layout_marginRight="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_format_bold_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintLeft_toRightOf="@id/text_style_label"
+        app:layout_constraintRight_toLeftOf="@id/format_italic_btn"
+        app:layout_constraintTop_toTopOf="@id/font_value"
+        app:layout_constraintBottom_toBottomOf="@id/font_value"
+        android:scaleType="fitXY" />
+
+    <ImageButton
+        android:id="@+id/format_italic_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18px"
+        android:layout_marginRight="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_format_italic_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
+        app:layout_constraintLeft_toRightOf="@id/format_bold_btn"
+        app:layout_constraintRight_toLeftOf="@id/format_underlined_btn"
+        android:scaleType="fitXY" />
+
+    <ImageButton
+        android:id="@+id/format_underlined_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="18px"
+        android:layout_marginRight="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_format_underlined_black_24dp"
+        android:tint="@color/commonButtonNormalTextColor"
+        android:tintMode="src_in"
+        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
+        app:layout_constraintLeft_toRightOf="@id/format_italic_btn"
+        android:scaleType="fitXY" /-->
+
     <!-- Color -->
     <TextView
         android:id="@+id/text_color_label"
@@ -110,69 +176,11 @@
         android:id="@+id/text_color_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18px"
+        android:layout_marginTop="24px"
         android:layout_marginLeft="18px"
         app:layout_constraintTop_toBottomOf="@id/font_value"
         app:layout_constraintLeft_toRightOf="@id/text_color_label"
         />
-
-    <!-- Style -->
-    <TextView
-        android:id="@+id/text_style_label"
-        android:layout_width="150px"
-        android:layout_height="wrap_content"
-        android:gravity="right"
-        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
-        app:layout_constraintBottom_toBottomOf="@id/format_bold_btn"
-        app:layout_constraintLeft_toLeftOf="@id/vcenter_guideline"
-        app:layout_constraintRight_toLeftOf="@id/format_bold_btn"
-        android:text="Style"
-        android:textSize="28px" />
-
-    <ImageButton
-        android:id="@+id/format_bold_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15px"
-        android:layout_marginRight="15px"
-        android:background="#00000000"
-        android:src="@drawable/ic_format_bold_black_24dp"
-        android:tint="@color/commonButtonNormalTextColor"
-        android:tintMode="src_in"
-        app:layout_constraintLeft_toRightOf="@id/text_style_label"
-        app:layout_constraintRight_toLeftOf="@id/format_italic_btn"
-        app:layout_constraintTop_toTopOf="@id/font_value"
-        app:layout_constraintBottom_toBottomOf="@id/font_value"
-        android:scaleType="fitXY" />
-
-    <ImageButton
-        android:id="@+id/format_italic_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15px"
-        android:layout_marginRight="15px"
-        android:background="#00000000"
-        android:src="@drawable/ic_format_italic_black_24dp"
-        android:tint="@color/commonButtonNormalTextColor"
-        android:tintMode="src_in"
-        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
-        app:layout_constraintLeft_toRightOf="@id/format_bold_btn"
-        app:layout_constraintRight_toLeftOf="@id/format_underlined_btn"
-        android:scaleType="fitXY" />
-
-    <ImageButton
-        android:id="@+id/format_underlined_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="15px"
-        android:layout_marginRight="15px"
-        android:background="#00000000"
-        android:src="@drawable/ic_format_underlined_black_24dp"
-        android:tint="@color/commonButtonNormalTextColor"
-        android:tintMode="src_in"
-        app:layout_constraintTop_toTopOf="@id/format_bold_btn"
-        app:layout_constraintLeft_toRightOf="@id/format_italic_btn"
-        android:scaleType="fitXY" />
 
     <!-- Background Color -->
     <TextView
@@ -191,7 +199,7 @@
         android:id="@+id/bg_color_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18px"
+        android:layout_marginTop="24px"
         android:layout_marginLeft="18px"
         app:layout_constraintTop_toBottomOf="@id/text_color_btn"
         app:layout_constraintLeft_toRightOf="@id/bg_color_label"
@@ -247,13 +255,14 @@
 
     <EditText
         android:id="@+id/bg_border_radius_value"
-        android:layout_width="80px"
+        android:layout_width="120px"
         android:layout_height="wrap_content"
         android:layout_marginLeft="18px"
+        android:gravity="center"
         app:layout_constraintTop_toTopOf="@id/bg_opacity_seek_bar"
         app:layout_constraintBottom_toBottomOf="@id/bg_opacity_seek_bar"
         app:layout_constraintLeft_toRightOf="@id/bg_border_radius_label"
-        android:text="5px"
+        android:text="5"
         android:textColor="@color/primaryTextColor"
         android:textSize="28px" />
 

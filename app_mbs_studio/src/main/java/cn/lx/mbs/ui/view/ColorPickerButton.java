@@ -9,15 +9,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.widget.AppCompatButton;
-
-import com.sanbu.tools.LogUtil;
-
-import cn.lx.mbs.R;
-import cn.lx.mbs.support.MBS;
-import cn.lx.mbs.support.structures.Layout;
-import cn.lx.mbs.ui.MainActivity;
-
 public class ColorPickerButton extends LinearLayout {
     private ColorButton mSelectedCB;
     private ColorButton[] mColorButtons;
@@ -53,7 +44,6 @@ public class ColorPickerButton extends LinearLayout {
 
             cb.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    // TODO:
                     if (v instanceof ColorButton) {
                         ColorButton btn = (ColorButton) v;
                         if (mSelectedCB != btn) {
@@ -79,8 +69,8 @@ public class ColorPickerButton extends LinearLayout {
     private class ColorButton extends Button {
         public static final int COLOR_SELECTED = 0xFFF74A00;
 
-        public final int BORDER_WIDTH = Utils.PX(6);
-        public final int PADDING_WIDTH = Utils.PX(1);
+        public final int BORDER_WIDTH = Utils.PX(8);
+        public final int PADDING_WIDTH = Utils.PX(0);
 
         private Color mColor;
         private boolean mIsSelected = false;
@@ -129,12 +119,14 @@ public class ColorPickerButton extends LinearLayout {
 
             canvas.drawRect(left, top, right, bottom, mBorderPaint);
 
-            left += BORDER_WIDTH;
-            right -= BORDER_WIDTH;
-            top += BORDER_WIDTH;
-            bottom -= BORDER_WIDTH;
+            if (PADDING_WIDTH > 0) {
+                left += BORDER_WIDTH;
+                right -= BORDER_WIDTH;
+                top += BORDER_WIDTH;
+                bottom -= BORDER_WIDTH;
 
-            canvas.drawRect(left, top, right, bottom, mPaddingPaint);
+                canvas.drawRect(left, top, right, bottom, mPaddingPaint);
+            }
         }
     }
 }
