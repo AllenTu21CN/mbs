@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.text.Layout;
@@ -134,6 +136,10 @@ public class TextRenderer {
         textPaint.setStyle(Paint.Style.FILL);
         if (underlined) {
             textPaint.setFlags(TextPaint.UNDERLINE_TEXT_FLAG);
+        }
+
+        if (textColor == Color.TRANSPARENT) {
+            textPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         }
 
         float textSize = 48.0f;

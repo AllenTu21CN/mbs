@@ -1,6 +1,7 @@
 package cn.lx.mbs.ui.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,11 +10,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-public class ColorPickerButton extends LinearLayout {
+public class ColorPicker extends LinearLayout {
+
+    public interface OnColorPickerChangeListener {
+        void OnColorSelected(ColorPicker colorPicker);
+    }
+
+    private OnColorPickerChangeListener mOnColorPickerChangeListener;
+
     private ColorButton mSelectedCB;
     private ColorButton[] mColorButtons;
 
-    public ColorPickerButton(Context context, AttributeSet attrs) {
+    public ColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         setOrientation(LinearLayout.HORIZONTAL);
@@ -52,6 +60,10 @@ public class ColorPickerButton extends LinearLayout {
                             }
                             btn.setSelect(true);
                             mSelectedCB = btn;
+
+                            if (mOnColorPickerChangeListener != null) {
+                                mOnColorPickerChangeListener.OnColorSelected(ColorPicker.this);
+                            }
                         }
                     }
                 }
@@ -59,6 +71,10 @@ public class ColorPickerButton extends LinearLayout {
         }
 
         invalidate();
+    }
+
+    public void setOnColorPickerChangeListener(OnColorPickerChangeListener listener) {
+        mOnColorPickerChangeListener = listener;
     }
 
     public boolean showCustomDialog() {
@@ -75,6 +91,7 @@ public class ColorPickerButton extends LinearLayout {
         private Color mColor;
         private boolean mIsSelected = false;
 
+        private Paint mBgImagePaint;
         private Paint mBorderPaint;
         private Paint mPaddingPaint;
 
@@ -83,6 +100,8 @@ public class ColorPickerButton extends LinearLayout {
 
             mColor = color;
             setBackgroundColor(mColor.toArgb());
+
+            mBgImagePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
             mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBorderPaint.setStyle(Paint.Style.STROKE);
@@ -107,6 +126,12 @@ public class ColorPickerButton extends LinearLayout {
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
+
+            if (mColor.toArgb() == Color.TRANSPARENT) {
+                final int CELL_SIZE = Utils.PX(5);
+                Bitmap bg = Utils.generateCheckerBoardBitmap(getWidth(), getHeight(), CELL_SIZE, CELL_SIZE);
+                canvas.drawBitmap(bg, 0, 0, mBgImagePaint);
+            }
 
             if (!mIsSelected) {
                 return;

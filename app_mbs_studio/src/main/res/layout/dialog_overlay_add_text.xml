@@ -66,7 +66,8 @@
         app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
         android:text="abcdefgABCDEFG\n123456789\nHello, world!\nMobile Broadcast Studio"
         android:textColor="@color/primaryTextColor"
-        android:textSize="28px" />
+        android:textSize="28px"
+        android:maxLines="2" />
 
     <!-- Font -->
     <TextView
@@ -106,7 +107,7 @@
         android:text="Style"
         android:textSize="28px" />
 
-    <cn.lx.mbs.ui.view.FontStyleButtonGroup
+    <cn.lx.mbs.ui.view.FontStyleToolBar
         android:id="@+id/text_style_button_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -172,7 +173,7 @@
         android:text="Color"
         android:textSize="28px" />
 
-    <cn.lx.mbs.ui.view.ColorPickerButton
+    <cn.lx.mbs.ui.view.ColorPicker
         android:id="@+id/text_color_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -195,7 +196,7 @@
         android:text="Bg Color"
         android:textSize="28px" />
 
-    <cn.lx.mbs.ui.view.ColorPickerButton
+    <cn.lx.mbs.ui.view.ColorPicker
         android:id="@+id/bg_color_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

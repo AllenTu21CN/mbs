@@ -12,7 +12,13 @@ import android.widget.LinearLayout;
 
 import cn.lx.mbs.R;
 
-public class FontStyleButtonGroup extends LinearLayout {
+public class FontStyleToolBar extends LinearLayout {
+
+    public interface OnFontStyleChangeListener {
+         void OnFontStyleChanged(FontStyleToolBar fontStyleToolBar);
+    }
+
+    private OnFontStyleChangeListener mOnFontStyleChangeListener;
 
     private static final int BOLD = 0;
     private static final int ITALIC = 1;
@@ -32,7 +38,7 @@ public class FontStyleButtonGroup extends LinearLayout {
 
     private FontStyleButton[] mButtons = new FontStyleButton[ICONS_RES_ID.length];
 
-    public FontStyleButtonGroup(Context context, AttributeSet attrs) {
+    public FontStyleToolBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         setOrientation(LinearLayout.HORIZONTAL);
@@ -49,6 +55,10 @@ public class FontStyleButtonGroup extends LinearLayout {
                         if (v instanceof FontStyleButton) {
                             FontStyleButton btn = (FontStyleButton) v;
                             btn.toggle();
+
+                            if (mOnFontStyleChangeListener != null) {
+                                mOnFontStyleChangeListener.OnFontStyleChanged(FontStyleToolBar.this);
+                            }
                         }
                     }
                 });
@@ -62,6 +72,10 @@ public class FontStyleButtonGroup extends LinearLayout {
                                 mButtons[j].setChecked(false);
                             }
                             btn.setChecked(true);
+
+                            if (mOnFontStyleChangeListener != null) {
+                                mOnFontStyleChangeListener.OnFontStyleChanged(FontStyleToolBar.this);
+                            }
                         }
                     }
                 });
@@ -99,6 +113,10 @@ public class FontStyleButtonGroup extends LinearLayout {
         }
 
         return Layout.Alignment.ALIGN_CENTER;
+    }
+
+    public void setOnFontStyleChangeListener(OnFontStyleChangeListener listener) {
+        mOnFontStyleChangeListener = listener;
     }
 
     private class FontStyleButton extends ImageButton {
