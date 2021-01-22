@@ -69,18 +69,21 @@ public class OverlayAddTextDialog extends BaseDialog {
     private Bitmap mSceneEditorBgBitmap;
     private EditText mTextEditText;
     private Spinner mFontSpinner;
-    private FontStyleToolBar mFontStyleButtonGroup;
+    private FontStyleToolBar mFontStyleToolBar;
     private ColorPicker mTextColorPicker;
     private ColorPicker mBgColorPicker;
     private SeekBar mBgOpacitySeekBar;
     private TextView mBgOpacityTextView;
-    private EditText mBgBorderRadiusEditText;
+    private SeekBar mBgRadiusSeekBar;
+    private TextView mBgRadiusTextView;
 
     public OverlayAddTextDialog(Context context, int width, int height) {
         super(context, width, height);
 
         setupUi();
         setupListener();
+
+        initAsDefault();
     }
 
     private void setupUi() {
@@ -100,7 +103,7 @@ public class OverlayAddTextDialog extends BaseDialog {
         fontListAdapter.setTextSize(Utils.PX(28));
         mFontSpinner.setAdapter(fontListAdapter);
 
-        mFontStyleButtonGroup = mView.findViewById(R.id.text_style_button_group);
+        mFontStyleToolBar = mView.findViewById(R.id.text_style_button_group);
         mTextColorPicker = mView.findViewById(R.id.text_color_btn);
         mTextColorPicker.updateColorList(TEXT_COLORS);
 
@@ -110,10 +113,13 @@ public class OverlayAddTextDialog extends BaseDialog {
         mBgOpacitySeekBar = mView.findViewById(R.id.bg_opacity_seek_bar);
         mBgOpacitySeekBar.setMin(0);
         mBgOpacitySeekBar.setMax(100);
-        mBgOpacitySeekBar.setProgress(100);
 
         mBgOpacityTextView = mView.findViewById(R.id.bg_opacity_value);
-        mBgBorderRadiusEditText = mView.findViewById(R.id.bg_border_radius_value);
+
+        mBgRadiusSeekBar = mView.findViewById(R.id.bg_radius_seek_bar);
+        mBgRadiusSeekBar.setMin(0);
+        mBgRadiusSeekBar.setMax(50);
+        mBgRadiusTextView = mView.findViewById(R.id.bg_radius_value);
     }
 
     private void setupListener() {
@@ -160,7 +166,7 @@ public class OverlayAddTextDialog extends BaseDialog {
             }
         });
 
-        mFontStyleButtonGroup.setOnFontStyleChangeListener(new FontStyleToolBar.OnFontStyleChangeListener() {
+        mFontStyleToolBar.setOnFontStyleChangeListener(new FontStyleToolBar.OnFontStyleChangeListener() {
             @Override
             public void OnFontStyleChanged(FontStyleToolBar fontStyleButtonGroup) {
                 updatePreview();
@@ -199,45 +205,54 @@ public class OverlayAddTextDialog extends BaseDialog {
             }
         });
 
-        mBgBorderRadiusEditText.addTextChangedListener(new TextWatcher() {
+        mBgRadiusSeekBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                mBgRadiusTextView.setText(String.format("%d%%", progress));
                 updatePreview();
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
+            public void onStartTrackingTouch(android.widget.SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(android.widget.SeekBar seekBar) {
 
             }
         });
+    }
+
+    private void initAsDefault() {
+        mFontStyleToolBar.setStyle(false, false, false, Layout.Alignment.ALIGN_CENTER);
+        mTextColorPicker.setSelectedColor(Color.valueOf(0xFFFFFFFF));
+        mBgColorPicker.setSelectedColor(Color.valueOf(0xFF000000));
+        mBgOpacitySeekBar.setProgress(50);
+        mBgRadiusSeekBar.setProgress(5);
     }
 
     private void updatePreview() {
         // TODO:
         String text = mTextEditText.getText().toString();
         String fontFamily = (String) mFontSpinner.getSelectedItem();
-        boolean isBold = mFontStyleButtonGroup.isBold();
-        boolean isItalic = mFontStyleButtonGroup.isItalic();
-        boolean isUnderlined = mFontStyleButtonGroup.isUnderlined();
-        Layout.Alignment alignment = mFontStyleButtonGroup.getAlignment();
+        boolean isBold = mFontStyleToolBar.isBold();
+        boolean isItalic = mFontStyleToolBar.isItalic();
+        boolean isUnderlined = mFontStyleToolBar.isUnderlined();
+        Layout.Alignment alignment = mFontStyleToolBar.getAlignment();
         Color textColor = mTextColorPicker.getSelectedColor();
 
         Color bgColor = mBgColorPicker.getSelectedColor();
         int bgOpacity = (int) ((float) mBgOpacitySeekBar.getProgress() / 100.f * 255.f);
         int bgColorInt = (bgColor.toArgb() & 0x00FFFFFF) | (bgOpacity << 24);
 
-        int bgBorderRadius = Integer.valueOf(mBgBorderRadiusEditText.getText().toString());
+        float bgRadius = (float) mBgRadiusSeekBar.getProgress() / 100.f;
 
         Bitmap img = TextRenderer.renderTextAsBitmap(
                 text,
                 fontFamily.toLowerCase(), textColor.toArgb(),
                 isBold, isItalic, isUnderlined, alignment,
-                bgColorInt, bgBorderRadius, 1920, 1080);
+                bgColorInt, bgRadius, 1920, 1080);
         mSceneEditorBgImageView.setImageBitmap(img);
     }
 }

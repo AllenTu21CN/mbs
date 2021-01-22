@@ -68,7 +68,7 @@ public class FontStyleToolBar extends LinearLayout {
                     public void onClick(View v) {
                         if (v instanceof FontStyleButton) {
                             FontStyleButton btn = (FontStyleButton) v;
-                            for (int j = 3; j < mButtons.length; j++) {
+                            for (int j = ALIGN_LEFT; j <= ALIGN_RIGHT; j++) {
                                 mButtons[j].setChecked(false);
                             }
                             btn.setChecked(true);
@@ -113,6 +113,29 @@ public class FontStyleToolBar extends LinearLayout {
         }
 
         return Layout.Alignment.ALIGN_CENTER;
+    }
+
+    public void setStyle(boolean bold, boolean italic, boolean underlined, Layout.Alignment alignment) {
+        mButtons[BOLD].setChecked(bold);
+        mButtons[ITALIC].setChecked(italic);
+        mButtons[UNDERLINED].setChecked(underlined);
+
+        for (int j = ALIGN_LEFT; j <= ALIGN_RIGHT; j++) {
+            mButtons[j].setChecked(false);
+        }
+
+        switch (alignment) {
+            case ALIGN_NORMAL :
+                mButtons[ALIGN_LEFT].setChecked(true);
+                break;
+            case ALIGN_CENTER :
+                mButtons[ALIGN_CENTER].setChecked(true);
+                break;
+
+            case ALIGN_OPPOSITE :
+                mButtons[ALIGN_RIGHT].setChecked(true);
+                break;
+        }
     }
 
     public void setOnFontStyleChangeListener(OnFontStyleChangeListener listener) {

@@ -73,6 +73,21 @@ public class ColorPicker extends LinearLayout {
         invalidate();
     }
 
+    public void setSelectedColor(Color color) {
+        for (ColorButton cb : mColorButtons) {
+            if (cb.getColor().equals(color)) {
+                if (cb != mSelectedCB) {
+                    if (mSelectedCB != null) {
+                        mSelectedCB.setSelect(false);
+                    }
+                    cb.setSelect(true);
+                    mSelectedCB = cb;
+                }
+                break;
+            }
+        }
+    }
+
     public void setOnColorPickerChangeListener(OnColorPickerChangeListener listener) {
         mOnColorPickerChangeListener = listener;
     }

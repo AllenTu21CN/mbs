@@ -237,32 +237,42 @@
         app:layout_constraintTop_toTopOf="@id/bg_opacity_seek_bar"
         app:layout_constraintBottom_toBottomOf="@id/bg_opacity_seek_bar"
         app:layout_constraintLeft_toRightOf="@id/bg_opacity_seek_bar"
-        app:layout_constraintRight_toLeftOf="@id/vcenter_guideline"
+        app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
         android:text="100%"
         android:textSize="28px" />
 
     <!-- Background border radius -->
     <TextView
-        android:id="@+id/bg_border_radius_label"
+        android:id="@+id/bg_radius_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="right"
-        app:layout_constraintTop_toTopOf="@id/bg_border_radius_value"
-        app:layout_constraintBottom_toBottomOf="@id/bg_border_radius_value"
-        app:layout_constraintLeft_toRightOf="@id/vcenter_guideline"
-        app:layout_constraintRight_toLeftOf="@id/bg_border_radius_value"
-        android:text="Border Radius"
+        app:layout_constraintTop_toTopOf="@id/bg_radius_seek_bar"
+        app:layout_constraintBottom_toBottomOf="@id/bg_radius_seek_bar"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
+        app:layout_constraintRight_toLeftOf="@id/bg_radius_seek_bar"
+        android:text="Bg Radius"
         android:textSize="28px" />
 
-    <EditText
-        android:id="@+id/bg_border_radius_value"
-        android:layout_width="120px"
+    <cn.lx.mbs.ui.view.SeekBar
+        android:id="@+id/bg_radius_seek_bar"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24px"
         android:layout_marginLeft="18px"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="@id/bg_opacity_seek_bar"
-        app:layout_constraintBottom_toBottomOf="@id/bg_opacity_seek_bar"
-        app:layout_constraintLeft_toRightOf="@id/bg_border_radius_label"
+        app:layout_constraintTop_toBottomOf="@id/bg_opacity_seek_bar"
+        app:layout_constraintLeft_toRightOf="@id/bg_opacity_label"
+        app:layout_constraintRight_toLeftOf="@id/bg_opacity_value" />
+
+    <TextView
+        android:id="@+id/bg_radius_value"
+        android:layout_width="100px"
+        android:layout_height="wrap_content"
+        android:gravity="left"
+        app:layout_constraintTop_toTopOf="@id/bg_radius_seek_bar"
+        app:layout_constraintBottom_toBottomOf="@id/bg_radius_seek_bar"
+        app:layout_constraintLeft_toRightOf="@id/bg_radius_seek_bar"
+        app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
         android:text="5"
         android:textColor="@color/primaryTextColor"
         android:textSize="28px" />

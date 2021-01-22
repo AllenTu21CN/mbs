@@ -105,7 +105,7 @@ public class TextRenderer {
                                             String fontFamily, int textColor,
                                             boolean bold, boolean italic, boolean underlined,
                                             Layout.Alignment alignment,
-                                            int bgColor, int bgBorderRadius,
+                                            int bgColor, float bgRadius,
                                             int targetWidth, int targetHeight) {
         int fontStyle;
         if (bold) {
@@ -183,8 +183,9 @@ public class TextRenderer {
         Paint bgPaint = new Paint();
         bgPaint.setAntiAlias(true);
         bgPaint.setColor(bgColor);
-        canvas.drawRoundRect(new RectF(
-                0, 0, canvasWidth, canvasHeight), bgBorderRadius, bgBorderRadius, bgPaint);
+        int radius = (int) ((float)Math.min(canvasWidth, canvasHeight) * bgRadius);
+        canvas.drawRoundRect(new RectF(0, 0, canvasWidth, canvasHeight),
+                radius, radius, bgPaint);
 
         layout.draw(canvas);
 
