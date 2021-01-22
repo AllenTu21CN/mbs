@@ -67,6 +67,8 @@ public class OverlayAddTextDialog extends BaseDialog {
     private View mView;
     private ImageView mSceneEditorBgImageView;
     private Bitmap mSceneEditorBgBitmap;
+    private OverlayEditableView mOverlayEditableView;
+
     private EditText mTextEditText;
     private Spinner mFontSpinner;
     private FontStyleToolBar mFontStyleToolBar;
@@ -94,6 +96,7 @@ public class OverlayAddTextDialog extends BaseDialog {
         Utils.adjustAll((ViewGroup) mView);
 
         mSceneEditorBgImageView = mView.findViewById(R.id.scene_editor_bg);
+        mOverlayEditableView = mView.findViewById(R.id.scene_editor_overlay);
 
         mTextEditText = mView.findViewById(R.id.text_value);
         mFontSpinner = mView.findViewById(R.id.font_value);
@@ -253,6 +256,7 @@ public class OverlayAddTextDialog extends BaseDialog {
                 fontFamily.toLowerCase(), textColor.toArgb(),
                 isBold, isItalic, isUnderlined, alignment,
                 bgColorInt, bgRadius, 1920, 1080);
-        mSceneEditorBgImageView.setImageBitmap(img);
+
+        mOverlayEditableView.setImageBitmap(img);
     }
 }

@@ -144,8 +144,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         LogUtil.w(UIConst.TAG, TAG, "onStop");
         super.onStop();
-        if (MBS.getInstance().isReady())
-            MyApplication.exit();
+        //if (MBS.getInstance().isReady()) {
+        //    MyApplication.exit();
+        //}
     }
 
     @Override
@@ -185,6 +186,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onKeyUp(keyCode, event);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
     }
 
     public void hideSystemUI() {
