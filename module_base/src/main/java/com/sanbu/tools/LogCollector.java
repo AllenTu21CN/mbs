@@ -158,7 +158,7 @@ public class LogCollector {
     }
 
     public void release() {
-        final AsyncResult ar = new AsyncResult();
+        final AsyncHelper ar = new AsyncHelper();
         stopCollection(new Callback() {
             @Override
             public void done(Result result) {

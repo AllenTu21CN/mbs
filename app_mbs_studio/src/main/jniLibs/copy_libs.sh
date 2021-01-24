@@ -1,8 +1,11 @@
 rm -r -f arm64-v8a/
 mkdir -p arm64-v8a/
 
-echo "  copy libep3_android.so from nas to local"
-cp /mnt/builds/develop/multimedia/avalon/202005151707-dcfb0b4f/lib/jniLibs/arm64-v8a/libep3_android.so arm64-v8a/
+copyJniLib()
+{
+	echo "  cp $1 $2"
+  echo $1 >> $2/copy_from
+  cp $1 $2
+}
 
-echo "  copy libext_control.so from nas to local"
-cp /mnt/builds/develop/multimedia/avalon/202005151707-dcfb0b4f/lib/jniLibs/arm64-v8a/libext_control.so arm64-v8a/
+copyJniLib /mnt/builds/develop/multimedia/avalon/ep-dev-r-agent/202101201502-ecbfc694/lib/jniLibs/arm64-v8a/libep3_android.so arm64-v8a/

@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
-import com.sanbu.tools.AsyncResult;
+import com.sanbu.tools.AsyncHelper;
 import com.sanbu.tools.LogUtil;
 
 import java.util.LinkedList;
@@ -201,7 +201,7 @@ public class LooperWorker {
     }
 
     private boolean waitPendingCallback(long timeoutMS) {
-        final AsyncResult result = new AsyncResult();
+        final AsyncHelper result = new AsyncHelper();
         mWorkHandler.post(new Runnable() {
             @Override
             public void run() {

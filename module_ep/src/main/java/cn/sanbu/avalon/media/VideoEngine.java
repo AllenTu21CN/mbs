@@ -2876,7 +2876,7 @@ public class VideoEngine {
             // Draw debug information
             //drawDebugInfo();
 
-            // Draw something unvisible, fix crash on RK3288
+            // Draw something invisible, fix crash on RK3288
             mTri.setPosition(2.0f, 2.0f);
             mTri.draw(mProgram, mDisplayProjectionMatrix);
 
@@ -2886,7 +2886,7 @@ public class VideoEngine {
         private void render(long timeStampNanos) {
             //LogUtil.d(TAG, "Rendering scene #" + mId + "timestamp:" + timeStampNanos);
 
-            // Update transition progress if neccessary
+            // Update transition progress if necessarily
             update(timeStampNanos);
 
             // Render off-screen

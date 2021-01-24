@@ -501,6 +501,20 @@ public class Endpoint3 {
         return ret;
     }
 
+    // @brief Adds file source
+    // @param url [IN] source url, e.g. file://...
+    // @param loopCount [IN] source loop stream count, e.g. -1/1/2 ...
+    // @return source_id
+    public int epAddFileSource(String url, int loopCount) {
+        JsonObject properties = new JsonObject();
+        properties.addProperty("loop_stream_count", loopCount);
+        String json = properties.toString();
+
+        int ret = jniEpAddSource(url, json);
+        EPConst.logAction("epAddSource(file)", ret, url, json);
+        return ret;
+    }
+
     // @brief Adds rmsp source
     // @param url [IN] source url, e.g. rmsp/rmsi...
     // @param video [IN] format of video stream

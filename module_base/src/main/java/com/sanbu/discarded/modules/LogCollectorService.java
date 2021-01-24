@@ -1,4 +1,4 @@
-package com.sanbu.modules;
+package com.sanbu.discarded.modules;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -51,6 +51,7 @@ import java.util.zip.ZipOutputStream;
  * @author Vald
  *
  */
+@Deprecated
 public class LogCollectorService extends Service {
 
     private static final String TAG = LogCollectorService.class.getSimpleName();

@@ -232,7 +232,7 @@ public class LooperHelper {
     }
 
     private static boolean waitPendingCallback(Handler h, long timeoutMS) {
-        final AsyncResult result = new AsyncResult();
+        final AsyncHelper result = new AsyncHelper();
         h.post(new Runnable() {
             @Override
             public void run() {

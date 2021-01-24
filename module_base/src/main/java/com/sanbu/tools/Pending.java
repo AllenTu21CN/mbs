@@ -18,7 +18,7 @@ public class Pending {
         if (handler.getLooper().getThread() == Thread.currentThread())
             return BaseError.ACTION_CANCELED;
 
-        final AsyncResult result = new AsyncResult();
+        final AsyncHelper result = new AsyncHelper();
         handler.post(new Runnable() {
             @Override
             public void run() {
