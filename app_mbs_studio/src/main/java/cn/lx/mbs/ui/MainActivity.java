@@ -402,7 +402,7 @@ public class MainActivity extends AppCompatActivity {
 
             s.rtmpConfig.url = "8.8.8.8:1935/live/a";
 
-            s.fileConfig.path = "/sdcard/ZeddAlessiaCara-Stay.mp4";
+            s.fileConfig.path = LXConst.TEST_MP4;
             s.fileConfig.loop = true;
 
             mVideoSourcesDataModel.add(s);
@@ -439,7 +439,7 @@ public class MainActivity extends AppCompatActivity {
 
         Layout layout3 = new Layout().addOverlays(TSLayout.AB, Arrays.asList(
                 OverlaySrc.buildStream(ChannelId.IN1),
-                OverlaySrc.buildStream(ChannelId.IN1)
+                OverlaySrc.buildStream(ChannelId.IN2)
         ));
 
         Layout layout4 = new Layout().addOverlays(TSLayout.AB_ZYTX, Arrays.asList(
@@ -449,16 +449,16 @@ public class MainActivity extends AppCompatActivity {
 
         Layout layout5 = new Layout().addOverlays(TSLayout.AB_ZYTX, Arrays.asList(
                 OverlaySrc.buildStream(ChannelId.IN1),
-                OverlaySrc.buildStream(ChannelId.IN1)
+                OverlaySrc.buildStream(ChannelId.IN2)
         ));
 
         Layout layout6 = new Layout().addOverlays(TSLayout.AB_ZYTX, Arrays.asList(
                 OverlaySrc.buildStream(ChannelId.IN1),
-                OverlaySrc.buildStream(ChannelId.IN1)
+                OverlaySrc.buildStream(ChannelId.IN2)
         )).addCommonOverlays(Arrays.asList(
                 new CommonOverlay(OverlaySrc.buildImage(LXConst.BG_IMAGE_LOADING),
                         new OverlayDst(TSLayout.AB_IN_RT.regions.get(1))),
-                new CommonOverlay(OverlaySrc.buildStream(ChannelId.IN1),
+                new CommonOverlay(OverlaySrc.buildStream(ChannelId.IN2),
                         new OverlayDst(TSLayout.AB_IN_RB.regions.get(1)))));
 
         mSceneLayouts = Arrays.asList(layout1, layout2, layout3, layout4, layout5, layout6);

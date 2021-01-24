@@ -73,10 +73,14 @@ public class LXConst {
     public static final String BG_IMAGE_LOADING = IMAGE_PATH + "/loading_720p.png";
     public static final String BG_IMAGE_NONE = IMAGE_PATH + "/none_720p.png";
 
+    // 测试MP4
+    public static final String TEST_MP4 = MEDIA_PATH + "/test.mp4";
+
     // 须复制到存储的资源列表
     public static final Map<String/*toFile*/, Tuple<Integer/*resId*/, FileSaveUtil.Action>> FIXED_RESOURCE = new HashMap<String, Tuple<Integer, FileSaveUtil.Action>>() {{
-        put(BG_IMAGE_LOADING, new Tuple<>(R.raw.loading_720p, FileSaveUtil.Action.Simple));
-        put(BG_IMAGE_NONE, new Tuple<>(R.raw.none_720p, FileSaveUtil.Action.Simple));
+        put(BG_IMAGE_LOADING, new Tuple<>(R.raw.loading_720p, FileSaveUtil.Action.Smart));
+        put(BG_IMAGE_NONE, new Tuple<>(R.raw.none_720p, FileSaveUtil.Action.Smart));
+        put(TEST_MP4, new Tuple<>(R.raw.test, FileSaveUtil.Action.Simple));
     }};
 
     // 须复制到存储的Assert列表

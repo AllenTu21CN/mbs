@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import com.sanbu.media.Resolution;
 import com.sanbu.tools.LogUtil;
+import com.sanbu.tools.ToastUtil;
+
+import java.io.File;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -236,8 +239,18 @@ public class VideoSourcesArea {
             });
             item = new RtspVideoSource(itemId, item.mSelf, config.rtspConfig);
         } else if (config.type == VideoSourcesDataModel.VideoSourceConfig.TYPE_FILE) {
-            LogUtil.w(UIConst.TAG, TAG, "not support file source");
-            return false;
+            VideoSourcesDataModel.VideoSourceConfig.FileConfig file = config.fileConfig;
+
+            if (!new File(file.path).exists()) {
+                ToastUtil.show("文件不存在: " + file.path);
+                return false;
+            }
+
+            MBS.getInstance().addSource(Source.buildFile("FILE", file.path, file.loop), (ret) -> {
+                if (ret.isSuccessful())
+                    MBS.getInstance().loadInput(channel, (Integer) ret.data, null);
+            });
+            item = new FileVideoSource(itemId, item.mSelf, config.fileConfig);
         } else {
             LogUtil.w(UIConst.TAG, TAG, "not support source: " + config.type);
             return false;
@@ -325,6 +338,57 @@ public class VideoSourcesArea {
             mButtons[1].setEnabled(true);
             mButtons[2].setType(DynamicButton.TYPE_CAM_CONTROL);
             mButtons[2].setEnabled(true);
+            mButtons[3].setType(DynamicButton.TYPE_SETTINGS);
+            mButtons[3].setEnabled(true);
+
+            mButtons[0].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MBS.getInstance().cutInputVideo(getChannelId(mId), null);
+                }
+            });
+
+            mButtons[1].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO:
+                    if (mButtons[1].getType() == DynamicButton.TYPE_PAUSE) {
+                        mButtons[1].setType(DynamicButton.TYPE_PLAY);
+                    } else if (mButtons[1].getType() == DynamicButton.TYPE_PLAY) {
+                        mButtons[1].setType(DynamicButton.TYPE_PAUSE);
+                    }
+                }
+            });
+        }
+    }
+
+    class FileVideoSource extends VideoSourceItem {
+
+        VideoSourcesDataModel.VideoSourceConfig.FileConfig config;
+
+        FileVideoSource(int id, ConstraintLayout view, VideoSourcesDataModel.VideoSourceConfig.FileConfig config) {
+            super(id, view);
+            this.config = config;
+        }
+
+        @Override
+        void init() {
+            super.init();
+
+            mSourceType.setText("FILE");
+            mSourceType.setVisibility(View.VISIBLE);
+
+            mSourceFormat.setText("Unknown format");
+            mSourceFormat.setVisibility(View.VISIBLE);
+
+            mAddSourceButton.setVisibility(View.INVISIBLE);
+
+            mButtons[0].setType(DynamicButton.TYPE_CUT);
+            mButtons[0].setEnabled(true);
+            mButtons[1].setType(DynamicButton.TYPE_PAUSE);
+            mButtons[1].setEnabled(true);
+            mButtons[2].setType(DynamicButton.TYPE_NONE);
+            mButtons[2].setEnabled(false);
             mButtons[3].setType(DynamicButton.TYPE_SETTINGS);
             mButtons[3].setEnabled(true);
 

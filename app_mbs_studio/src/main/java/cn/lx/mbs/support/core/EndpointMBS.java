@@ -25,11 +25,12 @@ import com.sanbu.media.VideoFormat;
 import com.sanbu.network.CallingDir;
 import com.sanbu.network.CallingProtocol;
 import com.sanbu.network.TransProtocol;
-import com.sanbu.tools.AsyncResult;
+import com.sanbu.tools.AsyncHelper;
 import com.sanbu.tools.CompareHelper;
 import com.sanbu.tools.LogUtil;
 import com.sanbu.tools.StringUtil;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -241,7 +242,7 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
         // block to release all handlers
         if (mRTWorker != null) {
 
-            AsyncResult asyncResult = new AsyncResult();
+            AsyncHelper async = new AsyncHelper();
             mRTWorker.post(() -> {
                 switchRecordingState(SRState.Stop);
                 switchStreamingState(SRState.Stop);
@@ -260,10 +261,10 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                 mStreaming = null;
                 mRecording = null;
 
-                asyncResult.notify2(0);
+                async.notify2(0);
             });
 
-            int ret = (int) asyncResult.wait2(4000, -1);
+            int ret = (int) async.wait2(4000, -1);
             if (ret != 0)
                 LogUtil.w(CoreUtils.TAG, TAG, "release timeout");
         }
@@ -545,6 +546,13 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
             } else if (source.type == InputType.RTSP) {
                 TransProtocol protocol = source.overTCP ? TransProtocol.TCP : TransProtocol.RTP;
                 epId = mEndpoint.epAddRTSPSource(source.url, protocol, LXConst.SOURCE_RECONNECTING);
+            } else if (source.type == InputType.File) {
+                if (!new File(source.path).exists())
+                    return genError("loadInput", BaseError.TARGET_NOT_FOUND,
+                            "not found the file: " + source.path,
+                            "未找到目标文件: " + source.path);
+
+                epId = mEndpoint.epAddFileSource(source.url, source.loop ? -1 : 1);
             } else if (source.type == InputType.RTMP) {
                 epId = mEndpoint.epAddNetSource(source.url, LXConst.SOURCE_RECONNECTING);
             } else if (source.type == InputType.RMSP) {

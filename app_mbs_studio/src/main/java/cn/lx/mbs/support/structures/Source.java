@@ -29,6 +29,7 @@ public class Source {
     public AudioFormat audioFormat;
 
     // for File
+    public String path;  // 原始的文件路径
     public boolean loop; // 文件源是否循环播放
 
     // for Caller
@@ -109,6 +110,7 @@ public class Source {
 
         String url = InputType.File.prefix + path;
         Source source = new Source(id, name, InputType.File, url);
+        source.path = path;
         source.loop = loop;
         return source;
     }
@@ -136,7 +138,7 @@ public class Source {
                 other.useAudio, other.resolution,
                 other.overTCP, other.extraOptions,
                 other.videoFormat, other.audioFormat,
-                other.loop, other.audioCodecs);
+                other.path, other.loop, other.audioCodecs);
     }
 
     private Source(int id, String name, InputType type, String url) {
@@ -153,8 +155,8 @@ public class Source {
 
     public Source(int id, String name, InputType type, String url, boolean useAudio,
                   Resolution resolution, boolean overTCP, String extraOptions,
-                  VideoFormat videoFormat, AudioFormat audioFormat, boolean loop,
-                  List<AudioCodec> audioCodecs) {
+                  VideoFormat videoFormat, AudioFormat audioFormat, String path,
+                  boolean loop, List<AudioCodec> audioCodecs) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -165,6 +167,7 @@ public class Source {
         this.extraOptions = extraOptions;
         this.videoFormat = videoFormat;
         this.audioFormat = audioFormat;
+        this.path = path;
         this.loop = loop;
         this.audioCodecs = audioCodecs;
     }
