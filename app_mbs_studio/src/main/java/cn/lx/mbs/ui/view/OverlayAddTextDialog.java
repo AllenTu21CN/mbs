@@ -3,13 +3,20 @@ package cn.lx.mbs.ui.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.text.Editable;
+import android.text.Layout;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import cn.lx.mbs.R;
+import cn.sanbu.avalon.media.TextRenderer;
 
 public class OverlayAddTextDialog extends BaseDialog {
 
@@ -24,10 +31,14 @@ public class OverlayAddTextDialog extends BaseDialog {
             Color.valueOf(0xFF0070C0),
             Color.valueOf(0xFF002060),
             Color.valueOf(0xFFC00000),
-            Color.valueOf(0xFF7030A0)
+            Color.valueOf(0xFF7030A0),
+            Color.valueOf(0xFFFFFFFF),
+            Color.valueOf(0xFF000000),
+            Color.valueOf(0x00000000)
     };
 
     private static final Color[] BACKGROUND_COLORS = new Color[] {
+            Color.valueOf(0xFFFFFFFF),
             Color.valueOf(0xFFFFFF00),
             Color.valueOf(0xFF00FF00),
             Color.valueOf(0xFF00FFFF),
@@ -40,13 +51,13 @@ public class OverlayAddTextDialog extends BaseDialog {
             Color.valueOf(0xFF800080),
             Color.valueOf(0xFF800000),
             Color.valueOf(0xFF808000),
-            Color.valueOf(0xFF808080),
-            Color.valueOf(0xFFC0C0C0),
+            //Color.valueOf(0xFF808080),
+            //Color.valueOf(0xFFC0C0C0),
             Color.valueOf(0xFF000000)
     };
 
-    private static final String[] SYSTEM_DFAULT_FONTS = new String[] {
-            "Sans serif",
+    private static final String[] SYSTEM_DEFAULT_FONTS = new String[] {
+            "Sans-serif",
             "Serif",
             "Monospace"
     };
@@ -56,14 +67,28 @@ public class OverlayAddTextDialog extends BaseDialog {
     private View mView;
     private ImageView mSceneEditorBgImageView;
     private Bitmap mSceneEditorBgBitmap;
+    private OverlayEditableView mOverlayEditableView;
+
+    private EditText mTextEditText;
     private Spinner mFontSpinner;
-    private ColorPickerButton mTextColorPicker;
-    private ColorPickerButton mBgColorPicker;
+    private FontStyleToolBar mFontStyleToolBar;
+    private ColorPicker mTextColorPicker;
+    private ColorPicker mBgColorPicker;
+    private SeekBar mBgOpacitySeekBar;
+    private TextView mBgOpacityTextView;
+    private SeekBar mBgRadiusSeekBar;
+    private TextView mBgRadiusTextView;
 
     public OverlayAddTextDialog(Context context, int width, int height) {
         super(context, width, height);
 
-        // TODO:
+        setupUi();
+        setupListener();
+
+        initAsDefault();
+    }
+
+    private void setupUi() {
         setTitle("Add Text Overlay");
         mView = mInflater.inflate(R.layout.dialog_overlay_add_text, null);
         setContent(mView);
@@ -71,6 +96,36 @@ public class OverlayAddTextDialog extends BaseDialog {
         Utils.adjustAll((ViewGroup) mView);
 
         mSceneEditorBgImageView = mView.findViewById(R.id.scene_editor_bg);
+        mOverlayEditableView = mView.findViewById(R.id.scene_editor_overlay);
+
+        mTextEditText = mView.findViewById(R.id.text_value);
+        mFontSpinner = mView.findViewById(R.id.font_value);
+        SimpleArrayAdapter<String> fontListAdapter = new SimpleArrayAdapter<>(
+                mContext,
+                SYSTEM_DEFAULT_FONTS);
+        fontListAdapter.setTextSize(Utils.PX(28));
+        mFontSpinner.setAdapter(fontListAdapter);
+
+        mFontStyleToolBar = mView.findViewById(R.id.text_style_button_group);
+        mTextColorPicker = mView.findViewById(R.id.text_color_btn);
+        mTextColorPicker.updateColorList(TEXT_COLORS);
+
+        mBgColorPicker = mView.findViewById(R.id.bg_color_btn);
+        mBgColorPicker.updateColorList(BACKGROUND_COLORS);
+
+        mBgOpacitySeekBar = mView.findViewById(R.id.bg_opacity_seek_bar);
+        mBgOpacitySeekBar.setMin(0);
+        mBgOpacitySeekBar.setMax(100);
+
+        mBgOpacityTextView = mView.findViewById(R.id.bg_opacity_value);
+
+        mBgRadiusSeekBar = mView.findViewById(R.id.bg_radius_seek_bar);
+        mBgRadiusSeekBar.setMin(0);
+        mBgRadiusSeekBar.setMax(50);
+        mBgRadiusTextView = mView.findViewById(R.id.bg_radius_value);
+    }
+
+    private void setupListener() {
         mSceneEditorBgImageView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -83,19 +138,125 @@ public class OverlayAddTextDialog extends BaseDialog {
                                 CELL_SIZE, CELL_SIZE);
                         mSceneEditorBgImageView.setImageBitmap(mSceneEditorBgBitmap);
                     }
+                });
+
+        mTextEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updatePreview();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
         });
 
-        mFontSpinner = mView.findViewById(R.id.font_value);
-        SimpleArrayAdapter<String> fontListAdapter = new SimpleArrayAdapter<>(
-                mContext,
-                SYSTEM_DFAULT_FONTS);
-        fontListAdapter.setTextSize(Utils.PX(28));
-        mFontSpinner.setAdapter(fontListAdapter);
+        mFontSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updatePreview();
+            }
 
-        mTextColorPicker = mView.findViewById(R.id.text_color_btn);
-        mTextColorPicker.updateColorList(TEXT_COLORS);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                updatePreview();
+            }
+        });
 
-        mBgColorPicker = mView.findViewById(R.id.bg_color_btn);
-        mBgColorPicker.updateColorList(BACKGROUND_COLORS);
+        mFontStyleToolBar.setOnFontStyleChangeListener(new FontStyleToolBar.OnFontStyleChangeListener() {
+            @Override
+            public void OnFontStyleChanged(FontStyleToolBar fontStyleButtonGroup) {
+                updatePreview();
+            }
+        });
+
+        mTextColorPicker.setOnColorPickerChangeListener(new ColorPicker.OnColorPickerChangeListener() {
+            @Override
+            public void OnColorSelected(ColorPicker colorPicker) {
+                updatePreview();
+            }
+        });
+
+        mBgColorPicker.setOnColorPickerChangeListener(new ColorPicker.OnColorPickerChangeListener() {
+            @Override
+            public void OnColorSelected(ColorPicker colorPicker) {
+                updatePreview();
+            }
+        });
+
+        mBgOpacitySeekBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                mBgOpacityTextView.setText(String.format("%d%%", progress));
+                updatePreview();
+            }
+
+            @Override
+            public void onStartTrackingTouch(android.widget.SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(android.widget.SeekBar seekBar) {
+
+            }
+        });
+
+        mBgRadiusSeekBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
+                mBgRadiusTextView.setText(String.format("%d%%", progress));
+                updatePreview();
+            }
+
+            @Override
+            public void onStartTrackingTouch(android.widget.SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(android.widget.SeekBar seekBar) {
+
+            }
+        });
+    }
+
+    private void initAsDefault() {
+        mFontStyleToolBar.setStyle(false, false, false, Layout.Alignment.ALIGN_CENTER);
+        mTextColorPicker.setSelectedColor(Color.valueOf(0xFFFFFFFF));
+        mBgColorPicker.setSelectedColor(Color.valueOf(0xFF000000));
+        mBgOpacitySeekBar.setProgress(50);
+        mBgRadiusSeekBar.setProgress(5);
+    }
+
+    private void updatePreview() {
+        // TODO:
+        String text = mTextEditText.getText().toString();
+        String fontFamily = (String) mFontSpinner.getSelectedItem();
+        boolean isBold = mFontStyleToolBar.isBold();
+        boolean isItalic = mFontStyleToolBar.isItalic();
+        boolean isUnderlined = mFontStyleToolBar.isUnderlined();
+        Layout.Alignment alignment = mFontStyleToolBar.getAlignment();
+        Color textColor = mTextColorPicker.getSelectedColor();
+
+        Color bgColor = mBgColorPicker.getSelectedColor();
+        int bgOpacity = (int) ((float) mBgOpacitySeekBar.getProgress() / 100.f * 255.f);
+        int bgColorInt = (bgColor.toArgb() & 0x00FFFFFF) | (bgOpacity << 24);
+
+        float bgRadius = (float) mBgRadiusSeekBar.getProgress() / 100.f;
+
+        Bitmap img = TextRenderer.renderTextAsBitmap(
+                text,
+                fontFamily.toLowerCase(), textColor.toArgb(),
+                isBold, isItalic, isUnderlined, alignment,
+                bgColorInt, bgRadius, 1920, 1080);
+
+        mOverlayEditableView.setImageBitmap(img);
     }
 }

@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.text.Layout;
@@ -94,6 +96,97 @@ public class TextRenderer {
         canvas.drawRoundRect(new RectF(0, 0, canvasWidth, canvasHeight), RADIUS, RADIUS, bgPaint);
 
         // draw text
+        layout.draw(canvas);
+
+        return image;
+    }
+
+    public static Bitmap renderTextAsBitmap(String text,
+                                            String fontFamily, int textColor,
+                                            boolean bold, boolean italic, boolean underlined,
+                                            Layout.Alignment alignment,
+                                            int bgColor, float bgRadius,
+                                            int targetWidth, int targetHeight) {
+        int fontStyle;
+        if (bold) {
+            fontStyle = italic ? Typeface.BOLD_ITALIC : Typeface.BOLD;
+        } else {
+            fontStyle = italic ? Typeface.ITALIC : Typeface.NORMAL;
+        }
+
+        Typeface font;
+        if (fontFamily != null && !fontFamily.isEmpty()) {
+            if (fontFamily.startsWith("/") && new File(fontFamily).isFile()) {
+                font = Typeface.create(Typeface.createFromFile(fontFamily), fontStyle);
+            } else {
+                font = Typeface.create(fontFamily, fontStyle);
+            }
+        } else {
+            font = Typeface.defaultFromStyle(fontStyle);
+        }
+
+        if (font == null) {
+            return null;
+        }
+
+        TextPaint textPaint = new TextPaint();
+        textPaint.setAntiAlias(true);
+        textPaint.setTypeface(font);
+        textPaint.setColor(textColor);
+        textPaint.setStyle(Paint.Style.FILL);
+        if (underlined) {
+            textPaint.setFlags(TextPaint.UNDERLINE_TEXT_FLAG);
+        }
+
+        if (textColor == Color.TRANSPARENT) {
+            textPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        }
+
+        float textSize = 48.0f;
+        StaticLayout layout;
+        while (true) {
+            textPaint.setTextSize(textSize);
+            String[] lines = text.replace("\r\n", "\n")
+                    .replace("\r", "\n")
+                    .split("\n");
+            float maxWidth = 0.0f;
+            for (String line : lines) {
+                maxWidth = Math.max(textPaint.measureText(line), maxWidth);
+            }
+
+            float desiredTextSize = textSize * (float)targetWidth / (float)maxWidth;
+            if (Math.abs(desiredTextSize - textSize) >= 1.0f) {
+                textSize = desiredTextSize;
+                continue;
+            }
+
+            StaticLayout.Builder lb = StaticLayout.Builder.obtain(
+                    text, 0, text.length(), textPaint, (int)maxWidth);
+            lb.setAlignment(alignment);
+            lb.setText(text);
+            // TODO: Add line spacing parameters.
+            layout = lb.build();
+            //if (layout.getHeight() > targetHeight) {
+            //    textSize = textSize * (float)targetHeight / (float)(layout.getHeight());
+            //    continue;
+            //}
+            break;
+        }
+
+        int canvasWidth = layout.getWidth();
+        int canvasHeight = layout.getHeight();
+
+        Bitmap image = Bitmap.createBitmap(canvasWidth, canvasHeight, Bitmap.Config.ARGB_8888);
+        image.eraseColor(Color.TRANSPARENT);
+        Canvas canvas = new Canvas(image);
+
+        Paint bgPaint = new Paint();
+        bgPaint.setAntiAlias(true);
+        bgPaint.setColor(bgColor);
+        int radius = (int) ((float)Math.min(canvasWidth, canvasHeight) * bgRadius);
+        canvas.drawRoundRect(new RectF(0, 0, canvasWidth, canvasHeight),
+                radius, radius, bgPaint);
+
         layout.draw(canvas);
 
         return image;

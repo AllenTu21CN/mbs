@@ -1,6 +1,7 @@
 package cn.lx.mbs.ui.view;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,20 +10,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
-import androidx.appcompat.widget.AppCompatButton;
+public class ColorPicker extends LinearLayout {
 
-import com.sanbu.tools.LogUtil;
+    public interface OnColorPickerChangeListener {
+        void OnColorSelected(ColorPicker colorPicker);
+    }
 
-import cn.lx.mbs.R;
-import cn.lx.mbs.support.MBS;
-import cn.lx.mbs.support.structures.Layout;
-import cn.lx.mbs.ui.MainActivity;
+    private OnColorPickerChangeListener mOnColorPickerChangeListener;
 
-public class ColorPickerButton extends LinearLayout {
     private ColorButton mSelectedCB;
     private ColorButton[] mColorButtons;
 
-    public ColorPickerButton(Context context, AttributeSet attrs) {
+    public ColorPicker(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         setOrientation(LinearLayout.HORIZONTAL);
@@ -53,7 +52,6 @@ public class ColorPickerButton extends LinearLayout {
 
             cb.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    // TODO:
                     if (v instanceof ColorButton) {
                         ColorButton btn = (ColorButton) v;
                         if (mSelectedCB != btn) {
@@ -62,6 +60,10 @@ public class ColorPickerButton extends LinearLayout {
                             }
                             btn.setSelect(true);
                             mSelectedCB = btn;
+
+                            if (mOnColorPickerChangeListener != null) {
+                                mOnColorPickerChangeListener.OnColorSelected(ColorPicker.this);
+                            }
                         }
                     }
                 }
@@ -69,6 +71,25 @@ public class ColorPickerButton extends LinearLayout {
         }
 
         invalidate();
+    }
+
+    public void setSelectedColor(Color color) {
+        for (ColorButton cb : mColorButtons) {
+            if (cb.getColor().equals(color)) {
+                if (cb != mSelectedCB) {
+                    if (mSelectedCB != null) {
+                        mSelectedCB.setSelect(false);
+                    }
+                    cb.setSelect(true);
+                    mSelectedCB = cb;
+                }
+                break;
+            }
+        }
+    }
+
+    public void setOnColorPickerChangeListener(OnColorPickerChangeListener listener) {
+        mOnColorPickerChangeListener = listener;
     }
 
     public boolean showCustomDialog() {
@@ -79,12 +100,13 @@ public class ColorPickerButton extends LinearLayout {
     private class ColorButton extends Button {
         public static final int COLOR_SELECTED = 0xFFF74A00;
 
-        public final int BORDER_WIDTH = Utils.PX(6);
-        public final int PADDING_WIDTH = Utils.PX(1);
+        public final int BORDER_WIDTH = Utils.PX(8);
+        public final int PADDING_WIDTH = Utils.PX(0);
 
         private Color mColor;
         private boolean mIsSelected = false;
 
+        private Paint mBgImagePaint;
         private Paint mBorderPaint;
         private Paint mPaddingPaint;
 
@@ -93,6 +115,8 @@ public class ColorPickerButton extends LinearLayout {
 
             mColor = color;
             setBackgroundColor(mColor.toArgb());
+
+            mBgImagePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
             mBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             mBorderPaint.setStyle(Paint.Style.STROKE);
@@ -118,6 +142,12 @@ public class ColorPickerButton extends LinearLayout {
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
 
+            if (mColor.toArgb() == Color.TRANSPARENT) {
+                final int CELL_SIZE = Utils.PX(5);
+                Bitmap bg = Utils.generateCheckerBoardBitmap(getWidth(), getHeight(), CELL_SIZE, CELL_SIZE);
+                canvas.drawBitmap(bg, 0, 0, mBgImagePaint);
+            }
+
             if (!mIsSelected) {
                 return;
             }
@@ -129,12 +159,14 @@ public class ColorPickerButton extends LinearLayout {
 
             canvas.drawRect(left, top, right, bottom, mBorderPaint);
 
-            left += BORDER_WIDTH;
-            right -= BORDER_WIDTH;
-            top += BORDER_WIDTH;
-            bottom -= BORDER_WIDTH;
+            if (PADDING_WIDTH > 0) {
+                left += BORDER_WIDTH;
+                right -= BORDER_WIDTH;
+                top += BORDER_WIDTH;
+                bottom -= BORDER_WIDTH;
 
-            canvas.drawRect(left, top, right, bottom, mPaddingPaint);
+                canvas.drawRect(left, top, right, bottom, mPaddingPaint);
+            }
         }
     }
 }

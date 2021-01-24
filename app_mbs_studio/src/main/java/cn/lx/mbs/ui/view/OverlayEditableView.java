@@ -22,7 +22,7 @@ import static android.view.MotionEvent.INVALID_POINTER_ID;
 public class OverlayEditableView extends View {
 
     public interface OnPositionChangeListener {
-        public void onPositionChanged(int left, int top, int right, int bottom, int centerX, int centerY);
+        void onPositionChanged(int left, int top, int right, int bottom, int centerX, int centerY);
     }
 
     private static final String TAG = OverlayEditableView.class.getSimpleName();
@@ -72,6 +72,7 @@ public class OverlayEditableView extends View {
 
     public void setImageBitmap(Bitmap image) {
         mImage = image;
+        invalidate();
     }
 
     public void setText(String text) {
