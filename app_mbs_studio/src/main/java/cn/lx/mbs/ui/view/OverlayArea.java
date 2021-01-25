@@ -91,4 +91,8 @@ public class OverlayArea {
             }
         });
     }
+
+    public OverlayAddVideoDialog getAddVideoDialog() { return mAddVideoDialog; }
+    public OverlayAddImageDialog getAddImageDialog() { return mAddImageDialog; }
+    public OverlayAddTextDialog getAddTextDialog() { return mAddTextDialog; }
 }

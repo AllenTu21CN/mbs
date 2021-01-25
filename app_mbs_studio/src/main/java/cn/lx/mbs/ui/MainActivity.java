@@ -7,7 +7,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -80,6 +83,8 @@ public class MainActivity extends AppCompatActivity {
             // Manifest.permission.WRITE_SETTINGS,
             // Manifest.permission.MOUNT_UNMOUNT_FILESYSTEMS,
     };
+
+    public static final int REQUEST_IMAGE_OVERLAY_GET_CONTENT = 1;
 
     private Handler mHandler;
 
@@ -191,7 +196,22 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode != RESULT_OK) {
+            return;
+        }
 
+        switch (requestCode) {
+            case REQUEST_IMAGE_OVERLAY_GET_CONTENT :
+                Uri uri = data.getData();
+                if (mOverlayArea != null && mOverlayArea.getAddImageDialog() != null) {
+                    mOverlayArea.getAddImageDialog().setExternalImageUri(uri);
+                }
+                break;
+
+            default :
+                // Ignore
+                break;
+        }
     }
 
     public void hideSystemUI() {
@@ -256,11 +276,12 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        VideoSourcesManageDialog videoSourceManageDialog = new VideoSourcesManageDialog(this, Utils.PX(1200), Utils.PX(930), parent, entryId);
+        VideoSourcesManageDialog videoSourceManageDialog = new VideoSourcesManageDialog(
+                this, Utils.PX(1200), Utils.PX(930), parent, entryId);
         videoSourceManageDialog.showAtLocation(mTopGroup, Gravity.CENTER, 0, 0);
     }
 
-    public void showPickImageDialog() {
+    public void showImageOverlayPickDialog() {
         if (!MBS.getInstance().isReady()) {
             ToastUtil.show("尚未启动完成,无法使用", true);
             return;
@@ -268,7 +289,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent pickPhoto = new Intent(Intent.ACTION_PICK,
                 android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        startActivityForResult(pickPhoto , 1);//one can be replaced with any action code
+        startActivityForResult(pickPhoto , REQUEST_IMAGE_OVERLAY_GET_CONTENT);
     }
 
     public VideoSourcesDataModel getVideoSourcesDataModel() {

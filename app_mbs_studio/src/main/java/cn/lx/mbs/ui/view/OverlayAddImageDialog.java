@@ -1,15 +1,20 @@
 package cn.lx.mbs.ui.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 
 import cn.lx.mbs.R;
 
@@ -165,8 +170,46 @@ public class OverlayAddImageDialog extends BaseDialog {
             public void onClick(View v) {
                 // TODO:
                 MainActivity ma = (MainActivity) mContext;
-                ma.showPickImageDialog();
+                ma.showImageOverlayPickDialog();
             }
         });
+    }
+
+    public void setExternalImageUri(Uri uri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
+            mOverlayEditableView.setImageBitmap(bitmap);
+            // Center in scene and keep aspect ratio
+            // TODO:
+            int maxWidth = mSceneEditorBgImageView.getWidth();
+            int maxHeight = mSceneEditorBgImageView.getHeight();
+            int srcWidth = bitmap.getWidth();
+            int srcHeight = bitmap.getHeight();
+
+            int tgtWidht = srcWidth;
+            int tgtHeight = srcHeight;
+
+            if (srcWidth > maxWidth || srcHeight > maxHeight) {
+                float ratioOfWidth = (float)srcWidth / (float)maxWidth;
+                float ratioOfHeight = (float)srcHeight / (float)maxHeight;
+                if (ratioOfWidth > ratioOfHeight) {
+                    tgtWidht /= ratioOfWidth;
+                    tgtHeight /= ratioOfWidth;
+                    mOverlayEditableView.setScaleFactor(ratioOfWidth);
+                } else {
+                    tgtWidht /= ratioOfHeight;
+                    tgtHeight /= ratioOfHeight;
+                    mOverlayEditableView.setScaleFactor(ratioOfHeight);
+                }
+            }
+
+            mOverlayEditableView.setX(mSceneEditorBgImageView.getX() + (maxWidth - tgtWidht) / 2.f);
+            mOverlayEditableView.setY(mSceneEditorBgImageView.getY() + (maxHeight - tgtHeight) / 2.f);
+
+        } catch (FileNotFoundException e) {
+            // TODO: File not found
+        } catch (IOException e) {
+            // TODO: IO exception
+        }
     }
 }
