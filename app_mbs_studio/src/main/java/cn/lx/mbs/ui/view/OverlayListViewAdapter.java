@@ -28,14 +28,18 @@ public class OverlayListViewAdapter extends BaseAdapter {
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    public SceneOverlayDataModel getModel() {
+        return mDataModel;
+    }
+
     @Override
     public int getCount() {
-        return mDataModel.size();
+        return mDataModel != null ? mDataModel.size() : 0;
     }
 
     @Override
     public Object getItem(int position) {
-        return mDataModel.getItem(position);
+        return mDataModel != null ? mDataModel.getItem(position) : null;
     }
 
     @Override
@@ -66,11 +70,10 @@ public class OverlayListViewAdapter extends BaseAdapter {
 
         // TODO:
         TextView nameTextView = view.findViewById(R.id.name);
-        nameTextView.setText(item.name);
+        nameTextView.setText(item.getTitle());
 
         ImageView thumbnailImageView = view.findViewById(R.id.thumbnail);
-        item.updateThumbnail(Utils.PX(160), Utils.PX(90));
-        thumbnailImageView.setImageBitmap(item.thumbnailBitmap);
+        thumbnailImageView.setImageBitmap(item.getThumbnail(Utils.PX(160), Utils.PX(90)));
 
         ImageView typeIconImageView = view.findViewById(R.id.type_icon);
         switch (item.type) {

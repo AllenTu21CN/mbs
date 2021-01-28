@@ -130,8 +130,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        generateTestData();
+        loadData();
+
         initViews();
+
         initEvents();
 
         checkSysRes(3);
@@ -299,7 +301,7 @@ public class MainActivity extends AppCompatActivity {
     public SceneOverlayDataModel getSceneOverlayDataModel(int index) { return mSceneOverlayDataModel[index]; }
 
     public Layout getSceneLayout(int index) {
-        return mSceneLayouts.get(index % 6);
+        return mSceneLayouts.get(Math.max(0, index) % 6);
     }
 
     private void initViews() {
@@ -329,6 +331,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initEvents() {
+        mPreviewArea.setOnActiveSceneChangeListener(new PreviewArea.OnActiveSceneChangeListener() {
+            @Override
+            public void onActiveSceneChanged(int sceneIndex) {
+                // TODO: Update overlay area
+                SceneOverlayDataModel currentModel = null;
+                if (0 <= sceneIndex && sceneIndex < mSceneOverlayDataModel.length) {
+                    currentModel = mSceneOverlayDataModel[sceneIndex];
+                }
+                mOverlayArea.updateSceneOverlayDataModel(currentModel);
+
+                // TODO: TEST
+                Layout layout = getSceneLayout(sceneIndex);
+                MBS.getInstance().setPVWLayout(layout, null);
+            }
+        });
+    }
+
+    private void loadData() {
+        // TODO: Load configurations and data from persistent storage
+        for (int i = 0; i < mSceneOverlayDataModel.length; i++) {
+            mSceneOverlayDataModel[i] = new SceneOverlayDataModel();
+        }
+
+        generateTestData();
     }
 
     private void releaseEvents() {
@@ -439,20 +465,32 @@ public class MainActivity extends AppCompatActivity {
         String json = mVideoSourcesDataModel.toJson();
         LogUtil.i(UIConst.TAG, TAG, json);
 
-        mSceneOverlayDataModel[0] = new SceneOverlayDataModel();
-
         for (int i = 0; i < 5; i++) {
             SceneOverlayDataModel.Overlay videoOverlay = new SceneOverlayDataModel.VideoOverlay();
-            videoOverlay.name = "MAIN CAMERA";
+            //videoOverlay.name = "MAIN CAMERA";
             mSceneOverlayDataModel[0].add(videoOverlay);
 
             SceneOverlayDataModel.Overlay imageOverlay = new SceneOverlayDataModel.ImageOverlay();
-            imageOverlay.name = "LOGO";
+            //imageOverlay.name = "LOGO";
             mSceneOverlayDataModel[0].add(imageOverlay);
 
             SceneOverlayDataModel.Overlay textOverlay = new SceneOverlayDataModel.TextOverlay();
-            textOverlay.name = "Lower thirds";
+            //textOverlay.name = "Lower thirds";
             mSceneOverlayDataModel[0].add(textOverlay);
+        }
+
+        for (int i = 0; i < 1; i++) {
+            SceneOverlayDataModel.Overlay videoOverlay = new SceneOverlayDataModel.VideoOverlay();
+            //videoOverlay.name = "MAIN CAMERA";
+            mSceneOverlayDataModel[2].add(videoOverlay);
+
+            SceneOverlayDataModel.Overlay imageOverlay = new SceneOverlayDataModel.ImageOverlay();
+            //imageOverlay.name = "LOGO";
+            mSceneOverlayDataModel[2].add(imageOverlay);
+
+            SceneOverlayDataModel.Overlay textOverlay = new SceneOverlayDataModel.TextOverlay();
+            //textOverlay.name = "Lower thirds";
+            mSceneOverlayDataModel[2].add(textOverlay);
         }
 
         Layout layout1 = new Layout().addOverlays(TSLayout.AB, Arrays.asList(
