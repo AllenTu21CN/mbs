@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:background="@color/areaBackgroundColor">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -25,8 +26,6 @@
             android:id="@+id/thumbnail"
             android:layout_width="160px"
             android:layout_height="90px"
-            android:layout_marginTop="8px"
-            android:layout_marginBottom="8px"
             android:layout_marginLeft="8px"
             android:scaleType="fitXY"
             app:layout_constraintLeft_toLeftOf="parent"

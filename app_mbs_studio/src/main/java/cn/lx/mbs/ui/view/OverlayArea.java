@@ -13,6 +13,13 @@ import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Collections;
+
 import cn.lx.mbs.R;
 
 import cn.lx.mbs.ui.MainActivity;
@@ -28,7 +35,7 @@ public class OverlayArea {
     private ImageButton mAddVideoButton;
     private ImageButton mAddImageButton;
     private ImageButton mAddTextButton;
-    private ListView mListView;
+    private RecyclerView mListView;
 
     private OverlayListViewAdapter mOverlayListViewAdapter;
 
@@ -135,7 +142,37 @@ public class OverlayArea {
 
         mOverlayListViewAdapter = new OverlayListViewAdapter(mWrapperView.getContext(), model);
         mListView.setAdapter(mOverlayListViewAdapter);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mWrapperView.getContext(), DividerItemDecoration.VERTICAL);
+        mListView.addItemDecoration(dividerItemDecoration);
+
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.UP
+                        | ItemTouchHelper.DOWN
+                        | ItemTouchHelper.START
+                        | ItemTouchHelper.END, 0) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                int fromPosition = viewHolder.getAdapterPosition();
+                int toPosition = target.getAdapterPosition();
+
+                SceneOverlayDataModel model = ((OverlayListViewAdapter) recyclerView.getAdapter()).getModel();
+                model.swap(fromPosition, toPosition);
+                recyclerView.getAdapter().notifyItemMoved(fromPosition, toPosition);
+
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
+        itemTouchHelper.attachToRecyclerView(mListView);
+
+        /*mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 LogUtil.i("VideoSourcesManageDialog", "Item index " + i + " clicked!");
@@ -199,7 +236,7 @@ public class OverlayArea {
 
                 return false;
             }
-        });
+        });*/
     }
 
 }

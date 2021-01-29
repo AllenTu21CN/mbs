@@ -474,8 +474,8 @@ public class MainActivity extends AppCompatActivity {
             //imageOverlay.name = "LOGO";
             mSceneOverlayDataModel[0].add(imageOverlay);
 
-            SceneOverlayDataModel.Overlay textOverlay = new SceneOverlayDataModel.TextOverlay();
-            //textOverlay.name = "Lower thirds";
+            SceneOverlayDataModel.TextOverlay textOverlay = new SceneOverlayDataModel.TextOverlay();
+            textOverlay.text = "Lower thirds";
             mSceneOverlayDataModel[0].add(textOverlay);
         }
 
@@ -488,8 +488,8 @@ public class MainActivity extends AppCompatActivity {
             //imageOverlay.name = "LOGO";
             mSceneOverlayDataModel[2].add(imageOverlay);
 
-            SceneOverlayDataModel.Overlay textOverlay = new SceneOverlayDataModel.TextOverlay();
-            //textOverlay.name = "Lower thirds";
+            SceneOverlayDataModel.TextOverlay textOverlay = new SceneOverlayDataModel.TextOverlay();
+            textOverlay.text = "Lower thirds";
             mSceneOverlayDataModel[2].add(textOverlay);
         }
 

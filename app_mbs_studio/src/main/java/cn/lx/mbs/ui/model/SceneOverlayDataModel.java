@@ -7,6 +7,7 @@ import android.graphics.RectF;
 import com.google.gson.Gson;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -131,6 +132,10 @@ public class SceneOverlayDataModel {
 
     public void clear() {
         list.clear();
+    }
+
+    public void swap(int from, int to) {
+        Collections.swap(list, from, to);
     }
 
     public boolean fromJson(String json) {

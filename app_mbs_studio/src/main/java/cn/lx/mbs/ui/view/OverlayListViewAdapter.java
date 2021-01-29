@@ -9,18 +9,20 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
 
 import cn.lx.mbs.R;
 
 import cn.lx.mbs.ui.model.SceneOverlayDataModel;
 
-public class OverlayListViewAdapter extends BaseAdapter {
+public class OverlayListViewAdapter extends RecyclerView.Adapter<OverlayListViewAdapter.ViewHolder> {
 
     private Context mContext;
     private SceneOverlayDataModel mDataModel;
     private static LayoutInflater mInflater = null;
-    private int mCurrentIndex;
+    private ViewHolder mSelectedViewHolder;
 
     public OverlayListViewAdapter(Context context, SceneOverlayDataModel data) {
         mContext = context;
@@ -33,83 +35,129 @@ public class OverlayListViewAdapter extends BaseAdapter {
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return mDataModel != null ? mDataModel.size() : 0;
     }
 
+    //@Override
+    //public Object getItem(int position) {
+    //    return mDataModel != null ? mDataModel.getItem(position) : null;
+    //}
+
+    //@Override
+    //public long getItemId(int position) {
+    //    return position;
+    //}
+
+    @NonNull
     @Override
-    public Object getItem(int position) {
-        return mDataModel != null ? mDataModel.getItem(position) : null;
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = mInflater.inflate(R.layout.area_overlay_listview_item, parent, false);
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+
+        return viewHolder;
     }
 
     @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view = convertView;
-        if (view == null) {
-            view = mInflater.inflate(R.layout.area_overlay_listview_item, null);
-        }
-
-        ConstraintLayout layout = view.findViewById(R.id.layout);
-        Utils.adjustPaddings(layout);
-
-        // Highlight
-        layout.setBackground(mContext.getDrawable(
-                position == mCurrentIndex
-                        ? R.drawable.listview_item_highlight_bg
-                        : R.drawable.listview_item_normal_bg));
-
-        View selectedBorderView = view.findViewById(R.id.selected_border);
-        selectedBorderView.setVisibility(position == mCurrentIndex ? View.VISIBLE : View.INVISIBLE);
-
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // TODO:
         SceneOverlayDataModel.Overlay item = mDataModel.getItem(position);
 
-        // TODO:
-        TextView nameTextView = view.findViewById(R.id.name);
-        nameTextView.setText(item.getTitle());
+        holder.nameTextView.setText(item.getTitle());
 
-        ImageView thumbnailImageView = view.findViewById(R.id.thumbnail);
-        thumbnailImageView.setImageBitmap(item.getThumbnail(Utils.PX(160), Utils.PX(90)));
+        holder.thumbnailImageView.setImageBitmap(item.getThumbnail(Utils.PX(160), Utils.PX(90)));
 
-        ImageView typeIconImageView = view.findViewById(R.id.type_icon);
         switch (item.type) {
             case SceneOverlayDataModel.Overlay.TYPE_VIDEO :
-                typeIconImageView.setImageResource(R.drawable.ic_picture_in_picture_black_24dp);
+                holder.typeIconImageView.setImageResource(R.drawable.ic_picture_in_picture_black_24dp);
                 break;
 
             case SceneOverlayDataModel.Overlay.TYPE_IMAGE :
-                typeIconImageView.setImageResource(R.drawable.ic_image_black_24dp);
+                holder.typeIconImageView.setImageResource(R.drawable.ic_image_black_24dp);
                 break;
 
             case SceneOverlayDataModel.Overlay.TYPE_TEXT :
-                typeIconImageView.setImageResource(R.drawable.ic_title_black_24dp);
+                holder.typeIconImageView.setImageResource(R.drawable.ic_title_black_24dp);
                 break;
 
             default :
                 break;
         }
 
-        ImageView visibilityIconImageView = view.findViewById(R.id.visibility_icon);
-        visibilityIconImageView.setImageResource(
+        holder.visibilityIconImageView.setImageResource(
                 item.isVisiable
                         ? R.drawable.ic_visibility_black_24dp
                         : R.drawable.ic_visibility_off_black_24dp);
 
-        ImageView lockIconImageView = view.findViewById(R.id.lock_icon);
-        lockIconImageView.setImageResource(
+        holder.lockIconImageView.setImageResource(
                 item.isLocked
                         ? R.drawable.ic_lock_black_24dp
                         : R.drawable.ic_lock_open_black_24dp);
 
+        // Highlight
+        holder.layout.setBackground(mContext.getDrawable(
+                holder == mSelectedViewHolder
+                        ? R.drawable.listview_item_highlight_bg
+                        : R.drawable.listview_item_normal_bg));
 
-        return view;
+        holder.selectedBorderView.setVisibility(
+                holder == mSelectedViewHolder
+                    ? View.VISIBLE : View.INVISIBLE);
     }
 
-    public void setCurrentIndex(int index) {
-        mCurrentIndex = index;
+    //public void setCurrentIndex(int index) {
+    //    mCurrentIndex = index;
+    //}
+
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        ConstraintLayout layout;
+        TextView nameTextView;
+        ImageView thumbnailImageView;
+        ImageView typeIconImageView;
+        ImageView visibilityIconImageView;
+        ImageView lockIconImageView;
+        View selectedBorderView;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            layout = itemView.findViewById(R.id.layout);
+            nameTextView = itemView.findViewById(R.id.name);
+            thumbnailImageView = itemView.findViewById(R.id.thumbnail);
+            typeIconImageView = itemView.findViewById(R.id.type_icon);
+            visibilityIconImageView = itemView.findViewById(R.id.visibility_icon);
+            lockIconImageView = itemView.findViewById(R.id.lock_icon);
+            selectedBorderView = itemView.findViewById(R.id.selected_border);
+
+            Utils.adjustPaddings(layout);
+
+            itemView.setOnClickListener(this);
+
+            /*itemView.setOnLongClickListener((view) -> {
+                mDataModel.remove(getAdapterPosition());
+                notifyItemRemoved(getAdapterPosition());
+                return true;
+            });*/
+        }
+
+        @Override
+        public void onClick(View view) {
+            // TODO:
+            //LogUtil.i("VideoSourcesManageDialog", "Item index " + i + " clicked!");
+            // Clear and set highlight
+            if (mSelectedViewHolder != null) {
+                mSelectedViewHolder.layout.setBackground(
+                        mContext.getDrawable(R.drawable.listview_item_normal_bg)
+                );
+                mSelectedViewHolder.selectedBorderView.setVisibility(View.INVISIBLE);
+            }
+
+            mSelectedViewHolder = (ViewHolder) view.getTag();
+            mSelectedViewHolder.layout.setBackground(mContext.getDrawable(R.drawable.listview_item_highlight_bg));
+            mSelectedViewHolder.selectedBorderView.setVisibility(View.VISIBLE);
+
+            //mOverlayListViewAdapter.setCurrentIndex(i);
+        }
     }
 }
