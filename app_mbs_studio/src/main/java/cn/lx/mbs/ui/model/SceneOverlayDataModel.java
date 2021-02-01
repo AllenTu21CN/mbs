@@ -6,6 +6,8 @@ import android.graphics.RectF;
 
 import com.google.gson.Gson;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -68,16 +70,27 @@ public class SceneOverlayDataModel {
     }
 
     public static class ImageOverlay extends Overlay {
-        public String filePath;
+        public String originalFilePath;
+        public Bitmap orignalBitmap;    // Cached if original file missing
+
         public RectF dstRect;
         public float rotateAngle;
         public float opacity;
 
-        public Bitmap orignalBitmap;
-
         public ImageOverlay() {
             type = TYPE_IMAGE;
         }
+
+        @Override
+        public String getTitle() {
+            if (originalFilePath != null && !originalFilePath.isEmpty()) {
+                Path path = Paths.get(originalFilePath);
+                return path.getFileName().toString();
+            } else {
+                return "<No image>";
+            }
+        }
+
     }
 
     public static class TextOverlay extends Overlay {
@@ -102,7 +115,11 @@ public class SceneOverlayDataModel {
 
         @Override
         public String getTitle() {
-            return text;
+            if (text != null && !text.isEmpty()) {
+                return text;
+            } else {
+                return "<No text>";
+            }
         }
     }
 

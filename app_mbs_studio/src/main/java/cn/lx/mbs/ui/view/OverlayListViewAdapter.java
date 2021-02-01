@@ -19,10 +19,16 @@ import cn.lx.mbs.ui.model.SceneOverlayDataModel;
 
 public class OverlayListViewAdapter extends RecyclerView.Adapter<OverlayListViewAdapter.ViewHolder> {
 
+    public interface OnSelectListener {
+        void onItemSelected(int position);
+    }
+
     private Context mContext;
     private SceneOverlayDataModel mDataModel;
     private static LayoutInflater mInflater = null;
     private ViewHolder mSelectedViewHolder;
+
+    private OnSelectListener mOnSelectListener;
 
     public OverlayListViewAdapter(Context context, SceneOverlayDataModel data) {
         mContext = context;
@@ -34,20 +40,14 @@ public class OverlayListViewAdapter extends RecyclerView.Adapter<OverlayListView
         return mDataModel;
     }
 
+    public void setOnSelectListener(OnSelectListener listener) {
+        mOnSelectListener = listener;
+    }
+
     @Override
     public int getItemCount() {
         return mDataModel != null ? mDataModel.size() : 0;
     }
-
-    //@Override
-    //public Object getItem(int position) {
-    //    return mDataModel != null ? mDataModel.getItem(position) : null;
-    //}
-
-    //@Override
-    //public long getItemId(int position) {
-    //    return position;
-    //}
 
     @NonNull
     @Override
@@ -63,6 +63,8 @@ public class OverlayListViewAdapter extends RecyclerView.Adapter<OverlayListView
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // TODO:
         SceneOverlayDataModel.Overlay item = mDataModel.getItem(position);
+
+        holder.position = position;
 
         holder.nameTextView.setText(item.getTitle());
 
@@ -111,6 +113,8 @@ public class OverlayListViewAdapter extends RecyclerView.Adapter<OverlayListView
     //}
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        int position;
+
         ConstraintLayout layout;
         TextView nameTextView;
         ImageView thumbnailImageView;
@@ -133,18 +137,10 @@ public class OverlayListViewAdapter extends RecyclerView.Adapter<OverlayListView
             Utils.adjustPaddings(layout);
 
             itemView.setOnClickListener(this);
-
-            /*itemView.setOnLongClickListener((view) -> {
-                mDataModel.remove(getAdapterPosition());
-                notifyItemRemoved(getAdapterPosition());
-                return true;
-            });*/
         }
 
         @Override
         public void onClick(View view) {
-            // TODO:
-            //LogUtil.i("VideoSourcesManageDialog", "Item index " + i + " clicked!");
             // Clear and set highlight
             if (mSelectedViewHolder != null) {
                 mSelectedViewHolder.layout.setBackground(
@@ -157,7 +153,9 @@ public class OverlayListViewAdapter extends RecyclerView.Adapter<OverlayListView
             mSelectedViewHolder.layout.setBackground(mContext.getDrawable(R.drawable.listview_item_highlight_bg));
             mSelectedViewHolder.selectedBorderView.setVisibility(View.VISIBLE);
 
-            //mOverlayListViewAdapter.setCurrentIndex(i);
+            if (mOnSelectListener != null) {
+                mOnSelectListener.onItemSelected(mSelectedViewHolder.position);
+            }
         }
     }
 }

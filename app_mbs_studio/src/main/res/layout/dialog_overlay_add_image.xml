@@ -34,6 +34,32 @@
 
     </FrameLayout>
 
+    <!-- File path -->
+    <TextView
+        android:id="@+id/file_path_label"
+        android:layout_width="150px"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        app:layout_constraintTop_toTopOf="@id/file_path_value"
+        app:layout_constraintBottom_toBottomOf="@id/file_path_value"
+        app:layout_constraintLeft_toLeftOf="@id/scene_editor_bg"
+        app:layout_constraintRight_toLeftOf="@id/file_path_value"
+        android:text="File path"
+        android:textSize="28px" />
+
+    <TextView
+        android:id="@+id/file_path_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="36px"
+        android:gravity="left"
+        android:paddingLeft="18px"
+        app:layout_constraintTop_toBottomOf="@id/scene_editor_bg"
+        app:layout_constraintLeft_toRightOf="@id/file_path_label"
+        app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
+        android:text="file:///..."
+        android:textSize="28px" />
+
     <!-- Position -->
     <TextView
         android:id="@+id/position_label"
@@ -54,7 +80,7 @@
         android:layout_marginTop="36px"
         android:gravity="left"
         android:paddingLeft="18px"
-        app:layout_constraintTop_toBottomOf="@id/scene_editor_bg"
+        app:layout_constraintTop_toBottomOf="@id/file_path_value"
         app:layout_constraintLeft_toRightOf="@id/position_label"
         app:layout_constraintRight_toRightOf="@id/scene_editor_bg"
         android:text="left=, top=, right=, bottom=, center=x,y"
