@@ -17,6 +17,7 @@
         android:tint="@color/secondaryTextColor"
         android:tintMode="src_in"
         android:scaleType="fitXY"
+        android:visibility="invisible"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -31,100 +32,8 @@
         android:tint="@color/secondaryTextColor"
         android:tintMode="src_in"
         android:scaleType="fitXY"
+        android:visibility="invisible"
         app:layout_constraintTop_toBottomOf="@id/toggle_visibility_button"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <!-- Separator -->
-    <View
-        android:id="@+id/separator_0"
-        android:background="@color/secondaryTextColor"
-        android:layout_width = "48px"
-        android:layout_height="1px"
-        android:layout_marginTop="12px"
-        android:layout_marginBottom="12px"
-        app:layout_constraintTop_toBottomOf="@id/toggle_lock_button"
-        app:layout_constraintLeft_toLeftOf="@id/toggle_visibility_button" />
-
-    <ImageButton
-        android:id="@+id/add_video_button"
-        android:layout_width="48px"
-        android:layout_height="48px"
-        android:layout_marginLeft="18px"
-        android:layout_marginTop="18px"
-        android:background="#00000000"
-        android:src="@drawable/ic_picture_in_picture_black_24dp"
-        android:tint="@color/secondaryTextColor"
-        android:tintMode="src_in"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toBottomOf="@id/separator_0"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <ImageButton
-        android:id="@+id/add_image_button"
-        android:layout_width="48px"
-        android:layout_height="48px"
-        android:layout_marginLeft="18px"
-        android:layout_marginTop="18px"
-        android:background="#00000000"
-        android:src="@drawable/ic_image_black_24dp"
-        android:tint="@color/secondaryTextColor"
-        android:tintMode="src_in"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toBottomOf="@id/add_video_button"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <ImageButton
-        android:id="@+id/add_text_button"
-        android:layout_width="48px"
-        android:layout_height="48px"
-        android:layout_marginLeft="18px"
-        android:layout_marginTop="18px"
-        android:background="#00000000"
-        android:src="@drawable/ic_title_black_24dp"
-        android:tint="@color/secondaryTextColor"
-        android:tintMode="src_in"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toBottomOf="@id/add_image_button"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <ImageButton
-        android:id="@+id/create_group_button"
-        android:layout_width="48px"
-        android:layout_height="48px"
-        android:layout_marginLeft="18px"
-        android:layout_marginTop="18px"
-        android:background="#00000000"
-        android:src="@drawable/ic_create_new_folder_black_24dp"
-        android:tint="@color/secondaryTextColor"
-        android:tintMode="src_in"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toBottomOf="@id/add_text_button"
-        app:layout_constraintLeft_toLeftOf="parent" />
-
-    <!-- Separator -->
-    <View
-        android:id="@+id/separator_1"
-        android:background="@color/secondaryTextColor"
-        android:layout_width = "48px"
-        android:layout_height="1px"
-        android:layout_marginTop="12px"
-        android:layout_marginBottom="12px"
-        app:layout_constraintTop_toBottomOf="@id/create_group_button"
-        app:layout_constraintLeft_toLeftOf="@id/add_video_button"
-        app:layout_constraintRight_toRightOf="@id/add_video_button" />
-
-    <ImageButton
-        android:id="@+id/copy_button"
-        android:layout_width="48px"
-        android:layout_height="48px"
-        android:layout_marginLeft="18px"
-        android:layout_marginTop="18px"
-        android:background="#00000000"
-        android:src="@drawable/ic_content_copy_black_24dp"
-        android:tint="@color/secondaryTextColor"
-        android:tintMode="src_in"
-        android:scaleType="fitXY"
-        app:layout_constraintTop_toBottomOf="@id/separator_1"
         app:layout_constraintLeft_toLeftOf="parent" />
 
     <ImageButton
@@ -138,7 +47,8 @@
         android:tint="@color/secondaryTextColor"
         android:tintMode="src_in"
         android:scaleType="fitXY"
-        app:layout_constraintTop_toBottomOf="@id/copy_button"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/toggle_lock_button"
         app:layout_constraintLeft_toLeftOf="parent" />
 
     <ImageButton
@@ -146,12 +56,110 @@
         android:layout_width="48px"
         android:layout_height="48px"
         android:layout_marginLeft="18px"
-        android:layout_marginBottom="18px"
+        android:layout_marginTop="18px"
         android:background="#00000000"
         android:src="@drawable/ic_delete_black_24dp"
         android:tint="@color/secondaryTextColor"
         android:tintMode="src_in"
         android:scaleType="fitXY"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/edit_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <!-- Separator -->
+    <!--View
+        android:id="@+id/separator_0"
+        android:background="@color/secondaryTextColor"
+        android:layout_width = "48px"
+        android:layout_height="1px"
+        android:layout_marginTop="12px"
+        android:layout_marginBottom="12px"
+        app:layout_constraintTop_toBottomOf="@id/toggle_lock_button"
+        app:layout_constraintLeft_toLeftOf="@id/toggle_visibility_button" /-->
+
+    <!--ImageButton
+        android:id="@+id/create_group_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_create_new_folder_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        app:layout_constraintTop_toBottomOf="@id/add_text_button"
+        app:layout_constraintLeft_toLeftOf="parent" /-->
+
+    <!-- Separator -->
+    <!--View
+        android:id="@+id/separator_1"
+        android:background="@color/secondaryTextColor"
+        android:layout_width = "48px"
+        android:layout_height="1px"
+        android:layout_marginTop="12px"
+        android:layout_marginBottom="12px"
+        app:layout_constraintTop_toBottomOf="@id/create_group_button"
+        app:layout_constraintLeft_toLeftOf="@id/add_video_button"
+        app:layout_constraintRight_toRightOf="@id/add_video_button" /-->
+
+    <!--ImageButton
+        android:id="@+id/copy_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginTop="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_content_copy_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/separator_1"
+        app:layout_constraintLeft_toLeftOf="parent" /-->
+
+    <ImageButton
+        android:id="@+id/add_video_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginBottom="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_picture_in_picture_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/add_image_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/add_image_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginBottom="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_image_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@id/add_text_button"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <ImageButton
+        android:id="@+id/add_text_button"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginLeft="18px"
+        android:layout_marginBottom="18px"
+        android:background="#00000000"
+        android:src="@drawable/ic_title_black_24dp"
+        android:tint="@color/secondaryTextColor"
+        android:tintMode="src_in"
+        android:scaleType="fitXY"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent" />
 

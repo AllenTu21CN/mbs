@@ -3,8 +3,10 @@ package cn.lx.mbs.ui.view;
 import android.app.Activity;
 import android.content.Context;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.text.Layout;
 import android.view.Gravity;
 import android.view.View;
@@ -43,8 +45,14 @@ public class OverlayArea {
     private OverlayAddImageDialog mAddImageDialog;
     private OverlayAddTextDialog mAddTextDialog;
 
+    private Drawable INVISIBILITY_ICON;
+    private Drawable VISIBILITY_ICON;
+    private Drawable LOCK_ICON;
+    private Drawable UNLOCK_ICON;
+
     public OverlayArea(Activity activity) {
         mActivity = activity;
+        mContext = mActivity;
     }
 
     public void init() {
@@ -65,7 +73,7 @@ public class OverlayArea {
         mDeleteButton = mWrapperView.findViewById(R.id.delete_button);
 
         mOverlayListView = mWrapperView.findViewById(R.id.overlay_list);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mWrapperView.getContext(), DividerItemDecoration.VERTICAL);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(mContext, DividerItemDecoration.VERTICAL);
         mOverlayListView.addItemDecoration(dividerItemDecoration);
 
         ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(
@@ -94,13 +102,14 @@ public class OverlayArea {
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
         itemTouchHelper.attachToRecyclerView(mOverlayListView);
 
-        // TEST
-        MainActivity ma = (MainActivity) mActivity;
-        mContext = (Context) mActivity;
-
         mAddVideoDialog = new OverlayAddVideoDialog(mContext, Utils.PX(1200), Utils.PX(950));
         mAddImageDialog = new OverlayAddImageDialog(mContext, Utils.PX(1200), Utils.PX(1250));
         mAddTextDialog = new OverlayAddTextDialog(mContext, Utils.PX(1200), Utils.PX(1300));
+
+        INVISIBILITY_ICON = mContext.getDrawable(R.drawable.ic_visibility_off_black_24dp);
+        VISIBILITY_ICON = mContext.getDrawable(R.drawable.ic_visibility_black_24dp);
+        LOCK_ICON = mContext.getDrawable(R.drawable.ic_lock_black_24dp);
+        UNLOCK_ICON = mContext.getDrawable(R.drawable.ic_lock_open_black_24dp);
     }
 
     private void setupListener() {
@@ -129,7 +138,21 @@ public class OverlayArea {
                 mOverlayListViewAdapter.getModel().add(o);
                 mOverlayListViewAdapter.notifyDataSetChanged();
 
+                mAddImageDialog.updateFields(o.originalFilePath, o.orignalBitmap, o.dstRect, o.rotateAngle, o.opacity);
                 mAddImageDialog.showAtLocation(mWrapperView, Gravity.CENTER, 0, 0);
+
+                mAddImageDialog.setmOnSaveListener(new OverlayAddImageDialog.OnSaveListener() {
+                    @Override
+                    public void onSave(String originalFilePath, Bitmap originalBitmap, RectF dstRect, float rotateAngle, float opacity) {
+                        o.originalFilePath = originalFilePath;
+                        o.orignalBitmap = originalBitmap;
+                        o.dstRect = dstRect;
+                        o.rotateAngle = rotateAngle;
+                        o.opacity = opacity;
+
+                        mOverlayListViewAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
 
@@ -197,11 +220,19 @@ public class OverlayArea {
             mAddImageButton.setEnabled(false);
             mAddTextButton.setEnabled(false);
 
+            mAddVideoButton.setVisibility(View.INVISIBLE);
+            mAddImageButton.setVisibility(View.INVISIBLE);
+            mAddTextButton.setVisibility(View.INVISIBLE);
+
             mOverlayListViewAdapter = null;
         } else {
             mAddVideoButton.setEnabled(true);
             mAddImageButton.setEnabled(true);
             mAddTextButton.setEnabled(true);
+
+            mAddVideoButton.setVisibility(View.VISIBLE);
+            mAddImageButton.setVisibility(View.VISIBLE);
+            mAddTextButton.setVisibility(View.VISIBLE);
 
             mOverlayListViewAdapter = new OverlayListViewAdapter(mWrapperView.getContext(), model);
             mOverlayListViewAdapter.setOnSelectListener(new OverlayListViewAdapter.OnSelectListener() {
@@ -213,44 +244,134 @@ public class OverlayArea {
             });
         }
 
+        mToggleVisibilityButton.setEnabled(false);
+        mToggleLockButton.setEnabled(false);
+        mEditButton.setEnabled(false);
+        mDeleteButton.setEnabled(false);
+
+        mToggleVisibilityButton.setVisibility(View.INVISIBLE);
+        mToggleLockButton.setVisibility(View.INVISIBLE);
+        mEditButton.setVisibility(View.INVISIBLE);
+        mDeleteButton.setVisibility(View.INVISIBLE);
+
         mOverlayListView.setAdapter(mOverlayListViewAdapter);
     }
 
     private void onOverlayItemSelected(SceneOverlayDataModel.Overlay item) {
-        if (item instanceof SceneOverlayDataModel.TextOverlay) {
-            SceneOverlayDataModel.TextOverlay o = (SceneOverlayDataModel.TextOverlay) item;
-            mAddTextDialog.updateFields(o.text, o.fontFamily,
-                    o.isBold, o.isItalic, o.isUnderlined, o.alignment,
-                    o.textColor, o.backgroundColor, o.backgroundOpacity, o.backgroundRadius,
-                    o.dstRect, o.rotateAngle);
-            mAddTextDialog.showAtLocation(mWrapperView, Gravity.CENTER, 0, 0);
-            mAddTextDialog.setOnSaveListener(new OverlayAddTextDialog.OnSaveListener() {
-                @Override
-                public void onSave(String text, String fontFamily,
-                                   boolean isBold, boolean isItalic, boolean isUnderlined,
-                                   Layout.Alignment alignment,
-                                   Color textColor, Color backgroundColor,
-                                   float backgroundOpacity, float backgroundRadius,
-                                   RectF dstRect, float rotateAngle) {
-                    o.text = text;
-                    o.fontFamily = fontFamily;
-                    o.isBold = isBold;
-                    o.isItalic = isItalic;
-                    o.isUnderlined = isUnderlined;
-                    o.alignment = alignment;
-                    o.textColor = textColor;
-                    o.backgroundColor = backgroundColor;
-                    o.backgroundOpacity = backgroundOpacity;
-                    o.backgroundRadius = backgroundRadius;
 
-                    mOverlayListViewAdapter.notifyDataSetChanged();
+        updateToolbar(item);
+
+        mToggleVisibilityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                item.isVisiable = !item.isVisiable;
+                updateToolbar(item);
+                mOverlayListViewAdapter.notifyDataSetChanged();
+            }
+        });
+
+        mToggleLockButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                item.isLocked = !item.isLocked;
+                updateToolbar(item);
+                mOverlayListViewAdapter.notifyDataSetChanged();
+            }
+        });
+
+        mEditButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (item instanceof SceneOverlayDataModel.TextOverlay) {
+                    SceneOverlayDataModel.TextOverlay o = (SceneOverlayDataModel.TextOverlay) item;
+                    mAddTextDialog.updateFields(o.text, o.fontFamily,
+                            o.isBold, o.isItalic, o.isUnderlined, o.alignment,
+                            o.textColor, o.backgroundColor, o.backgroundOpacity, o.backgroundRadius,
+                            o.dstRect, o.rotateAngle);
+                    mAddTextDialog.showAtLocation(mWrapperView, Gravity.CENTER, 0, 0);
+                    mAddTextDialog.setOnSaveListener(new OverlayAddTextDialog.OnSaveListener() {
+                        @Override
+                        public void onSave(String text, String fontFamily,
+                                           boolean isBold, boolean isItalic, boolean isUnderlined,
+                                           Layout.Alignment alignment,
+                                           Color textColor, Color backgroundColor,
+                                           float backgroundOpacity, float backgroundRadius,
+                                           RectF dstRect, float rotateAngle) {
+                            o.text = text;
+                            o.fontFamily = fontFamily;
+                            o.isBold = isBold;
+                            o.isItalic = isItalic;
+                            o.isUnderlined = isUnderlined;
+                            o.alignment = alignment;
+                            o.textColor = textColor;
+                            o.backgroundColor = backgroundColor;
+                            o.backgroundOpacity = backgroundOpacity;
+                            o.backgroundRadius = backgroundRadius;
+
+                            mOverlayListViewAdapter.notifyDataSetChanged();
+                        }
+                    });
+                } else if (item instanceof SceneOverlayDataModel.ImageOverlay) {
+                    SceneOverlayDataModel.ImageOverlay o = (SceneOverlayDataModel.ImageOverlay) item;
+                    mAddImageDialog.updateFields(o.originalFilePath, o.orignalBitmap, o.dstRect, o.rotateAngle, o.opacity);
+                    mAddImageDialog.showAtLocation(mWrapperView, Gravity.CENTER, 0, 0);
+                    mAddImageDialog.setmOnSaveListener(new OverlayAddImageDialog.OnSaveListener() {
+                        @Override
+                        public void onSave(String originalFilePath, Bitmap originalBitmap, RectF dstRect, float rotateAngle, float opacity) {
+                            o.originalFilePath = originalFilePath;
+                            o.orignalBitmap = originalBitmap;
+                            o.dstRect = dstRect;
+                            o.rotateAngle = rotateAngle;
+                            o.opacity = opacity;
+
+                            mOverlayListViewAdapter.notifyDataSetChanged();
+                        }
+                    });
+                } else if (item instanceof SceneOverlayDataModel.VideoOverlay) {
+                    // TODO:
                 }
-            });
-        } else if (item instanceof SceneOverlayDataModel.ImageOverlay) {
-            // TODO:
-        } else if (item instanceof SceneOverlayDataModel.VideoOverlay) {
-            // TODO:
-        }
+            }
+        });
     }
 
+    private void updateToolbar(SceneOverlayDataModel.Overlay item) {
+        if (item != null) {
+            mToggleVisibilityButton.setEnabled(true);
+            mToggleLockButton.setEnabled(true);
+            mToggleVisibilityButton.setVisibility(View.VISIBLE);
+            mToggleLockButton.setVisibility(View.VISIBLE);
+
+            if (item.isVisiable) {
+                mToggleVisibilityButton.setImageDrawable(INVISIBILITY_ICON);
+            } else {
+                mToggleVisibilityButton.setImageDrawable(VISIBILITY_ICON);
+            }
+
+            if (item.isLocked) {
+                mToggleLockButton.setImageDrawable(UNLOCK_ICON);
+
+                mEditButton.setEnabled(false);
+                mDeleteButton.setEnabled(false);
+                mEditButton.setVisibility(View.INVISIBLE);
+                mDeleteButton.setVisibility(View.INVISIBLE);
+            } else {
+                mToggleLockButton.setImageDrawable(LOCK_ICON);
+
+                mEditButton.setEnabled(true);
+                mDeleteButton.setEnabled(true);
+                mEditButton.setVisibility(View.VISIBLE);
+                mDeleteButton.setVisibility(View.VISIBLE);
+            }
+        } else {
+            mToggleVisibilityButton.setEnabled(false);
+            mToggleLockButton.setEnabled(false);
+            mEditButton.setEnabled(false);
+            mDeleteButton.setEnabled(false);
+
+            mToggleVisibilityButton.setVisibility(View.INVISIBLE);
+            mToggleLockButton.setVisibility(View.INVISIBLE);
+            mEditButton.setVisibility(View.INVISIBLE);
+            mDeleteButton.setVisibility(View.INVISIBLE);
+        }
+    }
 }

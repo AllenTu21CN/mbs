@@ -67,6 +67,10 @@ public class OverlayAddImageDialog extends BaseDialog {
 
     }
 
+    public void setmOnSaveListener(OnSaveListener listener) {
+        mOnSaveListener = listener;
+    }
+
     private void setupUi() {
         setTitle("Add Image Overlay");
 
@@ -222,6 +226,10 @@ public class OverlayAddImageDialog extends BaseDialog {
         try {
             Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
             mOverlayEditableView.setImageBitmap(bitmap);
+
+            mFilePathTextView.setText(uri.toString());
+            mOriginalBitmap = bitmap;
+
             // Center in scene and keep aspect ratio
             // TODO:
             int maxWidth = mSceneEditorBgImageView.getWidth();
@@ -260,7 +268,10 @@ public class OverlayAddImageDialog extends BaseDialog {
                              RectF dstRect, float rotateAngle, float opacity) {
         // TODO:
         mFilePathTextView.setText(originalFilePath);
+
         mOriginalBitmap = originalBitmap;
+        mOverlayEditableView.setImageBitmap(mOriginalBitmap);
+
         mRotationSeekBar.setProgress((int)rotateAngle);
         mOpacitySeekBar.setProgress((int)(opacity * 100.f));
     }
