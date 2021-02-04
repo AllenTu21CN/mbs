@@ -25,6 +25,9 @@ import cn.sanbu.avalon.endpoint3.structures.AudioInputDevice;
 import cn.sanbu.avalon.endpoint3.structures.DisplayCell;
 import com.sanbu.media.EPObjectType;
 import com.sanbu.network.TransProtocol;
+
+import cn.sanbu.avalon.endpoint3.structures.RTSPSourceConfig;
+import cn.sanbu.avalon.endpoint3.structures.VolumeReport;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
 import com.sanbu.network.CallingDir;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPEvent;
@@ -198,7 +201,8 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
         // add a ipc video source, get its stream later
         String ipcUrl = "rtsp://10.10.10.10:554/ch3";
         Reconnecting reconnecting = new Reconnecting(-1, 3000, 8000, 100);
-        ipcSource = endpoint3.epAddRTSPSource(ipcUrl, TransProtocol.TCP, reconnecting);
+        ipcSource = endpoint3.epAddRTSPSource(ipcUrl,
+                new RTSPSourceConfig(reconnecting, TransProtocol.TCP));
     }
 
     private void startLR() {
@@ -366,7 +370,7 @@ public class Example implements Endpoint3.EPCallback, Endpoint3.StreamCallback,
     }
 
     @Override
-    public void onVolumeReport(String report) {
+    public void onVolumeReport(VolumeReport report) {
 
     }
 }

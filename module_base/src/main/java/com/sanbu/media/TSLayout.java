@@ -41,7 +41,7 @@ public enum TSLayout {
             */
             new Region(0.0094f, 0.1352f, 0.7353f, 0.7353f),
             new Region(0.7553f, 0.1352f, 0.2353f, 0.2353f)
-    ), Arrays.asList("A_B_LT", "A_B_LT2")),
+    ), Arrays.asList("A_B_LT")),
 
     AB_OUT_RB("右下画外画", Arrays.asList(
             /*
@@ -50,7 +50,19 @@ public enum TSLayout {
             */
             new Region(0.0094f, 0.1352f, 0.7353f, 0.7353f),
             new Region(0.7553f, 0.6352f, 0.2353f, 0.2353f)
-    ), Arrays.asList("A_B_LB", "A_B_LB2")),
+    ), Arrays.asList("A_B_LB")),
+
+    @Deprecated
+    AB_IN_LT("左上画中画", Arrays.asList(
+            new Region(0.0f, 0.0f, 1.0f, 1.0f),
+            new Region(0.0f, 0.0f, 0.25f, 0.25f)
+    ), Arrays.asList("A_B_LT2")),
+
+    @Deprecated
+    AB_IN_LB("左下画中画", Arrays.asList(
+            new Region(0.0f, 0.0f, 1.0f, 1.0f),
+            new Region(0.0f, 0.75f, 0.25f, 0.25f)
+    ), Arrays.asList("A_B_LB2")),
 
     // 三分屏
 

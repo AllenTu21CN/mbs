@@ -26,6 +26,8 @@ import com.sanbu.media.EPObjectType;
 import com.sanbu.network.TransProtocol;
 
 import cn.sanbu.avalon.endpoint3.structures.OutputStatus;
+import cn.sanbu.avalon.endpoint3.structures.RTSPSourceConfig;
+import cn.sanbu.avalon.endpoint3.structures.VolumeReport;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
 import cn.sanbu.avalon.endpoint3.structures.jni.EPEvent;
@@ -81,7 +83,7 @@ public class Endpoint3 {
 
         // Volume report for audio mixers and sources
         // @param report [IN] serialized string which can be parsed by VolumeReportParser
-        void onVolumeReport(String report);
+        void onVolumeReport(VolumeReport report);
     }
 
     // Terminal stream callbacks
@@ -217,7 +219,11 @@ public class Endpoint3 {
         return ret;
     }
 
+    // 0 means there is no report callback
     public int epSetVolumeReportInterval(int intervalInFrames) {
+        if (intervalInFrames < 0)
+            return BaseError.INVALID_PARAM;
+
         int ret = jniEpConfigure(EPConst.EP_PROPERTY_VOLUME_REPORT_INTERVAL, String.valueOf(intervalInFrames));
         EPConst.logAction("epSetVolumeReportInterval", ret, intervalInFrames);
         return ret;
@@ -358,7 +364,7 @@ public class Endpoint3 {
     // @param in_type [IN] type of input parent
     // @param in_id [IN] id of input parent
     // @param in_stream_id [IN] input stream id which can be -1 if input type is mixer
-    // @return @return 0 is suc, or failed.
+    // @return 0 is suc, or failed.
     public int epBindAudioOutputDevice(int device_id, EPObjectType in_type, int in_id, int in_stream_id) {
         if (in_type == EPObjectType.Stream || in_type == EPObjectType.Display ||
                 in_type == EPObjectType.Output) {
@@ -382,7 +388,7 @@ public class Endpoint3 {
     // @param in_type [IN] type of input parent
     // @param in_id [IN] id of input parent
     // @param in_stream_id [IN] input stream id which can be -1 if input type is mixer
-    // @return @return 0 is suc, or failed.
+    // @return 0 is suc, or failed.
     public int epUnBindAudioOutputDevice(int device_id, EPObjectType in_type, int in_id, int in_stream_id) {
         if (in_type == EPObjectType.Stream || in_type == EPObjectType.Display ||
                 in_type == EPObjectType.Output) {
@@ -411,9 +417,16 @@ public class Endpoint3 {
         return ret;
     }
 
+    // @brief Get scene id if the audio mixer
+    // @param mixer_id [IN] id of mixer
+    // @return audio scene id
+    public int epGetAudioSceneId(int mixer_id) {
+        return jniEpGetAudioSceneId(mixer_id);
+    }
+
     // @brief Removes audio mixer
     // @param mixer_id [IN] id of mixer would be removed
-    // @return @return 0 is suc, or failed.
+    // @return 0 is suc, or failed.
     public int epRemoveMixer(int mixer_id) {
         int ret = jniEpRemoveMixer(mixer_id);
         EPConst.logAction("epRemoveMixer", ret, mixer_id);
@@ -424,7 +437,7 @@ public class Endpoint3 {
     // @param mixer_id [IN] mixer id
     // @param volume [IN] mixer volume
     // @param tracks [IN] mixer tracks
-    // @return @return 0 is suc, or failed.
+    // @return 0 is suc, or failed.
     public int epSetMixer(int mixer_id, float volume, MixerTracks tracks) {
         JsonObject object = new Gson().toJsonTree(tracks).getAsJsonObject();
         object.addProperty("volume", volume);
@@ -484,18 +497,22 @@ public class Endpoint3 {
 
     // @brief Adds rtsp source
     // @param url [IN] source url, e.g. rtsp/rtmp/...
-    // @param trans_protocol [IN] protocol of media transport
-    // @param reconnecting [IN] configure of reconnecting
+    // @param config [IN] config of rtsp source
     // @return source_id
-    public int epAddRTSPSource(String url, @Nullable TransProtocol trans_protocol, @NonNull Reconnecting reconnecting) {
+    public int epAddRTSPSource(String url, RTSPSourceConfig config) {
         JsonObject properties = new JsonObject();
-        if (trans_protocol != null && trans_protocol != TransProtocol.UNSPECIFIED)
-            properties.addProperty("protocol", trans_protocol.value);
-        properties.add("reconnect", new Gson().toJsonTree(reconnecting));
+
+        properties.add("reconnect", new Gson().toJsonTree(config.reconnecting));
+
+        if (config.transProtocol != null && config.transProtocol != TransProtocol.UNSPECIFIED) {
+            properties.addProperty("protocol", config.transProtocol.value);
+            LogUtil.w(EPConst.TAG, "TODO: rtsp trans protocol is not used: " + config.transProtocol);
+        }
+
+        properties.addProperty("sps_pps_on", config.attachSpsPps);
+        properties.addProperty("adts_on", config.attachAdts);
+
         String json = properties.toString();
-
-        LogUtil.w(EPConst.TAG, "TODO: rtsp trans protocol is not used: " + trans_protocol);
-
         int ret = jniEpAddSource(url, json);
         EPConst.logAction("epAddSource(RTSP)", ret, url, json);
         return ret;
@@ -1024,8 +1041,10 @@ public class Endpoint3 {
                     break;
 
                 case AUDIO_VOLUME_REPORT:
-                    if (m_ep_cb != null)
-                        m_ep_cb.onVolumeReport(params);
+                    if (m_ep_cb != null) {
+                        VolumeReport report = VolumeReport.parse(params);
+                        m_ep_cb.onVolumeReport(report);
+                    }
                     break;
 
                 default:
@@ -1201,6 +1220,9 @@ public class Endpoint3 {
 
     // Add audio mixer
     private native int jniEpAddMixer();
+
+    // Get audio scene id by mixer id
+    private native int jniEpGetAudioSceneId(int mixer_id);
 
     // Remove audio mixer
     private native int jniEpRemoveMixer(int mixer_id);

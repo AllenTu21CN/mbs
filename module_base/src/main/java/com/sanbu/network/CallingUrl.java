@@ -1,5 +1,6 @@
 package com.sanbu.network;
 
+import com.sanbu.tools.CompareHelper;
 import com.sanbu.tools.LogUtil;
 
 import java.util.regex.Matcher;
@@ -50,6 +51,14 @@ public class CallingUrl {
         return url;
     }
 
+    public boolean isEqual(CallingUrl other) {
+        return (CompareHelper.isEqual(protocol, other.protocol) &&
+                CompareHelper.isEqual(username, other.username) &&
+                CompareHelper.isEqual(address, other.address) &&
+                CompareHelper.isEqual(confId, other.confId) &&
+                port == other.port);
+    }
+
     public static CallingUrl parse(String callingUrl) {
         try {
             CallingUrl result = new CallingUrl();
@@ -87,7 +96,7 @@ public class CallingUrl {
                 <username>
                 <username>:<confId>
             * */
-            regex = "^([\\w]+)(?:\\:(\\d+))?$";
+            regex = "^(\\+?[\\w]+)(?:\\:(\\d+))?$";
             m = Pattern.compile(regex).matcher(url);
             if (m.find()) {
                 if (result.username != null)

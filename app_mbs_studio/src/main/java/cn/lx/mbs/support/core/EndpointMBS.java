@@ -59,6 +59,8 @@ import cn.lx.mbs.support.utils.SPHelper;
 import cn.sanbu.avalon.endpoint3.Endpoint3;
 import cn.sanbu.avalon.endpoint3.structures.AudioInputDevice;
 import cn.sanbu.avalon.endpoint3.structures.AudioOutputDevice;
+import cn.sanbu.avalon.endpoint3.structures.RTSPSourceConfig;
+import cn.sanbu.avalon.endpoint3.structures.VolumeReport;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapabilities;
 import cn.sanbu.avalon.endpoint3.structures.jni.AudioCapability;
 import cn.sanbu.avalon.endpoint3.structures.jni.DisplayConfig;
@@ -545,7 +547,8 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
                 epId = mEndpoint.epAddOriginCamera(source.url, source.resolution);
             } else if (source.type == InputType.RTSP) {
                 TransProtocol protocol = source.overTCP ? TransProtocol.TCP : TransProtocol.RTP;
-                epId = mEndpoint.epAddRTSPSource(source.url, protocol, LXConst.SOURCE_RECONNECTING);
+                epId = mEndpoint.epAddRTSPSource(source.url,
+                        new RTSPSourceConfig(LXConst.SOURCE_RECONNECTING, protocol));
             } else if (source.type == InputType.File) {
                 if (!new File(source.path).exists())
                     return genError("loadInput", BaseError.TARGET_NOT_FOUND,
@@ -806,8 +809,8 @@ public class EndpointMBS implements Endpoint3.EPCallback, Endpoint3.StreamCallba
     }
 
     @Override
-    public void onVolumeReport(String report) {
-        LogUtil.d(CoreUtils.TAG, TAG, "onVolumeReport: " + report);
+    public void onVolumeReport(VolumeReport report) {
+        LogUtil.d(CoreUtils.TAG, TAG, "onVolumeReport");
     }
 
     /////////////////////////////// implementation of Endpoint3.StreamCallback

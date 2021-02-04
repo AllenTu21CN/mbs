@@ -8,4 +8,4 @@ copyJniLib()
   cp $1 $2
 }
 
-copyJniLib /mnt/builds/develop/multimedia/avalon/ep-dev-r-agent/202101201502-ecbfc694/lib/jniLibs/arm64-v8a/libep3_android.so arm64-v8a/
+copyJniLib /mnt/builds/develop/multimedia/avalon/ep-dev-r-agent/202102041105-820e8a25/lib/jniLibs/arm64-v8a/libep3_android.so arm64-v8a/

@@ -286,11 +286,8 @@ public class TimeUtil {
         if (null == format)
             format = "yyyy-MM-dd HH:mm:ss";
 
-        String res;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
-        Date date = new Date(time);
-        res = simpleDateFormat.format(date);
-        return res;
+        return simpleDateFormat.format(new Date(time));
     }
 
     public static String getDateByStamp(long stamp) {

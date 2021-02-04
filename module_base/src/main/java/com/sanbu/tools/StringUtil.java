@@ -87,4 +87,28 @@ public class StringUtil {
         }
         return true;
     }
+
+    // refer to String.indexOf
+    public static int indexOf(String src, int ch, int fromIndex, int endIndex) {
+        final int max = endIndex + 1;
+        if (fromIndex < 0) {
+            fromIndex = 0;
+        } else if (fromIndex >= max) {
+            // Note: fromIndex might be near -1>>>1.
+            return -1;
+        }
+
+        if (ch < Character.MIN_SUPPLEMENTARY_CODE_POINT) {
+            // handle most cases here (ch is a BMP code point or a
+            // negative value (invalid code point))
+            for (int i = fromIndex; i < max; i++) {
+                if (src.charAt(i) == ch) {
+                    return i;
+                }
+            }
+            return -1;
+        } else {
+            return -1;
+        }
+    }
 }
