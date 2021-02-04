@@ -3,6 +3,7 @@ package cn.lx.mbs.ui.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.TextWatcher;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -19,6 +21,14 @@ import cn.lx.mbs.R;
 import cn.sanbu.avalon.media.TextRenderer;
 
 public class OverlayAddTextDialog extends BaseDialog {
+
+    public interface OnSaveListener {
+        void onSave(String text, String fontFamily,
+                    boolean isBold, boolean isItalic, boolean isUnderlined,
+                    android.text.Layout.Alignment alignment,
+                    Color textColor, Color backgroundColor, float backgroundOpacity, float backgroundRadius,
+                    RectF dstRect, float rotateAngle);
+    }
 
     private static final Color[] TEXT_COLORS = new Color[] {
             Color.valueOf(0xFFC00000),
@@ -79,6 +89,11 @@ public class OverlayAddTextDialog extends BaseDialog {
     private SeekBar mBgRadiusSeekBar;
     private TextView mBgRadiusTextView;
 
+    private Button mCancelButton;
+    private Button mSaveButton;
+
+    private OnSaveListener mOnSaveListener;
+
     public OverlayAddTextDialog(Context context, int width, int height) {
         super(context, width, height);
 
@@ -86,6 +101,10 @@ public class OverlayAddTextDialog extends BaseDialog {
         setupListener();
 
         initAsDefault();
+    }
+
+    public void setOnSaveListener(OnSaveListener listener) {
+        mOnSaveListener = listener;
     }
 
     private void setupUi() {
@@ -123,6 +142,10 @@ public class OverlayAddTextDialog extends BaseDialog {
         mBgRadiusSeekBar.setMin(0);
         mBgRadiusSeekBar.setMax(50);
         mBgRadiusTextView = mView.findViewById(R.id.bg_radius_value);
+
+        mCancelButton = mView.findViewById(R.id.cancel_button);
+
+        mSaveButton = mView.findViewById(R.id.save_button);
     }
 
     private void setupListener() {
@@ -225,6 +248,117 @@ public class OverlayAddTextDialog extends BaseDialog {
 
             }
         });
+
+        mCancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mOnSaveListener != null) {
+                    String text = mTextEditText.getText().toString();
+                    String fontFamily = (String) mFontSpinner.getSelectedItem();
+                    boolean isBold = mFontStyleToolBar.isBold();
+                    boolean isItalic = mFontStyleToolBar.isItalic();
+                    boolean isUnderlined = mFontStyleToolBar.isUnderlined();
+                    Layout.Alignment alignment = mFontStyleToolBar.getAlignment();
+                    Color textColor = mTextColorPicker.getSelectedColor();
+                    Color bgColor = mBgColorPicker.getSelectedColor();
+                    float bgOpacity = (float) mBgOpacitySeekBar.getProgress() / 100.f;
+                    float bgRadius = (float) mBgRadiusSeekBar.getProgress() / 100.f;
+
+                    mOnSaveListener.onSave(text, fontFamily, isBold, isItalic, isUnderlined,
+                            alignment, textColor, bgColor, bgOpacity, bgRadius,
+                            null, 0.0f);
+                }
+
+                dismiss();
+            }
+        });
+    }
+
+    public String getText() {
+        return mTextEditText.getText().toString();
+    }
+
+    public String getFontFamily() {
+        return (String) mFontSpinner.getSelectedItem();
+    }
+
+    public boolean getFontStyleIsBold() {
+        return mFontStyleToolBar.isBold();
+    }
+
+    public boolean getFontStyleIsItalic() {
+        return mFontStyleToolBar.isItalic();
+    }
+
+    public boolean getFontStyleIsUnderlined() {
+        return mFontStyleToolBar.isUnderlined();
+    }
+
+    public android.text.Layout.Alignment getFontStyleAlignment() {
+        return mFontStyleToolBar.getAlignment();
+    }
+
+    public Color getTextColor() {
+        return mTextColorPicker.getSelectedColor();
+    }
+
+    public Color getBackgroundColor() {
+        return mBgColorPicker.getSelectedColor();
+    }
+
+    public float getBackgroundOpacity() {
+        return (float) mBgOpacitySeekBar.getProgress() / 100.f;
+    }
+
+    public float getBackgroundRadius() {
+        return (float) mBgRadiusSeekBar.getProgress() / 100.f;
+    }
+
+    public RectF getDstRect() {
+        // TODO:
+        return null;
+    }
+
+    public float getRotateAngle() {
+        // TODO:
+        return 0.0f;
+    }
+
+    public void updateFields(String text, String fontFamily,
+            boolean isBold, boolean isItalic, boolean isUnderlined,
+            android.text.Layout.Alignment alignment,
+            Color textColor, Color backgroundColor, float backgroundOpacity, float backgroundRadius,
+            RectF dstRect, float rotateAngle) {
+
+        mTextEditText.setText(text);
+
+        int fontSpinnerIndex = 0;
+        for (int i = 0; i < SYSTEM_DEFAULT_FONTS.length; i++) {
+            if (SYSTEM_DEFAULT_FONTS[i].equals(fontFamily)) {
+                fontSpinnerIndex = i;
+                break;
+            }
+        }
+        mFontSpinner.setSelection(fontSpinnerIndex);
+
+        mFontStyleToolBar.setStyle(isBold, isItalic, isUnderlined, alignment);
+
+        mTextColorPicker.setSelectedColor(textColor);
+
+        mBgColorPicker.setSelectedColor(backgroundColor);
+
+        mBgOpacitySeekBar.setProgress((int)(backgroundOpacity * 100.f));
+
+        mBgRadiusSeekBar.setProgress((int)(backgroundRadius * 100.f));
+
+        // TODO: SET RECT AND RATATE ANGLE
     }
 
     private void initAsDefault() {
@@ -251,12 +385,15 @@ public class OverlayAddTextDialog extends BaseDialog {
 
         float bgRadius = (float) mBgRadiusSeekBar.getProgress() / 100.f;
 
-        Bitmap img = TextRenderer.renderTextAsBitmap(
-                text,
-                fontFamily.toLowerCase(), textColor.toArgb(),
-                isBold, isItalic, isUnderlined, alignment,
-                bgColorInt, bgRadius, 1920, 1080);
+        Bitmap bitmap = null;
+        if (text != null && !text.isEmpty()) {
+            bitmap = TextRenderer.renderTextAsBitmap(
+                    text,
+                    fontFamily.toLowerCase(), textColor.toArgb(),
+                    isBold, isItalic, isUnderlined, alignment,
+                    bgColorInt, bgRadius, 1920, 1080);
+        }
 
-        mOverlayEditableView.setImageBitmap(img);
+        mOverlayEditableView.setImageBitmap(bitmap);
     }
 }

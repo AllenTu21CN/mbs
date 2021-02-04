@@ -1,11 +1,15 @@
 package cn.lx.mbs.ui.model;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.RectF;
 
 import com.google.gson.Gson;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -20,40 +24,41 @@ public class SceneOverlayDataModel {
         public final static int TYPE_IMAGE = 3;
         public final static int TYPE_TEXT = 4;
 
-        public String name;
+        //public String name;
         public int type;
         public boolean isVisiable;
         public boolean isLocked;
 
-        public RectF srcRect;
-        public RectF dstRect;
-        public float rotateAngle;
-        public float opacity;
-
-        public Bitmap thumbnailBitmap;
+        //public Bitmap thumbnailBitmap;
 
         public Overlay() {
             // TODO:
         }
 
-        public void updateThumbnail(int width, int height) {
-            // Draw checkerborad
-            final int CELL_SIZE = Utils.PX(5);
-            thumbnailBitmap = Utils.generateCheckerBoardBitmap(width, height, CELL_SIZE, CELL_SIZE);
+        public int getType() {
+            return type;
+        }
 
-            // TODO: Draw content on top
+        public String getTitle() {
+            return "";
+        }
+
+        public Bitmap getThumbnail(int width, int height) {
+            // TODO: Cache thumbnail bitmap for performance optimization
+            final int CELL_SIZE = Utils.PX(5);
+            return Utils.generateCheckerBoardBitmap(width, height, CELL_SIZE, CELL_SIZE);
         }
 
     } // End of class Overlay
 
-    public static class GroupOverlay extends Overlay {
+    /*public static class GroupOverlay extends Overlay {
         // TODO:
         public List<Overlay> children;
 
         public GroupOverlay() {
             type = TYPE_GROUP;
         }
-    }
+    }*/
 
     public static class VideoOverlay extends Overlay {
         // TODO:
@@ -65,27 +70,56 @@ public class SceneOverlayDataModel {
     }
 
     public static class ImageOverlay extends Overlay {
-        // TODO:
-        public String filePath;
-        public Bitmap orignalBitmap;
+        public String originalFilePath;
+        public Bitmap orignalBitmap;    // Cached if original file missing
+
+        public RectF dstRect;
+        public float rotateAngle;
+        public float opacity;
 
         public ImageOverlay() {
             type = TYPE_IMAGE;
         }
+
+        @Override
+        public String getTitle() {
+            if (originalFilePath != null && !originalFilePath.isEmpty()) {
+                Path path = Paths.get(originalFilePath);
+                return path.getFileName().toString();
+            } else {
+                return "<No image>";
+            }
+        }
+
     }
 
     public static class TextOverlay extends Overlay {
-        // TODO:
         public String text;
-        public float textSize;
-        public String font;
-        public int backgroundColor;
+        public String fontFamily;
+        public boolean isBold;
+        public boolean isItalic;
+        public boolean isUnderlined;
+        public android.text.Layout.Alignment alignment;
+        public Color textColor;
+        public Color backgroundColor;
         public float backgroundOpacity;
-        public int[] paddings;
+        public float backgroundRadius;
+
+        public RectF dstRect;
+        public float rotateAngle;
         public Bitmap renderedBitmap;
 
         public TextOverlay() {
             type = TYPE_TEXT;
+        }
+
+        @Override
+        public String getTitle() {
+            if (text != null && !text.isEmpty()) {
+                return text;
+            } else {
+                return "<No text>";
+            }
         }
     }
 
@@ -115,6 +149,10 @@ public class SceneOverlayDataModel {
 
     public void clear() {
         list.clear();
+    }
+
+    public void swap(int from, int to) {
+        Collections.swap(list, from, to);
     }
 
     public boolean fromJson(String json) {

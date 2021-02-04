@@ -1,9 +1,12 @@
 package cn.lx.mbs.ui.view;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.RectF;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -11,17 +14,27 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
 import cn.lx.mbs.R;
 
 import cn.lx.mbs.ui.MainActivity;
 
 public class OverlayAddImageDialog extends BaseDialog {
 
+    public interface OnSaveListener {
+        void onSave(String originalFilePath, Bitmap originalBitmap,
+                    RectF dstRect, float rotateAngle, float opacity);
+    }
+
     private static final String TAG = OverlayAddImageDialog.class.getSimpleName();
 
     private View mView;
     private ImageView mSceneEditorBgImageView;
     private OverlayEditableView mOverlayEditableView;
+    private TextView mFilePathTextView;
     private TextView mPositionValueTextView;
     private SeekBar mScaleSeekBar;
     private TextView mScaleValueTextView;
@@ -31,20 +44,69 @@ public class OverlayAddImageDialog extends BaseDialog {
     private TextView mOpacityValueTextView;
 
     private Button mOpenButton;
+    private Button mSaveButton;
 
     private Bitmap mSceneEditorBgBitmap;
+    private Bitmap mOriginalBitmap;
+
+    private OnSaveListener mOnSaveListener;
 
     public OverlayAddImageDialog(Context context, int width, int height) {
         super(context, width, height);
 
-        // TODO:
+        setupUi();
+        setupListener();
+
+        // TEST ////////////////////////////////////////////////////////////////////////////////////
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inScaled = false;
+        Bitmap testImg = BitmapFactory.decodeResource(context.getResources(), R.drawable.test_image_1, options);
+        mOverlayEditableView.setImageBitmap(testImg);
+        //mOverlayEditableView.setRotateAngle(45);
+        // TEST ENDS ///////////////////////////////////////////////////////////////////////////////
+
+    }
+
+    public void setmOnSaveListener(OnSaveListener listener) {
+        mOnSaveListener = listener;
+    }
+
+    private void setupUi() {
         setTitle("Add Image Overlay");
+
         mView = mInflater.inflate(R.layout.dialog_overlay_add_image, null);
         setContent(mView);
 
         Utils.adjustAll((ViewGroup)mView);
 
         mSceneEditorBgImageView = mView.findViewById(R.id.scene_editor_bg);
+        mOverlayEditableView = mView.findViewById(R.id.scene_editor_overlay);
+
+        mFilePathTextView = mView.findViewById(R.id.file_path_value);
+        mPositionValueTextView = mView.findViewById(R.id.position_value);
+        mScaleSeekBar = mView.findViewById(R.id.scale_seek_bar);
+        mScaleValueTextView = mView.findViewById(R.id.scale_value);
+        mRotationSeekBar = mView.findViewById(R.id.rotation_seek_bar);
+        mRotationValueTextView = mView.findViewById(R.id.rotation_value);
+        mOpacitySeekBar = mView.findViewById(R.id.opacity_seek_bar);
+        mOpacityValueTextView = mView.findViewById(R.id.opacity_value);
+        mOpenButton = mView.findViewById(R.id.open_button);
+        mSaveButton = mView.findViewById(R.id.save_button);
+
+        //mScaleSeekBar.setMin(1);
+        mScaleSeekBar.setMax(500);
+        mScaleSeekBar.setProgress(100);
+
+        //mRotationSeekBar.setMin(0);
+        mRotationSeekBar.setMax(360);
+        mRotationSeekBar.setProgress(0);
+
+        //mOpacitySeekBar.setMin(0);
+        mOpacitySeekBar.setMax(100);
+        mOpacitySeekBar.setProgress(100);
+    }
+
+    private void setupListener() {
         mSceneEditorBgImageView.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -57,10 +119,8 @@ public class OverlayAddImageDialog extends BaseDialog {
                                 CELL_SIZE, CELL_SIZE);
                         mSceneEditorBgImageView.setImageBitmap(mSceneEditorBgBitmap);
                     }
-        });
+                });
 
-        mOverlayEditableView = mView.findViewById(R.id.scene_editor_overlay);
-        mPositionValueTextView = mView.findViewById(R.id.position_value);
         mOverlayEditableView.setOnPositionChangeListener(new OverlayEditableView.OnPositionChangeListener() {
             @Override
             public void onPositionChanged(int left, int top, int right, int bottom, int centerX, int centerY) {
@@ -74,27 +134,10 @@ public class OverlayAddImageDialog extends BaseDialog {
                 float cy = (float)centerY / (float)bgHeight;
                 mPositionValueTextView.setText(
                         String.format("left=%.3f, top=%.3f, right=%.3f, bottom=%.3f, center=[%.3f, %.3f]",
-                        l, t, r, b, cx, cy));
+                                l, t, r, b, cx, cy));
             }
         });
 
-        // TEST ////////////////////////////////////////////////////////////////////////////////////
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inScaled = false;
-        Bitmap testImg = BitmapFactory.decodeResource(context.getResources(), R.drawable.test_image_1, options);
-        mOverlayEditableView.setImageBitmap(testImg);
-        //mOverlayEditableView.setRotateAngle(45);
-        // TEST ENDS ///////////////////////////////////////////////////////////////////////////////
-
-        mScaleSeekBar = mView.findViewById(R.id.scale_seek_bar);
-        mScaleValueTextView = mView.findViewById(R.id.scale_value);
-        mRotationSeekBar = mView.findViewById(R.id.rotation_seek_bar);
-        mRotationValueTextView = mView.findViewById(R.id.rotation_value);
-        mOpacitySeekBar = mView.findViewById(R.id.opacity_seek_bar);
-        mOpacityValueTextView = mView.findViewById(R.id.opacity_value);
-
-        //mScaleSeekBar.setMin(1);
-        mScaleSeekBar.setMax(500);
         mScaleSeekBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
@@ -114,8 +157,7 @@ public class OverlayAddImageDialog extends BaseDialog {
             }
         });
 
-        //mRotationSeekBar.setMin(0);
-        mRotationSeekBar.setMax(360);
+
         mRotationSeekBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
@@ -134,8 +176,7 @@ public class OverlayAddImageDialog extends BaseDialog {
             }
         });
 
-        //mOpacitySeekBar.setMin(0);
-        mOpacitySeekBar.setMax(100);
+
         mOpacitySeekBar.setOnSeekBarChangeListener(new android.widget.SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(android.widget.SeekBar seekBar, int progress, boolean fromUser) {
@@ -154,19 +195,84 @@ public class OverlayAddImageDialog extends BaseDialog {
             }
         });
 
-        // Initialize value
-        mScaleSeekBar.setProgress(100);
-        mRotationSeekBar.setProgress(0);
-        mOpacitySeekBar.setProgress(100);
-
-        mOpenButton = mView.findViewById(R.id.open_button);
         mOpenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // TODO:
                 MainActivity ma = (MainActivity) mContext;
-                ma.showPickImageDialog();
+                ma.showImageOverlayPickDialog();
             }
         });
+
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO:
+                if (mOnSaveListener != null) {
+                    String originalFilePath = mFilePathTextView.getText().toString();
+                    RectF dstRect = null;
+                    float rotateAngle = mRotationSeekBar.getProgress();
+                    float opacity = (float) mOpacitySeekBar.getProgress() / 100.f;
+
+                    mOnSaveListener.onSave(originalFilePath, mOriginalBitmap, dstRect, rotateAngle, opacity);
+                }
+
+                dismiss();
+            }
+        });
+    }
+
+    public void setExternalImageUri(Uri uri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(mContext.getContentResolver(), uri);
+            mOverlayEditableView.setImageBitmap(bitmap);
+
+            mFilePathTextView.setText(uri.toString());
+            mOriginalBitmap = bitmap;
+
+            // Center in scene and keep aspect ratio
+            // TODO:
+            int maxWidth = mSceneEditorBgImageView.getWidth();
+            int maxHeight = mSceneEditorBgImageView.getHeight();
+            int srcWidth = bitmap.getWidth();
+            int srcHeight = bitmap.getHeight();
+
+            int tgtWidth = srcWidth;
+            int tgtHeight = srcHeight;
+
+            if (srcWidth > maxWidth || srcHeight > maxHeight) {
+                float ratioOfWidth = (float)srcWidth / (float)maxWidth;
+                float ratioOfHeight = (float)srcHeight / (float)maxHeight;
+                if (ratioOfWidth > ratioOfHeight) {
+                    tgtWidth /= ratioOfWidth;
+                    tgtHeight /= ratioOfWidth;
+                    mOverlayEditableView.setScaleFactor(ratioOfWidth);
+                } else {
+                    tgtWidth /= ratioOfHeight;
+                    tgtHeight /= ratioOfHeight;
+                    mOverlayEditableView.setScaleFactor(ratioOfHeight);
+                }
+            }
+
+            mOverlayEditableView.setX(mSceneEditorBgImageView.getX() + (maxWidth - tgtWidth) / 2.f);
+            mOverlayEditableView.setY(mSceneEditorBgImageView.getY() + (maxHeight - tgtHeight) / 2.f);
+
+        } catch (FileNotFoundException e) {
+            // TODO: File not found
+        } catch (IOException e) {
+            // TODO: IO exception
+        }
+    }
+
+    public void updateFields(String originalFilePath, Bitmap originalBitmap,
+                             RectF dstRect, float rotateAngle, float opacity) {
+        // TODO:
+        mFilePathTextView.setText(originalFilePath);
+
+        mOriginalBitmap = originalBitmap;
+        mOverlayEditableView.setImageBitmap(mOriginalBitmap);
+
+        mRotationSeekBar.setProgress((int)rotateAngle);
+        mOpacitySeekBar.setProgress((int)(opacity * 100.f));
     }
 }

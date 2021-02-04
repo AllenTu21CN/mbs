@@ -278,6 +278,17 @@
         android:textSize="28px" />
 
     <Button
+        android:id="@+id/cancel_button"
+        android:layout_width="180px"
+        android:layout_height="60px"
+        android:layout_margin="18px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/save_button"
+        android:background="@drawable/common_button_bg"
+        android:text="Cancel"
+        android:textSize="28px"/>
+
+    <Button
         android:id="@+id/save_button"
         android:layout_width="180px"
         android:layout_height="60px"

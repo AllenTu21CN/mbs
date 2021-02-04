@@ -17,6 +17,10 @@ import cn.lx.mbs.support.structures.Layout;
 import cn.lx.mbs.ui.MainActivity;
 
 public class PreviewArea {
+    public interface OnActiveSceneChangeListener {
+        void onActiveSceneChanged(int sceneIndex);
+    }
+
     private static final String TAG = PreviewArea.class.getSimpleName();
     private static final int SCENE_COUNT = 9;
 
@@ -27,9 +31,17 @@ public class PreviewArea {
     private SceneButton[] mSceneButtons = new SceneButton[SCENE_COUNT];
 
     private int mActiveSceneIndex = -1;
+    private OnActiveSceneChangeListener mOnActiveSceneChangeListener;
 
     public PreviewArea(Activity activity) {
         mActivity = activity;
+    }
+
+    public void setOnActiveSceneChangeListener(OnActiveSceneChangeListener listener) {
+        mOnActiveSceneChangeListener = listener;
+    }
+    public int getActiveSceneIndex() {
+        return mActiveSceneIndex;
     }
 
     public void init() {
@@ -86,8 +98,12 @@ public class PreviewArea {
                             }
                         }
 
-                        Layout layout = ((MainActivity) mActivity).getSceneLayout(btn.mSceneId);
-                        MBS.getInstance().setPVWLayout(layout, null);
+                        if (mOnActiveSceneChangeListener != null) {
+                            mOnActiveSceneChangeListener.onActiveSceneChanged(mActiveSceneIndex);
+                        }
+
+                        //Layout layout = ((MainActivity) mActivity).getSceneLayout(btn.mSceneId);
+                        //MBS.getInstance().setPVWLayout(layout, null);
                     }
                 }
             });
